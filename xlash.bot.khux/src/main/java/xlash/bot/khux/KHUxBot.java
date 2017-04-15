@@ -21,7 +21,7 @@ public class KHUxBot {
 	
 	public static void main(String[] args){
 		//Enter your token here in the bot contructor.
-		new KHUxBot("");
+		new KHUxBot("MzAwMTE3OTUwNDU3NzA4NTYw.C9Px2Q.Rm54g9X4L84JIg81yIaF8lX_wQQ");
 	}
 	
 	public HashMap<String, String> nicknames = new HashMap<String, String>();
@@ -145,7 +145,7 @@ public class KHUxBot {
 			name = name.replace("KH 3D ", "KHDDD");
 			name = name.replace("Timeless River", "TR");
 			name = name.replace("Haloween", "HT");
-			name = name.replace("Key Art #", "KA");
+			name = name.replace("Key Art ", "KA");
 			name = name.replace("(Medal)", "");
 			if(name.contains("Illustrated")){
 				name = name.replace("Illustrated", "i");
