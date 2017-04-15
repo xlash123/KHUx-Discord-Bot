@@ -1,11 +1,8 @@
 package xlash.bot.khux;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Random;
 
 
 import org.jsoup.Jsoup;
@@ -21,6 +18,11 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 
 public class KHUxBot {
+	
+	public static void main(String[] args){
+		//Enter your token here in the bot contructor.
+		new KHUxBot("");
+	}
 	
 	public HashMap<String, String> nicknames = new HashMap<String, String>();
 	
@@ -178,8 +180,4 @@ public class KHUxBot {
 		nicknames.put("BronzeDonald", "Donald A");
 	}
 	
-	public static void main(String[] args){
-		new KHUxBot("");
-	}
-
 }
