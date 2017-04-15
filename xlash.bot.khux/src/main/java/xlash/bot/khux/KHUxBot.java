@@ -179,7 +179,7 @@ public class KHUxBot {
 	}
 	
 	public static void main(String[] args){
-		new KHUxBot("MzAwMTE3OTUwNDU3NzA4NTYw.C9M4SQ.FOPy64e23Dnhmgw27FuV7m5nyik");
+		new KHUxBot("");
 	}
 
 }
