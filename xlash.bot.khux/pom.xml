@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>xlash</groupId>
+  <artifactId>xlash.bot.khux</artifactId>
+  <version>1.0</version>
+  <name>KHUx Bot</name>
+  <description>A Discord bot that gets medal descriptions for the game KHUx.</description>
+  <repositories>
+  <repository>
+  <id>javacord-repo</id>
+  <url>http://repo.bastian-oppermann.de</url>
+</repository>
+  </repositories>
+  <dependencies>
+  <dependency>
+  <groupId>de.btobastian.javacord</groupId>
+  <artifactId>javacord</artifactId>
+  <version>2.0.14</version>
+   <!-- This will use the shaded javacord which contains all required dependencies -->
+  <classifier>shaded</classifier>
+</dependency>
+<!-- A SLF4J comaptible logging framework. I would recommend to use logback -->
+<dependency>
+  <groupId>ch.qos.logback</groupId>
+  <artifactId>logback-classic</artifactId>
+  <version>1.1.3</version>
+</dependency>
+<dependency>
+  <!-- jsoup HTML parser library @ http://jsoup.org/ -->
+  <groupId>org.jsoup</groupId>
+  <artifactId>jsoup</artifactId>
+  <version>1.10.2</version>
+</dependency>
+  </dependencies>
+</project>
+
