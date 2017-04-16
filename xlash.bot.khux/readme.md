@@ -32,6 +32,8 @@ Download the [latest build](https://github.com/xlash123/KHUx-Discord-Bot/release
 java -jar "[filepath]" [Discord App ID] (optional: channel ID for auto Twitter updates )
 ```
 A good explaination of how to get the Discord App ID is explained [here](https://github.com/BtoBastian/Javacord/blob/master/README.md) in the Javacord README.
+<br>
+If you're still lost, here's a helpful [Reddit thread](https://www.reddit.com/r/KingdomHearts/comments/65puab/khux_easy_guide_to_run_xlash123s_khux_bot_in_your/), thanks to /u/MaxialstarOA.
 
 ## Questions?
 
