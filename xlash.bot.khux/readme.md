@@ -1,8 +1,8 @@
-#KHUx Info Bot
+# KHUx Info Bot
 
 This is a bot I created to make it easier to retrieve medal info, along with auto posting updates from Twitter if you so choose. This was made using the libraries [Javacord](https://github.com/BtoBastian/Javacord/) by BtoBastian and [JSoup](https://jsoup.org/).
 
-##How to use
+## How to use
 
 Right now, there is only one command, but I plan to add more features in the future, so expect more.
 <br>
@@ -25,7 +25,7 @@ Note that you can either use the medal's full name or nicknames based on the fol
 <br>
 Some commonly used names, such as Tieri and Pooglet, are also valid. If a common nickname is not present, let me know.
 
-##How to install
+## How to install
 
 Download the latest build or build from the source (using Maven). Then run the jar with the following command line:
 ```cmd
@@ -33,6 +33,6 @@ java -jar "[filepath]" [Discord App ID] (optional: channel ID for auto Twitter u
 ```
 A good explaination of how to get the Discord App ID is explained [here](https://github.com/BtoBastian/Javacord/blob/master/README.md) in the Javacord README.
 
-##Questions?
+## Questions?
 
 Any bugs, suggestions, or questions can be posted as an issue. I'll respond to anything I get.
