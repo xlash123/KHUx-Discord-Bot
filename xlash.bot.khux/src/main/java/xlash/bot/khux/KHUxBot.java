@@ -19,44 +19,53 @@ import de.btobastian.javacord.listener.message.MessageCreateListener;
 
 public class KHUxBot {
 	
+	public String lastTwitterUpdate;
+	public String updateChannel;
+	
 	public static void main(String[] args){
 		//Enter your token here in the bot contructor.
-		new KHUxBot("MzAwMTE3OTUwNDU3NzA4NTYw.C9Px2Q.Rm54g9X4L84JIg81yIaF8lX_wQQ");
+		new KHUxBot("MzAwMTE3OTUwNDU3NzA4NTYw.C9Px2Q.Rm54g9X4L84JIg81yIaF8lX_wQQ", "updates");
 	}
 	
 	public HashMap<String, String> nicknames = new HashMap<String, String>();
 	
 	public HashMap<String, String> medalNamesAndLink;
 	
-	public KHUxBot(String token){
+	public KHUxBot(String token, String updateChannel){
+		this.updateChannel = updateChannel;
 		this.initialize();
-		DiscordAPI api = Javacord.getApi(token, true);
-        // connect
-        api.connect(new FutureCallback<DiscordAPI>() {
-            public void onSuccess(DiscordAPI api) {
-                // register listener
-                api.registerListener(new MessageCreateListener() {
-                    public void onMessageCreate(DiscordAPI api, Message message) {
-                        // check the content of the message
-                        if (message.getContent().startsWith("!medal ")) {
-                            String medal = message.getContent().substring(7);
-                            System.out.println("Medal in question: " + medal);
-                            String realName = getRealNameByNickname(medal);
-                            System.out.println("Interpreted as: " + realName);
-                            if(realName != null){
-                            	getMedalInfo(realName, message);
-                            }else{
-                            	message.reply("I don't know what medal that is.");
-                            }
-                        }
-                    }
-                });
-            }
-
-            public void onFailure(Throwable t) {
-                t.printStackTrace();
-            }
-        });
+		final DiscordAPI api = Javacord.getApi(token, true);
+        connect(api);
+        Thread refresh = new Thread("Refresh"){
+        	@Override
+        	public void run(){
+        		while(true){
+        			try {
+						Thread.sleep(21600000l);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+        			System.out.println("Refreshing medal list. Rebooting...");
+        			api.disconnect();
+        			initialize();
+        			connect(api);
+        			System.out.println("Complete!");
+        		}
+        	}
+        };
+        Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
+        	@Override
+        	public void run(){
+        		try {
+					Thread.sleep(120000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+        		getTwitterUpdate(api);
+        	}
+        };
+        refresh.start();
+        grabTwitterUpdate.start();
 	}
 	
 	public void initialize(){
@@ -66,8 +75,29 @@ public class KHUxBot {
 		getMedalList();
 		System.out.println("Got medal list");
 		createNicknames();
+		lastTwitterUpdate = getTwitterUpdateLink();
 		System.out.println("Created nicknames");
 		System.out.println("Initialization finished!");
+	}
+	
+	public void getTwitterUpdate(DiscordAPI api){
+		String link = getTwitterUpdateLink();
+		if(!link.equals(lastTwitterUpdate)){
+			lastTwitterUpdate = link;
+			api.getChannelById(this.updateChannel).sendMessage(link);
+		}
+	}
+	
+	public String getTwitterUpdateLink(){
+		try {
+			Document doc = Jsoup.connect("https://twitter.com/kh_ux_na").get();
+			String shortUrl = doc.getElementsByClass("js-tweet-text-container").get(0).getElementsByTag("a").get(1).attr("href");
+			Document doc2 = Jsoup.connect(shortUrl).get();
+			return doc2.getElementsByTag("title").text();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public String getRealNameByNickname(String name){
@@ -178,6 +208,34 @@ public class KHUxBot {
 		nicknames.put("Tieri", "Illustrated KH II Kairi");
 		nicknames.put("Pooglet", "Pooh & Piglet");
 		nicknames.put("BronzeDonald", "Donald A");
+	}
+	
+	public void connect(DiscordAPI api){
+		api.connect(new FutureCallback<DiscordAPI>() {
+            public void onSuccess(DiscordAPI api) {
+                // register listener
+                api.registerListener(new MessageCreateListener() {
+                    public void onMessageCreate(DiscordAPI api, Message message) {
+                        // check the content of the message
+                        if (message.getContent().startsWith("!medal ")) {
+                            String medal = message.getContent().substring(7);
+                            System.out.println("Medal in question: " + medal);
+                            String realName = getRealNameByNickname(medal);
+                            System.out.println("Interpreted as: " + realName);
+                            if(realName != null){
+                            	getMedalInfo(realName, message);
+                            }else{
+                            	message.reply("I don't know what medal that is.");
+                            }
+                        }
+                    }
+                });
+            }
+
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+            }
+        });
 	}
 	
 }
