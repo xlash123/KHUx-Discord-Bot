@@ -201,9 +201,9 @@ public class KHUxBot {
 			name = name.replace("KH II ", "KH2");
 			name = name.replaceAll("The ", "");
 			name = name.replace("WORLD OF FF", "WOFF");
-			name = name.replace("KH 3D ", "KHDDD");
 			name = name.replace("Timeless River", "TR");
-			name = name.replace("Haloween", "HT");
+			name = name.replace("Halloween", "HT");
+			name = name.replace("Atlantica", "AT");
 			name = name.replace("Key Art ", "KA");
 			name = name.replace("(Medal)", "");
 			if(name.contains("Illustrated")){
