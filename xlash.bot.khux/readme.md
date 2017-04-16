@@ -27,7 +27,7 @@ Some commonly used names, such as Tieri and Pooglet, are also valid. If a common
 
 ## How to install
 
-Download the latest build or build from the source (using Maven). Then run the jar with the following command line:
+Download the [latest build](https://github.com/xlash123/KHUx-Discord-Bot/releases/) or build from the source (using Maven). Then run the jar with the following command line:
 ```cmd
 java -jar "[filepath]" [Discord App ID] (optional: channel ID for auto Twitter updates )
 ```
