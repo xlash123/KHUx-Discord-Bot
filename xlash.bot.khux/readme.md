@@ -10,7 +10,7 @@ To get the details of any medal currently in the NA version of the game, use the
 
 *!medal [medal name/nickname]*
 <br>
-Note that you can either use the medal's full name or nicknames based on the following conventions:
+Note that you can either use the medal's full name or nicknames based on the following conventions (capitals are completely ignored):
 <br>
 + "Person & Person" will be shorted to their initals separated by &. Ex: Xehanort & Vanitas = X&V.
 + "Illustrated" will be replaced by 'i'. Ex: Illustrated Ansem = iAnsem, Illustrated Belle & Beast = iB&B.
