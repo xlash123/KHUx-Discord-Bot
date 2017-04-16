@@ -14,28 +14,48 @@ import com.google.common.util.concurrent.FutureCallback;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
+import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
+import de.btobastian.javacord.listener.server.ServerJoinListener;
 
 public class KHUxBot {
 	
 	public String lastTwitterUpdate;
 	public String updateChannel;
+	public DiscordAPI api;
+	public boolean shouldUpdate;
+	
+	public volatile boolean holdOn;
 	
 	public static void main(String[] args){
-		//Enter your token here in the bot contructor.
-		new KHUxBot("MzAwMTE3OTUwNDU3NzA4NTYw.C9Px2Q.Rm54g9X4L84JIg81yIaF8lX_wQQ", "updates");
+		String token = "";
+		String updateChannel = "";
+		if(args.length > 0){
+			token = args[0];
+			if(args.length > 1){
+				updateChannel = args[1];
+			}
+			new KHUxBot(token, updateChannel);
+			return;
+		}
+		System.err.println("You must define a token for the bot.");
 	}
 	
 	public HashMap<String, String> nicknames = new HashMap<String, String>();
 	
 	public HashMap<String, String> medalNamesAndLink;
 	
-	public KHUxBot(String token, String updateChannel){
+	public KHUxBot(final String token, String updateChannel){
 		this.updateChannel = updateChannel;
 		this.initialize();
-		final DiscordAPI api = Javacord.getApi(token, true);
+		api = Javacord.getApi(token, true);
         connect(api);
+        System.out.println("Waiting for server response...");
+        while(api.getServers().size()==0){}
+        System.out.println("Server connected! Let's go!");
+        this.shouldUpdate = api.getChannelById(updateChannel)!=null;
         Thread refresh = new Thread("Refresh"){
         	@Override
         	public void run(){
@@ -45,27 +65,36 @@ public class KHUxBot {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+        			while(holdOn){}
         			System.out.println("Refreshing medal list. Rebooting...");
+        			holdOn = true;
         			api.disconnect();
         			initialize();
+        			api = Javacord.getApi(token, true);
         			connect(api);
+        			holdOn = false;
         			System.out.println("Complete!");
         		}
         	}
         };
-        Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
-        	@Override
-        	public void run(){
-        		try {
-					Thread.sleep(120000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-        		getTwitterUpdate(api);
-        	}
-        };
         refresh.start();
-        grabTwitterUpdate.start();
+        if(shouldUpdate){
+        	Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
+        		@Override
+        		public void run(){
+        			try {
+						Thread.sleep(120000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+        			while(holdOn){}
+        			holdOn = true;
+        			getTwitterUpdate(api);
+        			holdOn = false;
+        		}
+        	};
+        	grabTwitterUpdate.start();
+        }
 	}
 	
 	public void initialize(){
@@ -213,9 +242,9 @@ public class KHUxBot {
 	public void connect(DiscordAPI api){
 		api.connect(new FutureCallback<DiscordAPI>() {
             public void onSuccess(DiscordAPI api) {
-                // register listener
                 api.registerListener(new MessageCreateListener() {
                     public void onMessageCreate(DiscordAPI api, Message message) {
+                    	System.out.println(api.getServers().size());
                         // check the content of the message
                         if (message.getContent().startsWith("!medal ")) {
                             String medal = message.getContent().substring(7);
@@ -230,6 +259,12 @@ public class KHUxBot {
                         }
                     }
                 });
+                api.registerListener(new ServerJoinListener(){
+					public void onServerJoin(DiscordAPI api, Server server) {
+						System.out.println("Joined server");
+						System.out.println(server);
+					}
+            	});
             }
 
             public void onFailure(Throwable t) {
