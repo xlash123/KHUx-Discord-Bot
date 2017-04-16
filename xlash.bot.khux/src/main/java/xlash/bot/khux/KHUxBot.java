@@ -51,33 +51,12 @@ public class KHUxBot {
 		this.updateChannel = updateChannel;
 		this.initialize();
 		api = Javacord.getApi(token, true);
+		api.setAutoReconnect(false);
         connect(api);
         System.out.println("Waiting for server response...");
         while(api.getServers().size()==0){}
         System.out.println("Server connected! Let's go!");
         this.shouldUpdate = api.getChannelById(updateChannel)!=null;
-        Thread refresh = new Thread("Refresh"){
-        	@Override
-        	public void run(){
-        		while(true){
-        			try {
-						Thread.sleep(21600000l);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-        			while(holdOn){}
-        			System.out.println("Refreshing medal list. Rebooting...");
-        			holdOn = true;
-        			api.disconnect();
-        			initialize();
-        			api = Javacord.getApi(token, true);
-        			connect(api);
-        			holdOn = false;
-        			System.out.println("Complete!");
-        		}
-        	}
-        };
-        refresh.start();
         if(shouldUpdate){
         	Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
         		@Override
