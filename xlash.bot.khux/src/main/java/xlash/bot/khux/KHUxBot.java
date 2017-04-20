@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,7 +13,6 @@ import com.google.common.util.concurrent.FutureCallback;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
-import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
@@ -22,14 +20,15 @@ import de.btobastian.javacord.listener.server.ServerJoinListener;
 
 public class KHUxBot {
 	
+	public static final String VERSION = "1.0.2";
+	
 	public String lastTwitterUpdate;
 	public String updateChannel;
 	public DiscordAPI api;
 	public boolean shouldUpdate;
-	
-	public volatile boolean holdOn;
-	
+
 	public static void main(String[] args){
+		findUpdate();
 		String token = "";
 		String updateChannel = "";
 		if(args.length > 0){
@@ -61,19 +60,32 @@ public class KHUxBot {
         	Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
         		@Override
         		public void run(){
-        			try {
-						Thread.sleep(120000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-        			while(holdOn){}
-        			holdOn = true;
-        			getTwitterUpdate(api);
-        			holdOn = false;
+        			while(true){
+        				try {
+							Thread.sleep(120000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+        				getTwitterUpdate(api);
+        			}
         		}
         	};
         	grabTwitterUpdate.start();
         }
+        Thread botUpdate = new Thread("Bot Update"){
+        	@Override
+        	public void run(){
+        		while(true){
+        			try {
+						Thread.sleep(1800000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+        			findUpdate();
+        		}
+        	}
+        };
+        botUpdate.start();
 	}
 	
 	public void initialize(){
@@ -83,7 +95,7 @@ public class KHUxBot {
 		getMedalList();
 		System.out.println("Got medal list");
 		createNicknames();
-		lastTwitterUpdate = getTwitterUpdateLink();
+		lastTwitterUpdate = "https://twitter.com/kh_ux_na/status/852718178593521665";
 		System.out.println("Created nicknames");
 		System.out.println("Initialization finished!");
 	}
@@ -101,6 +113,7 @@ public class KHUxBot {
 			Document doc = Jsoup.connect("https://twitter.com/kh_ux_na").get();
 			String shortUrl = doc.getElementsByClass("js-tweet-text-container").get(0).getElementsByTag("a").get(1).attr("href");
 			Document doc2 = Jsoup.connect(shortUrl).get();
+			System.out.println(doc2.getElementsByTag("title").text());
 			return doc2.getElementsByTag("title").text();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -153,7 +166,7 @@ public class KHUxBot {
 					"Cost: " + medalGuages + " SP \n"+
 					"========";
 			message.reply(reply);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			message.reply("Oh dear... something went wrong...");
 		}
@@ -250,6 +263,18 @@ public class KHUxBot {
                 t.printStackTrace();
             }
         });
+	}
+	
+	public static void findUpdate(){
+		try {
+			Document doc = Jsoup.connect("https://github.com/xlash123/KHUx-Discord-Bot/releases").get();
+			String newVersion = doc.getElementsByClass("css-truncate-target").get(0).text();
+			if(!VERSION.equals(newVersion)){
+				System.out.println("New update avaialbe. Download at - https://github.com/xlash123/KHUx-Discord-Bot/releases");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
