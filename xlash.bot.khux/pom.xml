@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>xlash</groupId>
   <artifactId>xlash.bot.khux</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <name>KHUx Bot</name>
   <description>A Discord bot that gets medal descriptions for the game KHUx.</description>
   <repositories>
@@ -32,5 +32,25 @@
   <version>1.10.2</version>
 </dependency>
   </dependencies>
+  <build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <configuration>
+        <archive>
+          <manifest>
+            <mainClass>KHUxBot.class</mainClass>
+            <addDefaultImplementationEntries>
+              true
+            </addDefaultImplementationEntries>
+          </manifest>
+        </archive>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
 </project>
+
+
 
