@@ -2,7 +2,11 @@ package xlash.bot.khux;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +17,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
+import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
@@ -20,12 +25,13 @@ import de.btobastian.javacord.listener.server.ServerJoinListener;
 
 public class KHUxBot {
 	
-	public static final String VERSION = "1.0.2";
+	public static final String VERSION = "1.1.0";
 	
 	public String lastTwitterUpdate;
 	public String updateChannel;
 	public DiscordAPI api;
 	public boolean shouldUpdate;
+	public volatile Channel luxOn;
 
 	public static void main(String[] args){
 		findUpdate();
@@ -62,11 +68,13 @@ public class KHUxBot {
         		public void run(){
         			while(true){
         				try {
-							Thread.sleep(120000);
+							Thread.sleep(400);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-        				getTwitterUpdate(api);
+        				if(Integer.parseInt(getGMTTime("mm"))%2==0 && getGMTTime("ss").equals("05")){
+        					getTwitterUpdate(api);
+        				}
         			}
         		}
         	};
@@ -86,6 +94,26 @@ public class KHUxBot {
         	}
         };
         botUpdate.start();
+        Thread luxTimes = new Thread("Lux Times"){
+        	@Override
+        	public void run(){
+        		while(true){
+        			if(luxOn!=null){
+        				try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+        				if(getGMTTime("hh:mm:ss").equals("09:00:00")||getGMTTime("hh:mm:ss").equals("03:00:00")){
+        					if(luxOn!=null) luxOn.sendMessage("Double lux active!");
+        				}else if(getGMTTime("hh:mm:ss").equals("10:00:00")||getGMTTime("hh:mm:ss").equals("04:00:00")){
+        					if(luxOn!=null) luxOn.sendMessage("Double lux has faded...");
+        				}
+        			}
+        		}
+        	}
+        };
+        luxTimes.start();
 	}
 	
 	public void initialize(){
@@ -95,28 +123,35 @@ public class KHUxBot {
 		getMedalList();
 		System.out.println("Got medal list");
 		createNicknames();
-		lastTwitterUpdate = "https://twitter.com/kh_ux_na/status/852718178593521665";
+		lastTwitterUpdate = getTwitterUpdateLink(0);
 		System.out.println("Created nicknames");
 		System.out.println("Initialization finished!");
 	}
 	
 	public void getTwitterUpdate(DiscordAPI api){
-		String link = getTwitterUpdateLink();
-		if(!link.equals(lastTwitterUpdate)){
-			lastTwitterUpdate = link;
-			api.getChannelById(this.updateChannel).sendMessage(link);
+		ArrayList<String> links = new ArrayList<String>();
+		String current = getTwitterUpdateLink(0);
+		int i=0;
+		while(!lastTwitterUpdate.equals(current)){
+			current = getTwitterUpdateLink(i);
+			links.add(0, current);
+			i++;
 		}
+		for(String link : links){
+			if(link!=null) api.getChannelById(updateChannel).sendMessage(link);
+		}
+		if(links.size()>0) lastTwitterUpdate = links.get(links.size()-1);
 	}
 	
-	public String getTwitterUpdateLink(){
+	public String getTwitterUpdateLink(int recent){
 		try {
 			Document doc = Jsoup.connect("https://twitter.com/kh_ux_na").get();
-			String shortUrl = doc.getElementsByClass("js-tweet-text-container").get(0).getElementsByTag("a").get(1).attr("href");
+			String shortUrl = doc.getElementsByClass("js-tweet-text-container").get(recent).getElementsByTag("a").get(1).attr("href");
 			Document doc2 = Jsoup.connect(shortUrl).get();
-			System.out.println(doc2.getElementsByTag("title").text());
 			return doc2.getElementsByTag("title").text();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("Failed to get update from Twitter, but that won't stop me!");
 		}
 		return null;
 	}
@@ -139,6 +174,7 @@ public class KHUxBot {
 		try {
 			URL url = new URL(website);
 			doc = Jsoup.parse(url.openStream(), null, "");
+			//TODO Make compatible with non-6* versions
 			Elements medalMaxInfo = doc.getElementById("mw-content-text").getElementsByTag("div").get(1).getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
 			Elements attributes = new Elements();
 			for(int i=0;i<medalMaxInfo.size();i++){
@@ -236,8 +272,6 @@ public class KHUxBot {
             public void onSuccess(DiscordAPI api) {
                 api.registerListener(new MessageCreateListener() {
                     public void onMessageCreate(DiscordAPI api, Message message) {
-                    	System.out.println(api.getServers().size());
-                        // check the content of the message
                         if (message.getContent().startsWith("!medal ")) {
                             String medal = message.getContent().substring(7);
                             System.out.println("Medal in question: " + medal);
@@ -248,15 +282,20 @@ public class KHUxBot {
                             }else{
                             	message.reply("I don't know what medal that is.");
                             }
+                        }else if(message.getContent().equalsIgnoreCase("!tweet")){
+                        	message.reply(getTwitterUpdateLink(0));
+                        }else if(message.getContent().startsWith("!lux")){
+                        	String param = message.getContent().substring(5);
+                        	if(param.equalsIgnoreCase("on")){
+                        		message.reply("Double lux reminders have been turned on.");
+                        		luxOn = message.getChannelReceiver();
+                        	}else{
+                        		message.reply("Double lux reminders have been turned off.");
+                        		luxOn = null;
+                        	}
                         }
                     }
                 });
-                api.registerListener(new ServerJoinListener(){
-					public void onServerJoin(DiscordAPI api, Server server) {
-						System.out.println("Joined server");
-						System.out.println(server);
-					}
-            	});
             }
 
             public void onFailure(Throwable t) {
@@ -275,6 +314,20 @@ public class KHUxBot {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getGMTTime(String format){
+		final Date currentTime = new Date();
+
+		final SimpleDateFormat sdf =
+		        new SimpleDateFormat(format);
+
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return sdf.format(currentTime);
+	}
+	
+	public static String getGMTTime(){
+		return getGMTTime("HH:mm:ss");
 	}
 	
 }
