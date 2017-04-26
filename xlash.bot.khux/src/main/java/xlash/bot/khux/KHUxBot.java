@@ -1,11 +1,14 @@
 package xlash.bot.khux;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
@@ -22,53 +25,71 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
+import xlash.bot.khux.config.Config;
 
 public class KHUxBot {
 	
-	public static final String VERSION = "1.1.0";
+	public static final String VERSION = "1.1.2";
 	
 	public String lastTwitterUpdate;
-	public String updateChannel;
 	public DiscordAPI api;
-	public boolean shouldUpdate;
-	public volatile Channel luxOn;
+	
+	public static Config config;
+	
+	public volatile boolean shouldUpdate;
+	public volatile boolean shouldLux;
 
 	public static void main(String[] args){
-		findUpdate();
-		String token = "";
-		String updateChannel = "";
-		if(args.length > 0){
-			token = args[0];
-			if(args.length > 1){
-				updateChannel = args[1];
-			}
-			new KHUxBot(token, updateChannel);
-			return;
+		if(args.length == 0){
+		String runningFile;
+		try {
+			runningFile = new File(KHUxBot.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
+			ProcessBuilder builder = new ProcessBuilder(
+					"cmd.exe", "/c", "start", "java", "-jar", "\"" + runningFile + "\"", "run");
+			builder.redirectErrorStream(true);
+			builder.start();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		System.err.println("You must define a token for the bot.");
+		}else{
+			findUpdate();
+			config = new Config();
+			config.loadConfig();
+			if(config.botToken==null || config.botToken.isEmpty()){
+				System.out.println("This is your first time running this bot. Thanks for installing!");
+				System.out.println("To being using the bot, please enter your bot token.");
+				System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
+				Scanner in = new Scanner(System.in);
+				config.botToken = in.nextLine();
+				in.close();
+				config.saveConfig();
+			}
+			new KHUxBot();
+		}
 	}
 	
 	public HashMap<String, String> nicknames = new HashMap<String, String>();
 	
 	public HashMap<String, String> medalNamesAndLink;
 	
-	public KHUxBot(final String token, String updateChannel){
-		this.updateChannel = updateChannel;
+	public KHUxBot(){
 		this.initialize();
-		api = Javacord.getApi(token, true);
+		api = Javacord.getApi(config.botToken, true);
 		api.setAutoReconnect(false);
         connect(api);
         System.out.println("Waiting for server response...");
         while(api.getServers().size()==0){}
         System.out.println("Server connected! Let's go!");
-        this.shouldUpdate = api.getChannelById(updateChannel)!=null;
-        if(shouldUpdate){
+        this.shouldUpdate = api.getChannelById(config.updateChannel)!=null;
+        this.shouldLux = api.getChannelById(config.luxChannel)!=null;
         	Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
         		@Override
         		public void run(){
         			while(true){
         				try {
-							Thread.sleep(400);
+							Thread.sleep(1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -79,16 +100,16 @@ public class KHUxBot {
         		}
         	};
         	grabTwitterUpdate.start();
-        }
         Thread botUpdate = new Thread("Bot Update"){
         	@Override
         	public void run(){
         		while(true){
         			try {
-						Thread.sleep(1800000);
+						Thread.sleep(600000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+        			config.saveConfig();
         			findUpdate();
         		}
         	}
@@ -98,16 +119,16 @@ public class KHUxBot {
         	@Override
         	public void run(){
         		while(true){
-        			if(luxOn!=null){
+        			if(shouldLux){
         				try {
-							Thread.sleep(500);
+							Thread.sleep(1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
         				if(getGMTTime("hh:mm:ss").equals("09:00:00")||getGMTTime("hh:mm:ss").equals("03:00:00")){
-        					if(luxOn!=null) luxOn.sendMessage("Double lux active!");
+        					if(shouldLux) api.getChannelById(config.luxChannel).sendMessage("Double lux active!");
         				}else if(getGMTTime("hh:mm:ss").equals("10:00:00")||getGMTTime("hh:mm:ss").equals("04:00:00")){
-        					if(luxOn!=null) luxOn.sendMessage("Double lux has faded...");
+        					if(shouldLux) api.getChannelById(config.luxChannel).sendMessage("Double lux has faded...");
         				}
         			}
         		}
@@ -138,7 +159,7 @@ public class KHUxBot {
 			i++;
 		}
 		for(String link : links){
-			if(link!=null) api.getChannelById(updateChannel).sendMessage(link);
+			if(link!=null) api.getChannelById(config.updateChannel).sendMessage(link);
 		}
 		if(links.size()>0) lastTwitterUpdate = links.get(links.size()-1);
 	}
@@ -282,16 +303,35 @@ public class KHUxBot {
                             }else{
                             	message.reply("I don't know what medal that is.");
                             }
-                        }else if(message.getContent().equalsIgnoreCase("!tweet")){
-                        	message.reply(getTwitterUpdateLink(0));
+                        }else if(message.getContent().startsWith("!tweet")){
+                        	String param = message.getContent().substring(7);
+                        	if(param.equalsIgnoreCase("on")){
+                        		message.reply("Twitter updates are set to post on this channel.");
+                        		config.updateChannel = message.getChannelReceiver().getId();
+                        		shouldUpdate = true;
+                        	}else if(param.equalsIgnoreCase("off")){
+                        		message.reply("Twitter updates have been turned off.");
+                        		config.updateChannel = "";
+                        		shouldUpdate = false;
+                        	}else if(param.equalsIgnoreCase("get")){
+                        		message.reply(getTwitterUpdateLink(0));
+                        	}else{
+                        		if(shouldLux)message.reply("Twitter update reminders are set for channel: #" + api.getChannelById(config.updateChannel).getName());
+                        		else message.reply("Twitter updates are turned off.");
+                        	}
                         }else if(message.getContent().startsWith("!lux")){
                         	String param = message.getContent().substring(5);
                         	if(param.equalsIgnoreCase("on")){
-                        		message.reply("Double lux reminders have been turned on.");
-                        		luxOn = message.getChannelReceiver();
-                        	}else{
+                        		message.reply("Double lux reminders are set to post on.");
+                        		config.luxChannel = message.getChannelReceiver().getId();
+                        		shouldLux = true;
+                        	}else if(param.equalsIgnoreCase("off")){
                         		message.reply("Double lux reminders have been turned off.");
-                        		luxOn = null;
+                        		config.luxChannel = "";
+                        		shouldLux = false;
+                        	}else{
+                        		if(shouldLux) message.reply("Double lux reminders are set for channel: #" + api.getChannelById(config.luxChannel).getName());
+                        		else message.reply("Double lux reminders are turned off.");
                         	}
                         }
                     }
