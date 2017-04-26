@@ -8,7 +8,7 @@ There are a few commands you can use to help to prepare yourself. They are as li
 <br>
 To get the details of any medal currently in the NA version of the game, use the !medal command:
 ```cmd
-*!medal [medal name/nickname]*
+!medal [medal name/nickname]
 ```
 Note that you can either use the medal's full name or nicknames based on the following conventions (capitals are completely ignored):
 <br>
@@ -28,7 +28,7 @@ Some commonly used names, such as Tieri and Pooglet, are also valid. If a common
 To automatically grab the latest updates from Twitter, go to the channel of your choice and do:
 
 ```cmd
-*!tweet [on/off]*
+!tweet [on/off]
 ```
 *!tweet get* can also be used to grab the latest Tweet.
 
