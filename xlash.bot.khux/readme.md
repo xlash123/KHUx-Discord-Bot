@@ -26,6 +26,7 @@ Note that you can either use the medal's full name or nicknames based on the fol
 Some commonly used names, such as Tieri and Pooglet, are also valid. If a common nickname is not present, let me know.
 <br>
 To automatically grab the latest updates from Twitter, go to the channel of your choice and do:
+
 ```cmd
 *!tweet [on/off]*
 ```
