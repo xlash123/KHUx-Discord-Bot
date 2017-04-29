@@ -29,11 +29,12 @@ import xlash.bot.khux.config.Config;
 
 public class KHUxBot {
 	
-	public static final String VERSION = "1.1.2";
+	public static final String VERSION = "1.1.3";
 	
-	public String lastTwitterUpdate;
 	public DiscordAPI api;
-	
+
+	public static MedalHandler medalHandler;
+	public static TwitterHandler twitterHandler;
 	public static Config config;
 	
 	public volatile boolean shouldUpdate;
@@ -70,10 +71,6 @@ public class KHUxBot {
 		}
 	}
 	
-	public HashMap<String, String> nicknames = new HashMap<String, String>();
-	
-	public HashMap<String, String> medalNamesAndLink;
-	
 	public KHUxBot(){
 		this.initialize();
 		api = Javacord.getApi(config.botToken, true);
@@ -94,7 +91,7 @@ public class KHUxBot {
 							e.printStackTrace();
 						}
         				if(Integer.parseInt(getGMTTime("mm"))%2==0 && getGMTTime("ss").equals("05")){
-        					getTwitterUpdate(api);
+        					twitterHandler.getTwitterUpdate(api);
         				}
         			}
         		}
@@ -139,153 +136,9 @@ public class KHUxBot {
 	
 	public void initialize(){
 		System.out.println("Initializing...");
-		this.nicknames = new HashMap<String, String>();
-		this.medalNamesAndLink = new HashMap<String, String>();
-		getMedalList();
-		System.out.println("Got medal list");
-		createNicknames();
-		lastTwitterUpdate = getTwitterUpdateLink(0);
-		System.out.println("Created nicknames");
+		medalHandler = new MedalHandler();
+		twitterHandler = new TwitterHandler();
 		System.out.println("Initialization finished!");
-	}
-	
-	public void getTwitterUpdate(DiscordAPI api){
-		ArrayList<String> links = new ArrayList<String>();
-		String current = getTwitterUpdateLink(0);
-		int i=0;
-		while(!lastTwitterUpdate.equals(current)){
-			current = getTwitterUpdateLink(i);
-			links.add(0, current);
-			i++;
-		}
-		for(String link : links){
-			if(link!=null) api.getChannelById(config.updateChannel).sendMessage(link);
-		}
-		if(links.size()>0) lastTwitterUpdate = links.get(links.size()-1);
-	}
-	
-	public String getTwitterUpdateLink(int recent){
-		try {
-			Document doc = Jsoup.connect("https://twitter.com/kh_ux_na").get();
-			String shortUrl = doc.getElementsByClass("js-tweet-text-container").get(recent).getElementsByTag("a").get(1).attr("href");
-			Document doc2 = Jsoup.connect(shortUrl).get();
-			return doc2.getElementsByTag("title").text();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Failed to get update from Twitter, but that won't stop me!");
-		}
-		return null;
-	}
-	
-	public String getRealNameByNickname(String name){
-		for(String test : this.medalNamesAndLink.keySet()){
-			if(test.equalsIgnoreCase(name)) return test;
-		}
-		for(String test : this.nicknames.keySet()){
-			if(test.equalsIgnoreCase(name.replace(" ", ""))) return nicknames.get(test);
-		}
-		return null;
-	}
-	
-	public void getMedalInfo(String realName, Message message){
-		String website = this.medalNamesAndLink.get(realName);
-		
-		if(website == null) website = "http://www.khunchainedx.com/wiki/Donald_A";
-		Document doc;
-		try {
-			URL url = new URL(website);
-			doc = Jsoup.parse(url.openStream(), null, "");
-			//TODO Make compatible with non-6* versions
-			Elements medalMaxInfo = doc.getElementById("mw-content-text").getElementsByTag("div").get(1).getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
-			Elements attributes = new Elements();
-			for(int i=0;i<medalMaxInfo.size();i++){
-				if(!medalMaxInfo.get(i).hasAttr("colspan")) attributes.add(medalMaxInfo.get(i));
-				if(i>1&&medalMaxInfo.get(i).getElementsByAttributeValueMatching("colspan", "4").size()>0) attributes.add(medalMaxInfo.get(i));
-			}
-			
-			String medalAttribute = attributes.get(9).text();
-			String medalStrength = attributes.get(10).text();
-			String medalDefense = attributes.get(11).text();
-			String medalAbility = attributes.get(13).text();
-			String medalTarget = attributes.get(18).text();
-			String medalTier = attributes.get(19).text();
-			String medalMultiplier = attributes.get(20).text();
-			String medalGuages = attributes.get(21).text();
-			
-			String reply = "======== \n"+
-					realName+": \n"+
-					"Attribute: " + medalAttribute+" \n"+
-					"Ability: " + medalAbility+" \n"+
-					"Str/Def + " + medalStrength + "/" + medalDefense+" \n"+
-					"Target: " + medalTarget+" \n"+
-					"Tier " + medalTier+" \n"+
-					"Multiplier: " + medalMultiplier+" \n"+
-					"Cost: " + medalGuages + " SP \n"+
-					"========";
-			message.reply(reply);
-		} catch (Exception e) {
-			e.printStackTrace();
-			message.reply("Oh dear... something went wrong...");
-		}
-	}
-	
-	public void getMedalList(){
-		try {
-			Document doc = Jsoup.connect("http://www.khunchainedx.com/wiki/Medal").get();
-			Elements medalList = doc.getElementById("mw-content-text").getElementsByClass("collapsible collapsed").get(0).getElementsByTag("tr");
-			for(int i=1;i<medalList.size();i++){
-				Elements medalLinks = medalList.get(i).getElementsByTag("a");
-				for(Element link : medalLinks){
-					this.medalNamesAndLink.put(link.attr("title"), link.absUrl("href").replaceAll("%26", "&"));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void createNicknames(){
-		for(String name : this.medalNamesAndLink.keySet()){
-			String original = name.substring(0, name.length());
-			name = name.replace("KH II ", "KH2");
-			name = name.replaceAll("The ", "");
-			name = name.replace("WORLD OF FF", "WOFF");
-			name = name.replace("Timeless River", "TR");
-			name = name.replace("Halloween", "HT");
-			name = name.replace("Atlantica", "AT");
-			name = name.replace("Key Art ", "KA");
-			name = name.replace("(Medal)", "");
-			if(name.contains("Illustrated")){
-				name = name.replace("Illustrated", "i");
-				if(name.split(" ").length>1){
-					String[] words = name.split(" ");
-					if(name.contains("&")){
-						String product = "";
-						boolean skip = name.split("&").length > 2;
-						for(String word : words){
-							if(skip && word.equals("&")) continue;
-							product += word.substring(0, 1);
-						}
-						name = product;
-					}
-				}
-			}else if(name.contains("&")){
-				String[] words = name.split(" ");
-				String product = "";
-				boolean skip = name.split("&").length > 2;
-				for(String word : words){
-					if(skip && word.equals("&")) continue;
-					product += word.substring(0, 1);
-				}
-				name = product;
-			}
-			
-			name = name.replace(" ", "");
-			nicknames.put(name, original);
-		}
-		nicknames.put("Tieri", "Illustrated KH II Kairi");
-		nicknames.put("Pooglet", "Pooh & Piglet");
-		nicknames.put("BronzeDonald", "Donald A");
 	}
 	
 	public void connect(DiscordAPI api){
@@ -296,10 +149,11 @@ public class KHUxBot {
                         if (message.getContent().startsWith("!medal ")) {
                             String medal = message.getContent().substring(7);
                             System.out.println("Medal in question: " + medal);
-                            String realName = getRealNameByNickname(medal);
+                            while(medalHandler.isDisabled()){}
+                            String realName = medalHandler.getRealNameByNickname(medal);
                             System.out.println("Interpreted as: " + realName);
                             if(realName != null){
-                            	getMedalInfo(realName, message);
+                            	medalHandler.getMedalInfo(realName, message);
                             }else{
                             	message.reply("I don't know what medal that is.");
                             }
@@ -314,7 +168,7 @@ public class KHUxBot {
                         		config.updateChannel = "";
                         		shouldUpdate = false;
                         	}else if(param.equalsIgnoreCase("get")){
-                        		message.reply(getTwitterUpdateLink(0));
+                        		message.reply(twitterHandler.getTwitterUpdateLink(0));
                         	}else{
                         		if(shouldLux)message.reply("Twitter update reminders are set for channel: #" + api.getChannelById(config.updateChannel).getName());
                         		else message.reply("Twitter updates are turned off.");
@@ -333,6 +187,14 @@ public class KHUxBot {
                         		if(shouldLux) message.reply("Double lux reminders are set for channel: #" + api.getChannelById(config.luxChannel).getName());
                         		else message.reply("Double lux reminders are turned off.");
                         	}
+                        }else if(message.getContent().equalsIgnoreCase("!refresh")){
+                        	message.reply("Refreshing medal list. Please wait...");
+                        	medalHandler.refreshMedalList();
+                        	message.reply("Done! You may continue to query me.");
+                        }else if(message.getContent().equalsIgnoreCase("!reset")){
+                        	message.reply("Resetting medal descriptions. Please wait...");
+                        	medalHandler.resetDescriptions();
+                        	message.reply("Done! You may continue to query me.");
                         }
                     }
                 });
