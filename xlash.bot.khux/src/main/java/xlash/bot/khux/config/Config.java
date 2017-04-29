@@ -55,7 +55,6 @@ public class Config {
 	
 	public void saveConfig(){
 		Properties p = new Properties();
-		System.out.println(updateChannel);
 		p.setProperty("Bot_Token", botToken);
 		p.setProperty("Update_Channel", updateChannel);
 		p.setProperty("Lux_Channel", luxChannel);
