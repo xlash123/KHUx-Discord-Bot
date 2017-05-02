@@ -61,6 +61,10 @@ public class MedalHandler {
 				name = name.replaceAll("é", "e");
 				nicknames.put(name, original);
 			}
+			if(name.contains("è")){
+				name = name.replaceAll("è", "e");
+				nicknames.put(name, original);
+			}
 			name = name.replace("KH II ", "KH2");
 			name = name.replaceAll("The ", "");
 			name = name.replace("WORLD OF FF", "WOFF");
