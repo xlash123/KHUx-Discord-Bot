@@ -33,7 +33,7 @@ public class TwitterHandler {
 	public String getTwitterUpdateLink(int recent){
 		try {
 			Document doc = Jsoup.connect("https://twitter.com/kh_ux_na").get();
-			String id = doc.getElementsByClass("stream-items js-navigable-stream").get(0).getElementsByTag("li").get(recent).attr("data-item-id");
+			String id = doc.getElementsByClass("stream-items js-navigable-stream").get(0).getElementsByAttributeValueMatching("data-item-type", "tweet").get(recent).attr("data-item-id");
 			return "https://twitter.com/kh_ux_na/status/"+id;
 		} catch (Exception e) {
 			e.printStackTrace();
