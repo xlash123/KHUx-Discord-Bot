@@ -20,9 +20,9 @@ public class TwitterHandler {
 		String current = getTwitterUpdateLink(0);
 		int i=0;
 		while(!lastTwitterUpdate.equals(current)){
-			current = getTwitterUpdateLink(i);
 			if(current!=lastTwitterUpdate) links.add(0, current);
 			i++;
+			current = getTwitterUpdateLink(i);
 		}
 		for(String link : links){
 			if(link!=null) api.getChannelById(KHUxBot.config.updateChannel).sendMessage(link);
