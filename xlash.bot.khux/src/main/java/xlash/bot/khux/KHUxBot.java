@@ -55,6 +55,7 @@ public class KHUxBot {
 			e.printStackTrace();
 		}
 		}else{
+			System.out.println("Running bot version: " + VERSION);
 			findUpdate();
 			config = new Config();
 			config.loadConfig();
