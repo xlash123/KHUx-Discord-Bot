@@ -151,10 +151,32 @@ public class KHUxBot {
                             String medal = message.getContent().substring(7);
                             System.out.println("Medal in question: " + medal);
                             while(medalHandler.isDisabled()){}
-                            String realName = medalHandler.getRealNameByNickname(medal);
+                            String realName = medalHandler.getRealNameByNickname(medal, config.defaultGame);
                             System.out.println("Interpreted as: " + realName);
                             if(realName != null){
-                            	medalHandler.getMedalInfo(realName, message);
+                            	medalHandler.getMedalInfo(realName, message, config.defaultGame);
+                            }else{
+                            	message.reply("I don't know what medal that is.");
+                            }
+                        }else if(message.getContent().startsWith("!medalna ")){
+                        	String medal = message.getContent().substring(9);
+                            System.out.println("Medal in question: " + medal);
+                            while(medalHandler.isDisabled()){}
+                            String realName = medalHandler.getRealNameByNickname(medal, GameEnum.NA);
+                            System.out.println("Interpreted as: " + realName);
+                            if(realName != null){
+                            	medalHandler.getMedalInfo(realName, message, GameEnum.NA);
+                            }else{
+                            	message.reply("I don't know what medal that is.");
+                            }
+                        }else if(message.getContent().startsWith("!medaljp ")){
+                        	String medal = message.getContent().substring(9);
+                            System.out.println("Medal in question: " + medal);
+                            while(medalHandler.isDisabled()){}
+                            String realName = medalHandler.getRealNameByNickname(medal, GameEnum.JP);
+                            System.out.println("Interpreted as: " + realName);
+                            if(realName != null){
+                            	medalHandler.getMedalInfo(realName, message, GameEnum.JP);
                             }else{
                             	message.reply("I don't know what medal that is.");
                             }
