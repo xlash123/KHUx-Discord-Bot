@@ -185,25 +185,29 @@ public class MedalHandler {
 	}
 
 	public void getMedalInfo(String realName, Message message, GameEnum game) {
-		if (game.equals(GameEnum.NA) && this.medalDescriptions.containsKey(realName)) {
+		System.out.println("Getting info for game " + game.toString());
+		if (game==GameEnum.NA && this.medalDescriptions.containsKey(realName)) {
 			message.reply(this.medalDescriptions.get(realName));
 			return;
-		} else if (this.jpMedalDescriptions.containsKey(realName)) {
+		}
+		if (game==GameEnum.JP && this.jpMedalDescriptions.containsKey(realName)) {
 			message.reply(this.jpMedalDescriptions.get(realName));
 			return;
 		}
-		String website = "http://www.khunchainedx.com/wiki/Donald_A";
-		if (game.equals(GameEnum.NA)) {
-			this.medalNamesAndLink.get(realName);
-		} else
-			this.jpMedalNamesAndLink.get(realName);
-
+		String website;
+		if (game==GameEnum.NA) {
+			website = this.medalNamesAndLink.get(realName);
+		} else website = this.jpMedalNamesAndLink.get(realName);
+		
+		if(website==null || website.isEmpty()) website = "http://www.khunchainedx.com/wiki/Donald_A";
+		
 		Document doc;
 		try {
 			URL url = new URL(website);
 			doc = Jsoup.parse(url.openStream(), null, "");
 			// TODO Make compatible with non-6* versions
-			Elements medalMaxInfo = doc.getElementById("mw-content-text").getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
+			Elements medalMaxInfo = doc.getElementById("mw-content-text").getElementsByTag("div").get(game.tab)
+					.getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
 			Elements attributes = new Elements();
 			for (int i = 0; i < medalMaxInfo.size(); i++) {
 				if (!medalMaxInfo.get(i).hasAttr("colspan"))
@@ -226,10 +230,9 @@ public class MedalHandler {
 					+ medalTarget + " \n" + "Tier " + medalTier + " \n" + "Multiplier: " + medalMultiplier + " \n"
 					+ "Cost: " + medalGuages + " SP \n" + "========";
 			message.reply(reply);
-			if (game.equals(GameEnum.NA)) {
+			if (game==GameEnum.NA) {
 				this.medalDescriptions.put(realName, reply);
-			} else
-				this.jpMedalDescriptions.put(realName, reply);
+			} else this.jpMedalDescriptions.put(realName, reply);
 		} catch (Exception e) {
 			e.printStackTrace();
 			message.reply("Oh dear... something went wrong... Please contact the bot creator at"
@@ -239,7 +242,7 @@ public class MedalHandler {
 	}
 
 	public String getRealNameByNickname(String name, GameEnum game) {
-		if (game.equals(GameEnum.NA)) {
+		if (game==GameEnum.NA) {
 			for (String test : this.medalNamesAndLink.keySet()) {
 				if (test.equalsIgnoreCase(name))
 					return test;
