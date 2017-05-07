@@ -206,7 +206,12 @@ public class MedalHandler {
 			URL url = new URL(website);
 			doc = Jsoup.parse(url.openStream(), null, "");
 			// TODO Make compatible with non-6* versions
-			Elements medalMaxInfo = doc.getElementById("mw-content-text").getElementsByTag("div").get(game.tab)
+			Elements medalMaxInfoB = doc.getElementById("mw-content-text").getElementsByTag("div");
+			Elements medalMaxInfo;
+			if(medalMaxInfoB.size() > 4){
+				medalMaxInfo = medalMaxInfoB.get(game.tab)
+						.getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
+			}else medalMaxInfo = medalMaxInfoB.get(1)
 					.getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
 			Elements attributes = new Elements();
 			for (int i = 0; i < medalMaxInfo.size(); i++) {
@@ -235,9 +240,7 @@ public class MedalHandler {
 			} else this.jpMedalDescriptions.put(realName, reply);
 		} catch (Exception e) {
 			e.printStackTrace();
-			message.reply("Oh dear... something went wrong... Please contact the bot creator at"
-					+ " https://github.com/xlash123/KHUx-Discord-Bot/issues and link the error "
-					+ "log in the console.");
+			message.reply("Oh dear... something went wrong...");
 		}
 	}
 
