@@ -3,33 +3,25 @@ package xlash.bot.khux;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.google.common.util.concurrent.FutureCallback;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
-import de.btobastian.javacord.listener.server.ServerJoinListener;
 import xlash.bot.khux.config.Config;
 
 public class KHUxBot {
 	
-	public static final String VERSION = "1.1.7";
+	public static final String VERSION = "1.2.0";
 	
 	public DiscordAPI api;
 
@@ -218,6 +210,10 @@ public class KHUxBot {
                         	message.reply("Resetting medal descriptions. Please wait...");
                         	medalHandler.resetDescriptions();
                         	message.reply("Done! You may continue to query me.");
+                        }else if(message.getContent().startsWith("!default ")){
+                        	String param = message.getContent().substring(9);
+                        	config.defaultGame = GameEnum.parseString(param);
+                        	message.reply("Default game set to " + config.defaultGame.toString() + " version.");
                         }
                     }
                 });
