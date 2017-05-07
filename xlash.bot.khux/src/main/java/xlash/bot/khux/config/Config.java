@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
 
+import xlash.bot.khux.GameEnum;
+
 public class Config {
 	
 	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/config.properties";
@@ -15,6 +17,7 @@ public class Config {
 	public String botToken;
 	public volatile String updateChannel;
 	public volatile String luxChannel;
+	public volatile GameEnum defaultGame;
 	
 	public Config(){
 		init();
@@ -34,6 +37,7 @@ public class Config {
 		if(botToken == null) botToken = "";
 		if(updateChannel == null) updateChannel = "";
 		if(luxChannel == null) luxChannel = "";
+		if(defaultGame == null) defaultGame = GameEnum.NA;
 	}
 	
 	public void loadConfig(){
@@ -45,6 +49,7 @@ public class Config {
 			this.botToken = p.getProperty("Bot_Token");
 			this.updateChannel = p.getProperty("Update_Channel");
 			this.luxChannel = p.getProperty("Lux_Channel");
+			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -58,6 +63,7 @@ public class Config {
 		p.setProperty("Bot_Token", botToken);
 		p.setProperty("Update_Channel", updateChannel);
 		p.setProperty("Lux_Channel", luxChannel);
+		p.setProperty("Default_Game", defaultGame.toString());
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(DIRECTORY));
