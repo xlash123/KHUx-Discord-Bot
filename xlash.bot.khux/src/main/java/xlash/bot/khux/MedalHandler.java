@@ -149,9 +149,8 @@ public class MedalHandler {
 			this.medalDescriptions.put(realName, reply);
 		} catch (Exception e) {
 			e.printStackTrace();
-			message.reply("Oh dear... something went wrong... Please contact the bot creator at"
-					+ " https://github.com/xlash123/KHUx-Discord-Bot/issues and link the error "
-					+ "log in the console.");
+			message.reply("Oh dear... something went wrong... Check if the wiki is online. If it is"+
+			" report this to the bot creater.");
 		}
 	}
 	
