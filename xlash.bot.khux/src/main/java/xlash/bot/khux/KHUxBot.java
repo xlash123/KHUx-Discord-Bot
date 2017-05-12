@@ -29,7 +29,7 @@ import xlash.bot.khux.config.Config;
 
 public class KHUxBot {
 	
-	public static final String VERSION = "1.1.7";
+	public static final String VERSION = "1.1.8";
 	
 	public DiscordAPI api;
 
