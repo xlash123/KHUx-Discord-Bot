@@ -17,16 +17,12 @@ public class TwitterHandler {
 	
 	public void getTwitterUpdate(DiscordAPI api){
 		ArrayList<String> links = new ArrayList<String>();
-		String current = getTwitterUpdateLink(0);
-		int i=0;
-		while(!lastTwitterUpdate.equals(current)){
-			if(current!=lastTwitterUpdate) links.add(0, current);
-			i++;
-			try{
-				current = getTwitterUpdateLink(i);
-			}catch(Exception e){
-				break;
-			}
+		String current;
+		for(int i=0; i<8; i++){
+			current = getTwitterUpdateLink(i);
+			if(!current.equalsIgnoreCase(lastTwitterUpdate)){
+				links.add(current);
+			}else break;
 		}
 		for(String link : links){
 			if(link!=null) api.getChannelById(KHUxBot.config.updateChannel).sendMessage(link);
