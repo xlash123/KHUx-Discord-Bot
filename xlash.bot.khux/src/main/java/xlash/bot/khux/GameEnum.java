@@ -24,6 +24,10 @@ public enum GameEnum {
 			return JP;
 		case "north america":
 			return NA;
+		case "sena":
+			return NA;
+		case "sejp":
+			return JP;
 			default:
 				return NA;
 		}
