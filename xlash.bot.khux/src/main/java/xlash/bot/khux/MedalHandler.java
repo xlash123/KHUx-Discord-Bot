@@ -78,12 +78,12 @@ public class MedalHandler {
 	public void naNicknames() {
 		for (String name : this.medalNamesAndLink.keySet()) {
 			String original = name.substring(0, name.length());
-			if (name.contains("é")) {
-				name = name.replace("é", "e");
+			if (name.contains("Ã©")) {
+				name = name.replace("Ã©", "e");
 				nicknames.put(name, original);
 			}
-			if (name.contains("è")) {
-				name = name.replace("è", "e");
+			if (name.contains("Ã¨")) {
+				name = name.replace("Ã¨", "e");
 				nicknames.put(name, original);
 			}
 			name = name.replace("KH II ", "KH2");
@@ -134,12 +134,12 @@ public class MedalHandler {
 			String original = name.substring(0, name.length());
 			name = name.replace("Ver", "");
 			name = name.replace("(EX)", "EX");
-			if (name.contains("é")) {
-				name = name.replace("é", "e");
+			if (name.contains("Ã©")) {
+				name = name.replace("Ã©", "e");
 				jpNicknames.put(name, original);
 			}
-			if (name.contains("è")) {
-				name = name.replace("è", "e");
+			if (name.contains("Ã¨")) {
+				name = name.replace("Ã¨", "e");
 				jpNicknames.put(name, original);
 			}
 			name = name.replace("KH II ", "KH2");
