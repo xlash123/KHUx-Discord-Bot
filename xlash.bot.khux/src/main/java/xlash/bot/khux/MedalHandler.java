@@ -132,7 +132,8 @@ public class MedalHandler {
 	public void jpNicknames() {
 		for (String name : this.jpMedalNamesAndLink.keySet()) {
 			String original = name.substring(0, name.length());
-			name.replace("Ver", "");
+			name = name.replace("Ver", "");
+			name = name.replace("(EX)", "EX");
 			if (name.contains("é")) {
 				name = name.replace("é", "e");
 				jpNicknames.put(name, original);
@@ -148,11 +149,24 @@ public class MedalHandler {
 			name = name.replace("Halloween", "HT");
 			name = name.replace("Atlantica", "AT");
 			name = name.replace("Key Art ", "KA");
-			name = name.replace("Medal", "");
+			name = name.replace("(Medal)", "");
 			if (name.contains("Illustrated")) {
 				name = name.replace("Illustrated", "i");
 				if (name.split(" ").length > 1) {
 					String[] words = name.split(" ");
+					for(int i=0; i<words.length; i++){
+						if(i>0 && words[i].equalsIgnoreCase("i")){
+							for(int ii=i-1; ii>=0; ii--){
+								words[ii+1] = words[ii];
+							}
+							words[0] = "i";
+							String product = "";
+							for(String word : words){
+								product += word;
+							}
+							name = product;
+						}
+					}
 					if (name.contains("&")) {
 						String product = "";
 						boolean skip = name.split("&").length > 2;
@@ -208,9 +222,14 @@ public class MedalHandler {
 			// TODO Make compatible with non-6* versions
 			Elements medalMaxInfoB = doc.getElementById("mw-content-text").getElementsByTag("div");
 			Elements medalMaxInfo;
-			if(medalMaxInfoB.size() > 4){
+			if(medalMaxInfoB.size() > 5){
+				try{
 				medalMaxInfo = medalMaxInfoB.get(game.tab)
 						.getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
+				}catch (IndexOutOfBoundsException e){
+					medalMaxInfo = medalMaxInfoB.get(1)
+							.getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
+				}
 			}else medalMaxInfo = medalMaxInfoB.get(1)
 					.getElementsByAttributeValueStarting("title", "6").get(0).getElementsByTag("td");
 			Elements attributes = new Elements();
