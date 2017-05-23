@@ -33,7 +33,9 @@ public class MedalHandler {
 	public void refreshMedalList() {
 		disabled = true;
 		nicknames.clear();
+		jpNicknames.clear();
 		medalNamesAndLink.clear();
+		jpMedalNamesAndLink.clear();
 		getMedalList();
 		createNicknames();
 		disabled = false;
@@ -41,6 +43,7 @@ public class MedalHandler {
 
 	public void resetDescriptions() {
 		medalDescriptions.clear();
+		jpMedalDescriptions.clear();
 	}
 
 	public void getMedalList() {
@@ -198,15 +201,13 @@ public class MedalHandler {
 		jpNicknames.put("BronzeDonald", "Donald A");
 	}
 
-	public void getMedalInfo(String realName, Message message, GameEnum game) {
+	public String getMedalInfo(String realName, GameEnum game) {
 		System.out.println("Getting info for game " + game.toString());
 		if (game==GameEnum.NA && this.medalDescriptions.containsKey(realName)) {
-			message.reply(this.medalDescriptions.get(realName));
-			return;
+			return this.medalDescriptions.get(realName);
 		}
 		if (game==GameEnum.JP && this.jpMedalDescriptions.containsKey(realName)) {
-			message.reply(this.jpMedalDescriptions.get(realName));
-			return;
+			return this.jpMedalDescriptions.get(realName);
 		}
 		String website;
 		if (game==GameEnum.NA) {
@@ -253,13 +254,13 @@ public class MedalHandler {
 					+ medalAbility + " \n" + "Str/Def + " + medalStrength + "/" + medalDefense + " \n" + "Target: "
 					+ medalTarget + " \n" + "Tier " + medalTier + " \n" + "Multiplier: " + medalMultiplier + " \n"
 					+ "Cost: " + medalGuages + " SP \n" + "========";
-			message.reply(reply);
 			if (game==GameEnum.NA) {
 				this.medalDescriptions.put(realName, reply);
 			} else this.jpMedalDescriptions.put(realName, reply);
+			return reply;
 		} catch (Exception e) {
 			e.printStackTrace();
-			message.reply("Oh dear... something went wrong...");
+			return "Oh dear... something went wrong...";
 		}
 	}
 
