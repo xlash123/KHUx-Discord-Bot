@@ -17,44 +17,58 @@ import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
+import de.btobastian.sdcf4j.CommandHandler;
+import de.btobastian.sdcf4j.handler.JavacordHandler;
+import xlash.bot.khux.commands.DefaultCommand;
+import xlash.bot.khux.commands.LuxCommand;
+import xlash.bot.khux.commands.MedalCommand;
+import xlash.bot.khux.commands.MedalJPCommand;
+import xlash.bot.khux.commands.MedalNACommand;
+import xlash.bot.khux.commands.RefreshCommand;
+import xlash.bot.khux.commands.ResetCommand;
+import xlash.bot.khux.commands.TweetCommand;
 import xlash.bot.khux.config.Config;
 
 public class KHUxBot {
-	
-	public static final String VERSION = "1.2.0";
-	
-	public DiscordAPI api;
+
+	public static final String VERSION = "1.2.1";
+
+	public static DiscordAPI api;
 
 	public static MedalHandler medalHandler;
 	public static TwitterHandler twitterHandler;
+	public static CommandHandler commandHandler;
 	public static Config config;
-	
-	public volatile boolean shouldUpdate;
-	public volatile boolean shouldLux;
 
-	public static void main(String[] args){
-		if(args.length == 0){
-		String runningFile;
-		try {
-			runningFile = new File(KHUxBot.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
-			ProcessBuilder builder = new ProcessBuilder(
-					"cmd.exe", "/c", "start", "java", "-jar", "\"" + runningFile + "\"", "run");
-			builder.redirectErrorStream(true);
-			builder.start();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		}else{
+	public volatile static boolean shouldTwitterUpdate;
+	public volatile static boolean shouldLux;
+
+	public static void main(String[] args) {
+		if (args.length == 0) {
+			String runningFile;
+			try {
+				runningFile = new File(
+						KHUxBot.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+								.getAbsolutePath();
+				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "start", "java", "-jar",
+						"\"" + runningFile + "\"", "run");
+				builder.redirectErrorStream(true);
+				builder.start();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
 			System.out.println("Running bot version: " + VERSION);
 			findUpdate();
 			config = new Config();
 			config.loadConfig();
-			if(config.botToken==null || config.botToken.isEmpty()){
+			if (config.botToken == null || config.botToken.isEmpty()) {
 				System.out.println("This is your first time running this bot. Thanks for installing!");
 				System.out.println("To being using the bot, please enter your bot token.");
-				System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
+				System.out.println(
+						"If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
 				Scanner in = new Scanner(System.in);
 				config.botToken = in.nextLine();
 				in.close();
@@ -63,192 +77,142 @@ public class KHUxBot {
 			new KHUxBot();
 		}
 	}
-	
-	public KHUxBot(){
+
+	public KHUxBot() {
 		this.initialize();
 		api = Javacord.getApi(config.botToken, true);
 		api.setAutoReconnect(false);
-        connect(api);
-        System.out.println("Waiting for server response...");
-        while(api.getServers().size()==0){}
-        System.out.println("Server connected! Let's go!");
-        this.shouldUpdate = api.getChannelById(config.updateChannel)!=null;
-        this.shouldLux = api.getChannelById(config.luxChannel)!=null;
-        	Thread grabTwitterUpdate = new Thread("Grab Twitter Update"){
-        		@Override
-        		public void run(){
-        			while(true){
-        				try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-        				if(Integer.parseInt(getGMTTime("mm"))%2==0 && getGMTTime("ss").equals("05")){
-        					twitterHandler.getTwitterUpdate(api);
-        				}
-        			}
-        		}
-        	};
-        	grabTwitterUpdate.start();
-        Thread botUpdate = new Thread("Bot Update"){
-        	@Override
-        	public void run(){
-        		while(true){
-        			try {
+		commandHandler = new JavacordHandler(api);
+		registerCommands();
+		connect(api);
+		System.out.println("Waiting for server response...");
+		while (api.getServers().size() == 0) {
+		}
+		System.out.println("Server connected! Let's go!");
+		shouldTwitterUpdate = api.getChannelById(config.updateChannel) != null;
+		shouldLux = api.getChannelById(config.luxChannel) != null;
+		Thread grabTwitterUpdate = new Thread("Grab Twitter Update") {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					if (Integer.parseInt(getGMTTime("mm")) % 2 == 0 && getGMTTime("ss").equals("05")) {
+						twitterHandler.getTwitterUpdate(api);
+					}
+				}
+			}
+		};
+		grabTwitterUpdate.start();
+		Thread botUpdate = new Thread("Bot Update") {
+			@Override
+			public void run() {
+				while (true) {
+					try {
 						Thread.sleep(600000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-        			config.saveConfig();
-        			findUpdate();
-        		}
-        	}
-        };
-        botUpdate.start();
-        Thread luxTimes = new Thread("Lux Times"){
-        	@Override
-        	public void run(){
-        		while(true){
-        			if(shouldLux){
-        				try {
+					config.saveConfig();
+					findUpdate();
+				}
+			}
+		};
+		botUpdate.start();
+		Thread luxTimes = new Thread("Lux Times") {
+			@Override
+			public void run() {
+				while (true) {
+					if (shouldLux) {
+						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-        				if(getGMTTime("hh:mm:ss").equals("09:00:00")||getGMTTime("hh:mm:ss").equals("03:00:00")){
-        					if(shouldLux) api.getChannelById(config.luxChannel).sendMessage("Double lux active!");
-        				}else if(getGMTTime("hh:mm:ss").equals("10:00:00")||getGMTTime("hh:mm:ss").equals("04:00:00")){
-        					if(shouldLux) api.getChannelById(config.luxChannel).sendMessage("Double lux has faded...");
-        				}
-        			}
-        		}
-        	}
-        };
-        luxTimes.start();
+						if (config.defaultGame == GameEnum.NA) {
+							if (getGMTTime("hh:mm:ss").equals("09:00:00")
+									|| getGMTTime("hh:mm:ss").equals("03:00:00")) {
+								if (shouldLux)
+									api.getChannelById(config.luxChannel).sendMessage("Double lux active!");
+							} else if (getGMTTime("hh:mm:ss").equals("10:00:00")
+									|| getGMTTime("hh:mm:ss").equals("04:00:00")) {
+								if (shouldLux)
+									api.getChannelById(config.luxChannel).sendMessage("Double lux has faded...");
+							}
+						} else{
+							if (getGMTTime("hh:mm:ss").equals("03:00:00")
+									|| getGMTTime("hh:mm:ss").equals("04:00:00")) {
+								if (shouldLux)
+									api.getChannelById(config.luxChannel).sendMessage("Double lux active!");
+							} else if (getGMTTime("hh:mm:ss").equals("13:00:00")
+									|| getGMTTime("hh:mm:ss").equals("14:00:00")) {
+								if (shouldLux)
+									api.getChannelById(config.luxChannel).sendMessage("Double lux has faded...");
+							}
+						}
+					}
+				}
+			}
+		};
+		luxTimes.start();
 	}
-	
-	public void initialize(){
+
+	public void initialize() {
 		System.out.println("Initializing...");
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		System.out.println("Initialization finished!");
 	}
 	
-	public void connect(DiscordAPI api){
-		api.connect(new FutureCallback<DiscordAPI>() {
-            public void onSuccess(DiscordAPI api) {
-                api.registerListener(new MessageCreateListener() {
-                    public void onMessageCreate(DiscordAPI api, Message message) {
-                        if (message.getContent().startsWith("!medal ")) {
-                            String medal = message.getContent().substring(7);
-                            System.out.println("Medal in question: " + medal);
-                            while(medalHandler.isDisabled()){}
-                            String realName = medalHandler.getRealNameByNickname(medal, config.defaultGame);
-                            System.out.println("Interpreted as: " + realName);
-                            if(realName != null){
-                            	medalHandler.getMedalInfo(realName, message, config.defaultGame);
-                            }else{
-                            	message.reply("I don't know what medal that is.");
-                            }
-                        }else if(message.getContent().startsWith("!medalna ")){
-                        	String medal = message.getContent().substring(9);
-                            System.out.println("Medal in question: " + medal);
-                            while(medalHandler.isDisabled()){}
-                            String realName = medalHandler.getRealNameByNickname(medal, GameEnum.NA);
-                            System.out.println("Interpreted as: " + realName);
-                            if(realName != null){
-                            	medalHandler.getMedalInfo(realName, message, GameEnum.NA);
-                            }else{
-                            	message.reply("I don't know what medal that is.");
-                            }
-                        }else if(message.getContent().startsWith("!medaljp ")){
-                        	String medal = message.getContent().substring(9);
-                            System.out.println("Medal in question: " + medal);
-                            while(medalHandler.isDisabled()){}
-                            String realName = medalHandler.getRealNameByNickname(medal, GameEnum.JP);
-                            System.out.println("Interpreted as: " + realName);
-                            if(realName != null){
-                            	medalHandler.getMedalInfo(realName, message, GameEnum.JP);
-                            }else{
-                            	message.reply("I don't know what medal that is.");
-                            }
-                        }else if(message.getContent().startsWith("!tweet")){
-                        	String param = message.getContent().substring(7);
-                        	if(param.equalsIgnoreCase("on")){
-                        		message.reply("Twitter updates are set to post on this channel.");
-                        		config.updateChannel = message.getChannelReceiver().getId();
-                        		shouldUpdate = true;
-                        	}else if(param.equalsIgnoreCase("off")){
-                        		message.reply("Twitter updates have been turned off.");
-                        		config.updateChannel = "";
-                        		shouldUpdate = false;
-                        	}else if(param.equalsIgnoreCase("get")){
-                        		message.reply(twitterHandler.getTwitterUpdateLink(0));
-                        	}else{
-                        		if(shouldLux)message.reply("Twitter update reminders are set for channel: #" + api.getChannelById(config.updateChannel).getName());
-                        		else message.reply("Twitter updates are turned off.");
-                        	}
-                        }else if(message.getContent().startsWith("!lux")){
-                        	String param = message.getContent().substring(5);
-                        	if(param.equalsIgnoreCase("on")){
-                        		message.reply("Double lux reminders are set to post on.");
-                        		config.luxChannel = message.getChannelReceiver().getId();
-                        		shouldLux = true;
-                        	}else if(param.equalsIgnoreCase("off")){
-                        		message.reply("Double lux reminders have been turned off.");
-                        		config.luxChannel = "";
-                        		shouldLux = false;
-                        	}else{
-                        		if(shouldLux) message.reply("Double lux reminders are set for channel: #" + api.getChannelById(config.luxChannel).getName());
-                        		else message.reply("Double lux reminders are turned off.");
-                        	}
-                        }else if(message.getContent().equalsIgnoreCase("!refresh")){
-                        	message.reply("Refreshing medal list. Please wait...");
-                        	medalHandler.refreshMedalList();
-                        	message.reply("Done! You may continue to query me.");
-                        }else if(message.getContent().equalsIgnoreCase("!reset")){
-                        	message.reply("Resetting medal descriptions. Please wait...");
-                        	medalHandler.resetDescriptions();
-                        	message.reply("Done! You may continue to query me.");
-                        }else if(message.getContent().startsWith("!default ")){
-                        	String param = message.getContent().substring(9);
-                        	config.defaultGame = GameEnum.parseString(param);
-                        	message.reply("Default game set to " + config.defaultGame.toString() + " version.");
-                        }
-                    }
-                });
-            }
-
-            public void onFailure(Throwable t) {
-                t.printStackTrace();
-            }
-        });
+	public void registerCommands(){
+		commandHandler.registerCommand(new MedalCommand());
+		commandHandler.registerCommand(new MedalNACommand());
+		commandHandler.registerCommand(new MedalJPCommand());
+		commandHandler.registerCommand(new LuxCommand());
+		commandHandler.registerCommand(new TweetCommand());
+		commandHandler.registerCommand(new RefreshCommand());
+		commandHandler.registerCommand(new ResetCommand());
+		commandHandler.registerCommand(new DefaultCommand());
 	}
-	
-	public static void findUpdate(){
+
+	public void connect(DiscordAPI api) {
+		api.connect(new FutureCallback<DiscordAPI>() {
+			public void onSuccess(DiscordAPI api) {
+			}
+
+			public void onFailure(Throwable t) {
+				t.printStackTrace();
+			}
+		});
+	}
+
+	public static void findUpdate() {
 		try {
 			Document doc = Jsoup.connect("https://github.com/xlash123/KHUx-Discord-Bot/releases").get();
 			String newVersion = doc.getElementsByClass("css-truncate-target").get(0).text();
-			if(!VERSION.equals(newVersion)){
-				System.out.println("New update avaialbe. Download at - https://github.com/xlash123/KHUx-Discord-Bot/releases");
+			if (!VERSION.equals(newVersion)) {
+				System.out.println(
+						"New update avaialbe. Download at - https://github.com/xlash123/KHUx-Discord-Bot/releases");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static String getGMTTime(String format){
+
+	public static String getGMTTime(String format) {
 		final Date currentTime = new Date();
 
-		final SimpleDateFormat sdf =
-		        new SimpleDateFormat(format);
+		final SimpleDateFormat sdf = new SimpleDateFormat(format);
 
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return sdf.format(currentTime);
 	}
-	
-	public static String getGMTTime(){
+
+	public static String getGMTTime() {
 		return getGMTTime("HH:mm:ss");
 	}
-	
+
 }
