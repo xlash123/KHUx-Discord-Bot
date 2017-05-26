@@ -1,13 +1,16 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.sdcf4j.Command;
 import xlash.bot.khux.KHUxBot;
 
 public class LuxCommand extends CommandBase{
+	
+	@Override
+	public String[] getAliases(){
+		return new String[]{"!lux"};
+	}
 
 	@Override
-	@Command(aliases="!lux")
 	public void onCommand(String[] args, Message message) {
 		if(args.length == 0){
 			this.printDescriptionUsage(message);
@@ -47,6 +50,11 @@ public class LuxCommand extends CommandBase{
 	@Override
 	public String getUsage() {
 		return "!lux [on/off/status]";
+	}
+
+	@Override
+	public boolean isAdmin() {
+		return true;
 	}
 
 }

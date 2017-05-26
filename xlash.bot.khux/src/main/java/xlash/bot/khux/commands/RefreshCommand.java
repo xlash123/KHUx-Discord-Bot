@@ -1,13 +1,16 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.sdcf4j.Command;
 import xlash.bot.khux.KHUxBot;
 
 public class RefreshCommand extends CommandBase{
+	
+	@Override
+	public String[] getAliases(){
+		return new String[]{"!refresh"};
+	}
 
 	@Override
-	@Command(aliases="!refresh")
 	public void onCommand(String[] args, Message message) {
 		message.reply("Refreshing medal list. Please wait...");
 		KHUxBot.medalHandler.refreshMedalList();
@@ -22,6 +25,11 @@ public class RefreshCommand extends CommandBase{
 	@Override
 	public String getUsage() {
 		return "!refresh";
+	}
+	
+	@Override
+	public boolean isAdmin(){
+		return true;
 	}
 
 }

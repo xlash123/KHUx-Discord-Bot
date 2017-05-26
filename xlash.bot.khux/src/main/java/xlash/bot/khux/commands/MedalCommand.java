@@ -1,13 +1,15 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.sdcf4j.Command;
-import de.btobastian.sdcf4j.CommandExecutor;
 import xlash.bot.khux.KHUxBot;
 
 public class MedalCommand extends CommandBase{
 	
-	@Command(aliases="!medal")
+	@Override
+	public String[] getAliases(){
+		return new String[]{"!medal"};
+	}
+	
 	public void onCommand(String[] args, Message message){
 		if(args.length == 0){
 			this.printDescriptionUsage(message);

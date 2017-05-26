@@ -1,13 +1,16 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.sdcf4j.Command;
 import xlash.bot.khux.KHUxBot;
 
 public class ResetCommand extends CommandBase{
+	
+	@Override
+	public String[] getAliases(){
+		return new String[]{"!reset"};
+	}
 
 	@Override
-	@Command(aliases="!reset")
 	public void onCommand(String[] args, Message message) {
 		message.reply("Resetting medal descriptions. Please wait...");
 		KHUxBot.medalHandler.resetDescriptions();
@@ -22,6 +25,11 @@ public class ResetCommand extends CommandBase{
 	@Override
 	public String getUsage() {
 		return "!reset";
+	}
+	
+	@Override
+	public boolean isAdmin(){
+		return true;
 	}
 
 }

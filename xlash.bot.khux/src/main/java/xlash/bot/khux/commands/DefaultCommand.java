@@ -1,14 +1,17 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.sdcf4j.Command;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 
 public class DefaultCommand extends CommandBase{
-
+	
 	@Override
-	@Command(aliases="!default")
+	public String[] getAliases(){
+		return new String[]{"!default"};
+	}
+	
+	@Override
 	public void onCommand(String[] args, Message message) {
 		if(args.length == 0){
 			this.printDescriptionUsage(message);
@@ -30,6 +33,11 @@ public class DefaultCommand extends CommandBase{
 	@Override
 	public String getUsage() {
 		return "!default [na/jp/get]";
+	}
+
+	@Override
+	public boolean isAdmin() {
+		return true;
 	}
 
 }
