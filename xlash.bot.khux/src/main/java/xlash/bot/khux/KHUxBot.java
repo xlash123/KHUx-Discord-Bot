@@ -17,8 +17,7 @@ import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
-import de.btobastian.sdcf4j.CommandHandler;
-import de.btobastian.sdcf4j.handler.JavacordHandler;
+import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
@@ -82,7 +81,7 @@ public class KHUxBot {
 		this.initialize();
 		api = Javacord.getApi(config.botToken, true);
 		api.setAutoReconnect(false);
-		commandHandler = new JavacordHandler(api);
+		commandHandler = new CommandHandler();
 		registerCommands();
 		connect(api);
 		System.out.println("Waiting for server response...");
@@ -181,6 +180,14 @@ public class KHUxBot {
 	public void connect(DiscordAPI api) {
 		api.connect(new FutureCallback<DiscordAPI>() {
 			public void onSuccess(DiscordAPI api) {
+				api.registerListener(new MessageCreateListener(){
+
+					@Override
+					public void onMessageCreate(DiscordAPI api, Message message) {
+						commandHandler.executeCommand(message);
+					}
+					
+				});
 			}
 
 			public void onFailure(Throwable t) {
