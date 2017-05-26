@@ -10,10 +10,6 @@
   <id>javacord-repo</id>
   <url>http://repo.bastian-oppermann.de</url>
 </repository>
-<repository>
-  <id>sdcf4j-repo</id>
-  <url>http://repo.bastian-oppermann.de</url>
-</repository>
   </repositories>
   <dependencies>
   <dependency>
@@ -34,18 +30,6 @@
   <groupId>org.jsoup</groupId>
   <artifactId>jsoup</artifactId>
   <version>1.10.2</version>
-</dependency>
-<dependency>
-  <groupId>de.btobastian.sdcf4j</groupId>
-  <artifactId>sdcf4j-core</artifactId>
-  <version>1.0.4</version>
-</dependency>
-<!-- The module for your prefered lib-->
-<dependency>
-  <groupId>de.btobastian.sdcf4j</groupId>
-  <!-- Possible artifact ids: sdcf4j-javacord, sdcf4j-jda, sdcf4j-jda3, sdcf4j-discord4j -->
-  <artifactId>sdcf4j-javacord</artifactId>
-  <version>1.0.4</version>
 </dependency>
   </dependencies>
   <build>
