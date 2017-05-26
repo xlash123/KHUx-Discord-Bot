@@ -20,6 +20,9 @@ public class MedalCommand extends CommandBase{
 		}
 		medalName = medalName.trim();
 		String realName = KHUxBot.medalHandler.getRealNameByNickname(medalName, KHUxBot.config.defaultGame);
+		if(realName==null){
+			message.reply("I don't know what medal that is.");
+		}
 		message.reply(KHUxBot.medalHandler.getMedalInfo(realName, KHUxBot.config.defaultGame));
 	}
 
