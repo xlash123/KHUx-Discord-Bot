@@ -22,6 +22,7 @@ public class MedalJPCommand extends CommandBase{
 		String realName = KHUxBot.medalHandler.getRealNameByNickname(medalName, GameEnum.JP);
 		if(realName==null){
 			message.reply("I don't know what medal that is.");
+			return;
 		}
 		message.reply(KHUxBot.medalHandler.getMedalInfo(realName, GameEnum.JP));
 	}
