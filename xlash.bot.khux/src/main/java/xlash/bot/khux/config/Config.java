@@ -18,6 +18,9 @@ public class Config {
 	public volatile String luxChannel;
 	public volatile GameEnum defaultGame;
 	
+	public volatile String luxOnPrompt;
+	public volatile String luxOffPrompt;
+	
 	public Config(){
 		init();
 		File file = new File(DIRECTORY);
@@ -37,6 +40,8 @@ public class Config {
 		if(updateChannel == null) updateChannel = "";
 		if(luxChannel == null) luxChannel = "";
 		if(defaultGame == null) defaultGame = GameEnum.NA;
+		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
+		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
 	}
 	
 	public void loadConfig(){
@@ -49,6 +54,8 @@ public class Config {
 			this.updateChannel = p.getProperty("Update_Channel");
 			this.luxChannel = p.getProperty("Lux_Channel");
 			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
+			this.luxOnPrompt = p.getProperty("Lux_On_Prompt");
+			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -63,6 +70,8 @@ public class Config {
 		p.setProperty("Update_Channel", updateChannel);
 		p.setProperty("Lux_Channel", luxChannel);
 		p.setProperty("Default_Game", defaultGame.toString());
+		p.setProperty("Lux_On_Prompt", luxOnPrompt);
+		p.setProperty("Lux_Off_Prompt", luxOffPrompt);
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(DIRECTORY));
