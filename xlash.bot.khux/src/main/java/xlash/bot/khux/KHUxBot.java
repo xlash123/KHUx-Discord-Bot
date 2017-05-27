@@ -72,8 +72,8 @@ public class KHUxBot {
 				Scanner in = new Scanner(System.in);
 				config.botToken = in.nextLine();
 				in.close();
-				config.saveConfig();
 			}
+			config.saveConfig();
 			new KHUxBot();
 		}
 	}
