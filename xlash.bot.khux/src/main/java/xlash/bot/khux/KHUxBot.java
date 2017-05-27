@@ -18,6 +18,7 @@ import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import xlash.bot.khux.commands.CommandHandler;
+import xlash.bot.khux.commands.ConfigCommand;
 import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
@@ -175,6 +176,7 @@ public class KHUxBot {
 		commandHandler.registerCommand(new RefreshCommand());
 		commandHandler.registerCommand(new ResetCommand());
 		commandHandler.registerCommand(new DefaultCommand());
+		commandHandler.registerCommand(new ConfigCommand());
 	}
 
 	public void connect(DiscordAPI api) {
