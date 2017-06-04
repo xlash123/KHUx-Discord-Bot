@@ -6,8 +6,8 @@ This is a bot I created to make it easier to retrieve medal info, along with aut
 
 There are a few commands you can use to help to prepare yourself. They are as listed:
 <br>
-To get the details of any medal currently in the NA version of the game, use the !medal command:
-```cmd
+To get the details of any medal in your default game, use the !medal command:
+```bash
 !medal [medal name/nickname]
 ```
 Note that you can either use the medal's full name or nicknames based on the following conventions (capitals are completely ignored):
@@ -23,25 +23,37 @@ Note that you can either use the medal's full name or nicknames based on the fol
 + Any medal with more than 3 persons mention will be reduced to each person's initial. Ex: Sora & Donald & Goofy A = SDG A.
 + "The" is dropped. Ex: The King & Donald & Goofy = KDG.
 <br>
-Some commonly used names, such as Tieri and Pooglet, are also valid. If a common nickname is not present, let me know.
+Some commonly used names, such as Tieri and Pooglet, are also valid. If a common nickname is not present, let me know. The order of the terms in a medals name, when using the command, does not matter, although correct order is still preferred.
 <br>
+
+To change the default game that !medal pulls from, use:
+```bash
+!default [NA/JP]
+```
+You can also use !medalna or !medaljp if you don't want to change your default game. Note that !default will also change the lux times for the !lux command.
+
 To automatically grab the latest updates from Twitter, go to the channel of your choice and do:
 
-```cmd
+```bash
 !tweet [on/off]
 ```
 *!tweet get* can also be used to grab the latest Tweet.
 
 To automatically remind party members of double lux times during raid events, go to your desired channel and do the following:
-```cmd
+```bash
 !lux [on/off]
 ```
-This will send both a reminder that double lux has started and one for when it has ended. It will work regardless of time zones, set at 3-4am/pm and 9-10am/pm GMT/UTC.
+This will send both a reminder that double lux has started and one for when it has ended. It will work regardless of time zones, set at 3-4am/pm and 9-10am/pm GMT/UTC. The reminder message is editable in the config.
+
+To refresh the medal list in case of an update, use the !refresh command. Also, if medal descriptions get changed, use !reset to reset the medal description cache.
+
+To reload the config data, use !config. This is helpful for loading the lux reminder message when edited.
+
 
 ## How to install
 
 Download the [latest build](https://github.com/xlash123/KHUx-Discord-Bot/releases/) or build from the source (using Maven). Then either double click on the file (only for Windows) or run the following in terminal/cmd.
-```cmd
+```bash
 java -jar "[filepath]" run
 ```
 A good explaination of how to get the Discord App ID is explained [here](https://github.com/BtoBastian/Javacord/blob/master/README.md) in the Javacord README.
