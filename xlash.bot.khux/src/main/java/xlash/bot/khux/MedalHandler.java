@@ -90,6 +90,7 @@ public class MedalHandler {
 	private void naNicknames() {
 		for (String name : this.medalNamesAndLink.keySet()) {
 			String original = name.substring(0, name.length());
+			name = name.replace("(EX)", "EX");
 			if (name.contains("é")) {
 				name = name.replace("é", "e");
 				nicknames.put(name, original);
@@ -99,6 +100,7 @@ public class MedalHandler {
 				nicknames.put(name, original);
 			}
 			name = name.replace("KH II ", "KH2");
+			name = name.replace("KHII", "KH2");
 			name = name.replace("The ", "");
 			name = name.replace("WORLD OF FF", "WOFF");
 			name = name.replace("Timeless River", "TR");
@@ -155,6 +157,7 @@ public class MedalHandler {
 				jpNicknames.put(name, original);
 			}
 			name = name.replace("KH II ", "KH2");
+			name = name.replace("KHII", "KH2");
 			name = name.replace("The ", "");
 			name = name.replace("WORLD OF FF", "WOFF");
 			name = name.replace("Timeless River", "TR");
@@ -203,6 +206,7 @@ public class MedalHandler {
 			}
 
 			name = name.replace(" ", "");
+			System.out.println(name);
 			jpNicknames.put(name, original);
 		}
 		jpNicknames.put("Tieri", "Illustrated KH II Kairi");
