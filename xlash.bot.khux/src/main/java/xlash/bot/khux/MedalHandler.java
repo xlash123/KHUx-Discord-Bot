@@ -3,6 +3,7 @@ package xlash.bot.khux;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,6 +29,9 @@ public class MedalHandler {
 		System.out.println("Created nicknames");
 	}
 
+	/**
+	 * Deletes all medals in the database and regrabs the current list for both games. Preserves medal descriptions.
+	 */
 	public void refreshMedalList() {
 		disabled = true;
 		nicknames.clear();
@@ -39,12 +43,15 @@ public class MedalHandler {
 		disabled = false;
 	}
 
+	/**
+	 * Resets the medal descriptions for both games in the off chance something was changed.
+	 */
 	public void resetDescriptions() {
 		medalDescriptions.clear();
 		jpMedalDescriptions.clear();
 	}
 
-	public void getMedalList() {
+	private void getMedalList() {
 		try {
 			Document doc = Jsoup.connect("http://www.khunchainedx.com/wiki/Medal").get();
 			Elements medalList = doc.getElementById("mw-content-text").getElementsByClass("collapsible collapsed")
@@ -71,12 +78,16 @@ public class MedalHandler {
 		}
 	}
 
+	/**
+	 * Creates all the nicknames for each medal in both games.
+	 */
 	public void createNicknames() {
+		while(disabled){}
 		naNicknames();
 		jpNicknames();
 	}
 
-	public void naNicknames() {
+	private void naNicknames() {
 		for (String name : this.medalNamesAndLink.keySet()) {
 			String original = name.substring(0, name.length());
 			if (name.contains("é")) {
@@ -130,7 +141,7 @@ public class MedalHandler {
 		nicknames.put("BronzeDonald", "Donald A");
 	}
 
-	public void jpNicknames() {
+	private void jpNicknames() {
 		for (String name : this.jpMedalNamesAndLink.keySet()) {
 			String original = name.substring(0, name.length());
 			name = name.replace("Ver", "");
@@ -199,7 +210,14 @@ public class MedalHandler {
 		jpNicknames.put("BronzeDonald", "Donald A");
 	}
 
+	/**
+	 * Grabs the medal data from the wiki page.
+	 * @param realName The name of the medal as it appears in the database.
+	 * @param game The game to search on
+	 * @return The String meant to be published on Discord.
+	 */
 	public String getMedalInfo(String realName, GameEnum game) {
+		while(disabled){}
 		System.out.println("Getting info for game " + game.toString());
 		if (game==GameEnum.NA && this.medalDescriptions.containsKey(realName)) {
 			return this.medalDescriptions.get(realName);
@@ -262,7 +280,16 @@ public class MedalHandler {
 		}
 	}
 
+	/**
+	 * Attempts to get the real name of the medal. After checking the databases for exact matches, it will
+	 * then search by words and return the highest probable medal above 70%(inclusive) match.
+	 * @param name The nickname or real name of the medal to verify.
+	 * @param game The game to search
+	 * @return The medal's real name, or null if none is found
+	 */
 	public String getRealNameByNickname(String name, GameEnum game) {
+		while(disabled){}
+		name = name.toLowerCase();
 		if (game==GameEnum.NA) {
 			for (String test : this.medalNamesAndLink.keySet()) {
 				if (test.equalsIgnoreCase(name))
@@ -282,9 +309,103 @@ public class MedalHandler {
 					return jpNicknames.get(test);
 			}
 		}
-		return null;
+		//Now we search with words to get a most likely candidate.
+		String[] words = name.split(" ");
+		if(game==GameEnum.NA){
+			HashMap<String, Float> percentMatch = new HashMap<String, Float>();
+			for(String test : this.medalNamesAndLink.keySet()){
+				int matchLength = 0;
+				String compare = test.toLowerCase();
+				String[] testWords = compare.split(" ");
+				HashMap<String, Integer> repeats = new HashMap<String, Integer>();
+				for(String w : words){
+					int numOfOcc = 0;
+					if(repeats.get(w) != null) numOfOcc = repeats.get(w);
+					int initOcc = numOfOcc;
+					for(String tw : testWords){
+						if(tw.equals(w)){
+							numOfOcc--;
+							if(numOfOcc<0){
+								matchLength += tw.length();
+								repeats.put(w, initOcc+1);
+								break;
+							}
+						}
+					}
+				}
+				float higher = Math.max(test.length()-testWords.length, name.length()-words.length);
+				percentMatch.put(test, matchLength/higher);
+			}
+			Iterator<String> names = percentMatch.keySet().iterator();
+			Iterator<Float> percents = percentMatch.values().iterator();
+			String winner = null;
+			float winnerPer = 0;
+			for(int i=0; i<percentMatch.size(); i++){
+				String currentName = names.next();
+				float currentPercent = percents.next();
+				System.out.println(currentName + " : " + currentPercent);
+				if(currentPercent == 1){
+					return currentName;
+				}
+				if(currentPercent > winnerPer && currentPercent >= .7f){
+					winner = currentName;
+					winnerPer = currentPercent;
+				}
+			}
+			System.out.println();
+			System.out.println(winner + " " + winnerPer);
+			return winner;
+		} else {
+			HashMap<String, Float> percentMatch = new HashMap<String, Float>();
+			for(String test : this.jpMedalNamesAndLink.keySet()){
+				int matchLength = 0;
+				String compare = test.toLowerCase();
+				String[] testWords = compare.split(" ");
+				HashMap<String, Integer> repeats = new HashMap<String, Integer>();
+				for(String w : words){
+					int numOfOcc = 0;
+					if(repeats.get(w) != null) numOfOcc = repeats.get(w);
+					int initOcc = numOfOcc;
+					for(String tw : testWords){
+						if(tw.equals(w)){
+							numOfOcc--;
+							if(numOfOcc<0){
+								matchLength += tw.length();
+								repeats.put(w, initOcc+1);
+								break;
+							}
+						}
+					}
+				}
+				float higher = Math.max(test.length()-testWords.length, name.length()-words.length);
+				percentMatch.put(test, matchLength/higher);
+			}
+			Iterator<String> names = percentMatch.keySet().iterator();
+			Iterator<Float> percents = percentMatch.values().iterator();
+			String winner = null;
+			float winnerPer = 0;
+			for(int i=0; i<percentMatch.size(); i++){
+				String currentName = names.next();
+				float currentPercent = percents.next();
+				System.out.println(currentName + " : " + currentPercent);
+				if(currentPercent == 1){
+					return currentName;
+				}
+				if(currentPercent > winnerPer && currentPercent >= .7f){
+					winner = currentName;
+					winnerPer = currentPercent;
+				}
+			}
+			System.out.println();
+			System.out.println(winner + " " + winnerPer);
+			return winner;
+		}
 	}
 
+	/**
+	 * Whether or not the medal handler is disabled.
+	 * @return True when the database is refreshing.
+	 */
 	public boolean isDisabled() {
 		return disabled;
 	}
