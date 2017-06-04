@@ -11,6 +11,11 @@ public enum GameEnum {
 		this.tab = tab;
 	}
 	
+	/**
+	 * Takes a string and converts it into the GameState
+	 * @param game The nickname of the game
+	 * @return The corresponding GameState, or NA if none match.
+	 */
 	public static GameEnum parseString(String game){
 		if(game==null) return NA;
 		switch(game.toLowerCase()){

@@ -15,13 +15,17 @@ public class TwitterHandler {
 		lastTwitterUpdate = getTwitterUpdateLink(0);
 	}
 	
+	/**
+	 * Posts the newest Tweets to the channel specified in config.
+	 * @param api The api that sends the message.
+	 */
 	public void getTwitterUpdate(DiscordAPI api){
 		ArrayList<String> links = new ArrayList<String>();
 		String current;
 		for(int i=0; i<8; i++){
 			current = getTwitterUpdateLink(i);
 			if(!current.equalsIgnoreCase(lastTwitterUpdate)){
-				links.add(current);
+				links.add(0, current);
 			}else break;
 		}
 		for(String link : links){
@@ -30,6 +34,11 @@ public class TwitterHandler {
 		if(links.size()>0) lastTwitterUpdate = links.get(links.size()-1);
 	}
 	
+	/**
+	 * Grabs the link from the specified index of newest Tweet.
+	 * @param recent The index of the newest Tweet to get. 0 = newest.
+	 * @return The URL for the Tweet.
+	 */
 	public String getTwitterUpdateLink(int recent){
 		try {
 			Document doc = Jsoup.connect("https://twitter.com/kh_ux_na").get();

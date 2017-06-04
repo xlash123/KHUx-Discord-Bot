@@ -31,7 +31,7 @@ import xlash.bot.khux.config.Config;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.2.3";
+	public static final String VERSION = "1.2.4";
 
 	public static DiscordAPI api;
 
@@ -211,6 +211,11 @@ public class KHUxBot {
 		}
 	}
 
+	/**
+	 * Gets the GMT or UTC time.
+	 * @param format The format the time should be represented.
+	 * @return Time/Date in the GMT time zone.
+	 */
 	public static String getGMTTime(String format) {
 		final Date currentTime = new Date();
 
@@ -220,6 +225,10 @@ public class KHUxBot {
 		return sdf.format(currentTime);
 	}
 
+	/**
+	 * Gets the time in the GMT time zone in the 00:00:00 to 23:59:59 standard.
+	 * @return Time in the 00:00:00 to 23:59:59 standard.
+	 */
 	public static String getGMTTime() {
 		return getGMTTime("HH:mm:ss");
 	}
