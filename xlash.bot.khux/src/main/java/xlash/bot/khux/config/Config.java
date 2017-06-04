@@ -44,6 +44,9 @@ public class Config {
 		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
 	}
 	
+	/**
+	 * Loads the config file into memory.
+	 */
 	public void loadConfig(){
 		FileInputStream in;
 		try {
@@ -64,6 +67,9 @@ public class Config {
 		init();
 	}
 	
+	/**
+	 * Saves the config file.
+	 */
 	public void saveConfig(){
 		Properties p = new Properties();
 		p.setProperty("Bot_Token", botToken);
