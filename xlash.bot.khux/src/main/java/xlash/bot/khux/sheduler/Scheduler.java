@@ -142,8 +142,6 @@ public class Scheduler {
 			String currentTime = getGMTTime();
 			Date currentDate = convert(currentTime);
 			
-			System.out.println(currentTime);
-			
 			for(Event e : events){
 				for(String time : e.getTimes()){
 					if(time.equals(currentTime)){
