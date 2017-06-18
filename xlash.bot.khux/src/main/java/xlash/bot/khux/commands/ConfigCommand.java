@@ -12,8 +12,22 @@ public class ConfigCommand extends CommandBase{
 
 	@Override
 	public void onCommand(String[] args, Message message) {
-		KHUxBot.config.loadConfig();
-		message.reply("Configuration file reloaded.");
+		if(args.length==0){
+			this.printDescriptionUsage(message);
+		}else{
+			switch(args[0].toLowerCase()){
+			case "load":
+				KHUxBot.config.loadConfig();
+				message.reply("Configuration file reloaded.");
+				break;
+			case "save":
+				KHUxBot.config.saveConfig();
+				message.reply("Configuration file saved.");
+				break;
+				default:
+					this.printDescriptionUsage(message);
+			}
+		}
 	}
 
 	@Override
@@ -23,7 +37,7 @@ public class ConfigCommand extends CommandBase{
 
 	@Override
 	public String getUsage() {
-		return "!config";
+		return "!config [save/load]";
 	}
 	
 	@Override
