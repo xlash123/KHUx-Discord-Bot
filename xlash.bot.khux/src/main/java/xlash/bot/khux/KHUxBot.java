@@ -28,10 +28,13 @@ import xlash.bot.khux.commands.RefreshCommand;
 import xlash.bot.khux.commands.ResetCommand;
 import xlash.bot.khux.commands.TweetCommand;
 import xlash.bot.khux.config.Config;
+import xlash.bot.khux.sheduler.Event;
+import xlash.bot.khux.sheduler.Scheduler;
+import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.2.4";
+	public static final String VERSION = "1.2.5";
 
 	public static DiscordAPI api;
 
@@ -39,9 +42,11 @@ public class KHUxBot {
 	public static TwitterHandler twitterHandler;
 	public static CommandHandler commandHandler;
 	public static Config config;
+	public static Scheduler scheduler;
 
 	public volatile static boolean shouldTwitterUpdate;
-	public volatile static boolean shouldLux;
+	public volatile static boolean shouldLuxNA;
+	public volatile static boolean shouldLuxJP;
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
@@ -90,80 +95,133 @@ public class KHUxBot {
 		}
 		System.out.println("Server connected! Let's go!");
 		shouldTwitterUpdate = api.getChannelById(config.updateChannel) != null;
-		shouldLux = api.getChannelById(config.luxChannel) != null;
-		Thread grabTwitterUpdate = new Thread("Grab Twitter Update") {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					if (Integer.parseInt(getGMTTime("mm")) % 2 == 0 && getGMTTime("ss").equals("05")) {
-						twitterHandler.getTwitterUpdate(api);
-					}
-				}
-			}
-		};
-		grabTwitterUpdate.start();
-		Thread botUpdate = new Thread("Bot Update") {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(600000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					config.saveConfig();
-					findUpdate();
-				}
-			}
-		};
-		botUpdate.start();
-		Thread luxTimes = new Thread("Lux Times") {
-			@Override
-			public void run() {
-				while (true) {
-					if (shouldLux) {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						if (config.defaultGame == GameEnum.NA) {
-							if (getGMTTime("hh:mm:ss").equals("09:00:00")
-									|| getGMTTime("hh:mm:ss").equals("03:00:00")) {
-								if (shouldLux)
-									api.getChannelById(config.luxChannel).sendMessage(config.luxOnPrompt);
-							} else if (getGMTTime("hh:mm:ss").equals("10:00:00")
-									|| getGMTTime("hh:mm:ss").equals("04:00:00")) {
-								if (shouldLux)
-									api.getChannelById(config.luxChannel).sendMessage(config.luxOffPrompt);
-							}
-						} else{
-							if (getGMTTime("hh:mm:ss").equals("03:00:00")
-									|| getGMTTime("hh:mm:ss").equals("04:00:00")) {
-								if (shouldLux)
-									api.getChannelById(config.luxChannel).sendMessage(config.luxOnPrompt);
-							} else if (getGMTTime("hh:mm:ss").equals("13:00:00")
-									|| getGMTTime("hh:mm:ss").equals("14:00:00")) {
-								if (shouldLux)
-									api.getChannelById(config.luxChannel).sendMessage(config.luxOffPrompt);
-							}
-						}
-					}
-				}
-			}
-		};
-		luxTimes.start();
+		if(shouldTwitterUpdate){
+			scheduler.enableTimedEvent("Twitter Update");
+		}
+		shouldLuxNA = api.getChannelById(config.luxChannelNA) != null;
+		shouldLuxJP = api.getChannelById(config.luxChannelJP) != null;
+		if(shouldLuxNA){
+			scheduler.enableEvent("NA Lux On");
+			scheduler.enableEvent("NA Lux Off");
+		}
+		if(shouldLuxJP){
+			scheduler.enableEvent("JP Lux On");
+			scheduler.enableEvent("JP Lux Off");
+		}
 	}
 
 	public void initialize() {
 		System.out.println("Initializing...");
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
+		scheduler = new Scheduler();
+		scheduler.addDisabledEvent(new Event(){
+
+			@Override
+			public String[] getTimes() {
+				return new String[]{"03:00:00", "09:00:00"};
+			}
+
+			@Override
+			public void run() {
+				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOnPrompt);
+			}
+
+			@Override
+			public String getName() {
+				return "NA Lux On";
+			}
+			
+		});
+		scheduler.addDisabledEvent(new Event(){
+
+			@Override
+			public String[] getTimes() {
+				return new String[]{"04:00:00", "10:00:00"};
+			}
+
+			@Override
+			public void run() {
+				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOffPrompt);
+			}
+
+			@Override
+			public String getName() {
+				return "NA Lux Off";
+			}
+			
+		});
+		scheduler.addDisabledEvent(new Event(){
+
+			@Override
+			public String[] getTimes() {
+				return new String[]{"03:00:00", "13:00:00"};
+			}
+
+			@Override
+			public void run() {
+				api.getChannelById(config.luxChannelJP).sendMessage("JP: " + config.luxOnPrompt);
+			}
+
+			@Override
+			public String getName() {
+				return "JP Lux On";
+			}
+			
+		});
+		scheduler.addDisabledEvent(new Event(){
+
+			@Override
+			public String[] getTimes() {
+				return new String[]{"04:00:00", "14:00:00"};
+			}
+
+			@Override
+			public void run() {
+				api.getChannelById(config.luxChannelJP).sendMessage("JP: " + config.luxOffPrompt);
+			}
+
+			@Override
+			public String getName() {
+				return "JP Lux Off";
+			}
+			
+		});
+		scheduler.addDisabledTimedEvent(new TimedEvent() {
+			
+			@Override
+			public void run() {
+				twitterHandler.getTwitterUpdate(api);
+			}
+			
+			@Override
+			public String getName() {
+				return "Twitter Update";
+			}
+			
+			@Override
+			public int getFrequency() {
+				return 3;
+			}
+		});
+		scheduler.addTimedEvent(new TimedEvent() {
+			
+			@Override
+			public void run() {
+				config.saveConfig();
+				findUpdate();
+			}
+			
+			@Override
+			public String getName() {
+				return "Bot Update";
+			}
+			
+			@Override
+			public int getFrequency() {
+				return 20;
+			}
+		});
 		System.out.println("Initialization finished!");
 	}
 	
@@ -209,28 +267,6 @@ public class KHUxBot {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Gets the GMT or UTC time.
-	 * @param format The format the time should be represented.
-	 * @return Time/Date in the GMT time zone.
-	 */
-	public static String getGMTTime(String format) {
-		final Date currentTime = new Date();
-
-		final SimpleDateFormat sdf = new SimpleDateFormat(format);
-
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return sdf.format(currentTime);
-	}
-
-	/**
-	 * Gets the time in the GMT time zone in the 00:00:00 to 23:59:59 standard.
-	 * @return Time in the 00:00:00 to 23:59:59 standard.
-	 */
-	public static String getGMTTime() {
-		return getGMTTime("HH:mm:ss");
 	}
 
 }
