@@ -21,14 +21,16 @@ public class TweetCommand extends CommandBase{
 		}
 		switch(args[0]){
 		case "on":
-			message.reply("Twitter updates are set to post on this channel.");
     		KHUxBot.config.updateChannel = message.getChannelReceiver().getId();
+    		KHUxBot.scheduler.enableTimedEvent("Twitter Update");
     		KHUxBot.shouldTwitterUpdate = true;
+    		message.reply("Twitter updates are set to post on this channel.");
 			break;
 		case "off":
-			message.reply("Twitter updates have been turned off.");
     		KHUxBot.config.updateChannel = "";
+    		KHUxBot.scheduler.disableTimedEvent("Twitter Update");
     		KHUxBot.shouldTwitterUpdate = false;
+    		message.reply("Twitter updates have been turned off.");
     		break;
 		case "get":
 			message.reply(KHUxBot.twitterHandler.getTwitterUpdateLink(0));
