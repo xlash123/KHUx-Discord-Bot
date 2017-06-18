@@ -15,7 +15,8 @@ public class Config {
 	
 	public String botToken;
 	public volatile String updateChannel;
-	public volatile String luxChannel;
+	public volatile String luxChannelNA;
+	public volatile String luxChannelJP;
 	public volatile GameEnum defaultGame;
 	
 	public volatile String luxOnPrompt;
@@ -38,7 +39,8 @@ public class Config {
 	public void init(){
 		if(botToken == null) botToken = "";
 		if(updateChannel == null) updateChannel = "";
-		if(luxChannel == null) luxChannel = "";
+		if(luxChannelNA == null) luxChannelNA = "";
+		if(luxChannelJP == null) luxChannelJP = "";
 		if(defaultGame == null) defaultGame = GameEnum.NA;
 		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
 		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
@@ -55,7 +57,8 @@ public class Config {
 			p.load(in);
 			this.botToken = p.getProperty("Bot_Token");
 			this.updateChannel = p.getProperty("Update_Channel");
-			this.luxChannel = p.getProperty("Lux_Channel");
+			this.luxChannelNA = p.getProperty("Lux_Channel_NA");
+			this.luxChannelJP = p.getProperty("Lux_Channel_JP");
 			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
 			this.luxOnPrompt = p.getProperty("Lux_On_Prompt");
 			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
@@ -74,7 +77,8 @@ public class Config {
 		Properties p = new Properties();
 		p.setProperty("Bot_Token", botToken);
 		p.setProperty("Update_Channel", updateChannel);
-		p.setProperty("Lux_Channel", luxChannel);
+		p.setProperty("Lux_Channel_NA", luxChannelNA);
+		p.setProperty("Lux_Channel_JP", luxChannelJP);
 		p.setProperty("Default_Game", defaultGame.toString());
 		p.setProperty("Lux_On_Prompt", luxOnPrompt);
 		p.setProperty("Lux_Off_Prompt", luxOffPrompt);

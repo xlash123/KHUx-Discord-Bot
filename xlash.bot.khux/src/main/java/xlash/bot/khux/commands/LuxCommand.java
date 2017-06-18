@@ -1,7 +1,9 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
+import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.Config;
 
 public class LuxCommand extends CommandBase{
 	
@@ -19,23 +21,46 @@ public class LuxCommand extends CommandBase{
 		for(int i=0; i<args.length; i++){
 			args[i] = args[i].toLowerCase();
 		}
+		GameEnum game = KHUxBot.config.defaultGame;
+		if(args.length > 1){
+			game = GameEnum.parseString(args[1]);
+		}
 		switch(args[0]){
 		case "on":
-			message.reply("Double lux reminders have been turned on.");
-			KHUxBot.config.luxChannel = message.getChannelReceiver().getId();
-			KHUxBot.shouldLux = true;
+			if(game==GameEnum.NA){
+				KHUxBot.config.luxChannelNA = message.getChannelReceiver().getId();
+				KHUxBot.shouldLuxNA = true;
+			}else{
+				KHUxBot.config.luxChannelJP = message.getChannelReceiver().getId();
+				KHUxBot.shouldLuxJP = true;
+			}
+			KHUxBot.scheduler.enableEvent(game + " Lux On");
+			KHUxBot.scheduler.enableEvent(game + " Lux Off");
+			message.reply("Double lux reminders for " + game + " have been turned on.");
 			break;
 		case "off":
-			message.reply("Double lux reminders have been turned off.");
-			KHUxBot.config.luxChannel = "";
-			KHUxBot.shouldLux = false;
+			if(game==GameEnum.NA){
+				KHUxBot.config.luxChannelNA = "";
+				KHUxBot.shouldLuxNA = false;
+			}else{
+				KHUxBot.config.luxChannelJP = "";
+				KHUxBot.shouldLuxJP = false;
+			}
+			KHUxBot.scheduler.disableEvent(game + " Lux On");
+			KHUxBot.scheduler.disableEvent(game + " Lux Off");
+			message.reply("Double lux reminders for " + game + " have been turned off.");
     		break;
 		case "status":
-			if (KHUxBot.shouldLux)
-				message.reply("Double lux reminders are set for channel: #"
-						+ KHUxBot.api.getChannelById(KHUxBot.config.luxChannel).getName());
+			if (KHUxBot.shouldLuxNA)
+				message.reply("Double lux reminders for NA are set for channel: #"
+						+ KHUxBot.api.getChannelById(KHUxBot.config.luxChannelNA).getName());
 			else
-				message.reply("Double lux reminders are currently turned off.");
+				message.reply("Double lux reminders for NA are currently turned off.");
+			if (KHUxBot.shouldLuxJP)
+				message.reply("Double lux reminders for JP are set for channel: #"
+						+ KHUxBot.api.getChannelById(KHUxBot.config.luxChannelJP).getName());
+			else
+				message.reply("Double lux reminders for JP are currently turned off.");
 			break;
 			default:
 				this.printDescriptionUsage(message);
@@ -49,7 +74,7 @@ public class LuxCommand extends CommandBase{
 
 	@Override
 	public String getUsage() {
-		return "!lux [on/off/status]";
+		return "!lux [on/off/status] (na/jp)";
 	}
 
 	@Override
