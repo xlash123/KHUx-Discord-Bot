@@ -34,11 +34,17 @@ public class MedalHandler {
 	 */
 	public void refreshMedalList() {
 		disabled = true;
+		System.out.println("Clearing nicknames");
 		nicknames.clear();
+		System.out.println("Clearing JP Nicknames");
 		jpNicknames.clear();
+		System.out.println("Clearing medal names");
 		medalNamesAndLink.clear();
+		System.out.println("Clearing JP medal names");
 		jpMedalNamesAndLink.clear();
+		System.out.println("Generating medal list");
 		getMedalList();
+		System.out.println("Generating nicknames");
 		createNicknames();
 		disabled = false;
 	}
@@ -82,7 +88,6 @@ public class MedalHandler {
 	 * Creates all the nicknames for each medal in both games.
 	 */
 	public void createNicknames() {
-		while(disabled){}
 		naNicknames();
 		jpNicknames();
 	}
@@ -91,12 +96,12 @@ public class MedalHandler {
 		for (String name : this.medalNamesAndLink.keySet()) {
 			String original = name.substring(0, name.length());
 			name = name.replace("(EX)", "EX");
-			if (name.contains("é")) {
-				name = name.replace("é", "e");
+			if (name.contains("\u00E9")) {
+				name = name.replace("\u00E9", "e");
 				nicknames.put(name, original);
 			}
-			if (name.contains("è")) {
-				name = name.replace("è", "e");
+			if (name.contains("\u00E8")) {
+				name = name.replace("\u00E8", "e");
 				nicknames.put(name, original);
 			}
 			name = name.replace("KH II ", "KH2");
@@ -148,13 +153,13 @@ public class MedalHandler {
 			String original = name.substring(0, name.length());
 			name = name.replace("Ver", "");
 			name = name.replace("(EX)", "EX");
-			if (name.contains("é")) {
-				name = name.replace("é", "e");
-				jpNicknames.put(name, original);
+			if (name.contains("\u00E9")) {
+				name = name.replace("\u00E9", "e");
+				nicknames.put(name, original);
 			}
-			if (name.contains("è")) {
-				name = name.replace("è", "e");
-				jpNicknames.put(name, original);
+			if (name.contains("\u00E8")) {
+				name = name.replace("\u00E8", "e");
+				nicknames.put(name, original);
 			}
 			name = name.replace("KH II ", "KH2");
 			name = name.replace("KHII", "KH2");
@@ -206,7 +211,6 @@ public class MedalHandler {
 			}
 
 			name = name.replace(" ", "");
-			System.out.println(name);
 			jpNicknames.put(name, original);
 		}
 		jpNicknames.put("Tieri", "Illustrated KH II Kairi");
@@ -347,7 +351,6 @@ public class MedalHandler {
 			for(int i=0; i<percentMatch.size(); i++){
 				String currentName = names.next();
 				float currentPercent = percents.next();
-				System.out.println(currentName + " : " + currentPercent);
 				if(currentPercent == 1){
 					return currentName;
 				}
@@ -356,8 +359,6 @@ public class MedalHandler {
 					winnerPer = currentPercent;
 				}
 			}
-			System.out.println();
-			System.out.println(winner + " " + winnerPer);
 			return winner;
 		} else {
 			HashMap<String, Float> percentMatch = new HashMap<String, Float>();
@@ -391,7 +392,6 @@ public class MedalHandler {
 			for(int i=0; i<percentMatch.size(); i++){
 				String currentName = names.next();
 				float currentPercent = percents.next();
-				System.out.println(currentName + " : " + currentPercent);
 				if(currentPercent == 1){
 					return currentName;
 				}
@@ -400,8 +400,6 @@ public class MedalHandler {
 					winnerPer = currentPercent;
 				}
 			}
-			System.out.println();
-			System.out.println(winner + " " + winnerPer);
 			return winner;
 		}
 	}
