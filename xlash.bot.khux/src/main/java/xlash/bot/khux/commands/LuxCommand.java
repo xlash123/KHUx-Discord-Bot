@@ -28,9 +28,17 @@ public class LuxCommand extends CommandBase{
 		switch(args[0]){
 		case "on":
 			if(game==GameEnum.NA){
+				if(KHUxBot.shouldLuxNA){
+					message.reply("NA Lux reminders are already on.");
+					return;
+				}
 				KHUxBot.config.luxChannelNA = message.getChannelReceiver().getId();
 				KHUxBot.shouldLuxNA = true;
 			}else{
+				if(KHUxBot.shouldLuxJP){
+					message.reply("JP Lux reminders are already on.");
+					return;
+				}
 				KHUxBot.config.luxChannelJP = message.getChannelReceiver().getId();
 				KHUxBot.shouldLuxJP = true;
 			}
@@ -40,9 +48,17 @@ public class LuxCommand extends CommandBase{
 			break;
 		case "off":
 			if(game==GameEnum.NA){
+				if(!KHUxBot.shouldLuxNA){
+					message.reply("NA Lux reminders are already off.");
+					return;
+				}
 				KHUxBot.config.luxChannelNA = "";
 				KHUxBot.shouldLuxNA = false;
 			}else{
+				if(!KHUxBot.shouldLuxJP){
+					message.reply("JP Lux reminders are already off.");
+					return;
+				}
 				KHUxBot.config.luxChannelJP = "";
 				KHUxBot.shouldLuxJP = false;
 			}
