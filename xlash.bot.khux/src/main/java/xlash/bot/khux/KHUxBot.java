@@ -3,10 +3,7 @@ package xlash.bot.khux;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Scanner;
-import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +12,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
+import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import xlash.bot.khux.commands.CommandHandler;
@@ -245,6 +243,12 @@ public class KHUxBot {
 					@Override
 					public void onMessageCreate(DiscordAPI api, Message message) {
 						commandHandler.executeCommand(message);
+						for(User u : message.getMentions()){
+							if(u.isYourself()){
+								message.reply("Don't at me, bro.");
+								//TODO Have a list of messages to choose from.
+							}
+						}
 					}
 					
 				});
