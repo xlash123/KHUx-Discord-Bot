@@ -154,7 +154,7 @@ public class Scheduler {
 			
 			for(TimedEvent e : timedEvents){
 				long difference = difference(convert(e.lastRun), currentDate).getTime();
-				if(difference > e.getFrequency()*60*1000){
+				if(difference > e.getFrequency()*60000){
 					System.out.println("Running " + e.getName());
 					e.run();
 					e.lastRun = String.valueOf(currentTime);
