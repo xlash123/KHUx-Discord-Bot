@@ -3,6 +3,7 @@ package xlash.bot.khux.sheduler;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -137,29 +138,22 @@ public class Scheduler {
 	}
 	
 	private void scheduler(){
+		long timeSec = System.currentTimeMillis()/1000;
+		long prevTimeSec = new Long(timeSec);
+		
 		while(true){
-			long timeSec = System.currentTimeMillis()/1000;
-			String currentTime = getGMTTime();
-			Date currentDate = convert(currentTime);
+			timeSec = System.currentTimeMillis()/1000;
 			
-			for(Event e : events){
-				for(String time : e.getTimes()){
-					if(time.equals(currentTime)){
-						System.out.println("Running " + e.getName());
-						e.run();
-						break;
-					}
+			//Safety just in case 2 seconds pass in one tick
+			if(timeSec-prevTimeSec > 1){
+				for(int i=1; prevTimeSec+i<timeSec; i++){
+					this.executeEvents(prevTimeSec+i);
 				}
 			}
 			
-			for(TimedEvent e : timedEvents){
-				long difference = difference(convert(e.lastRun), currentDate).getTime();
-				if(difference > e.getFrequency()*60000){
-					System.out.println("Running " + e.getName());
-					e.run();
-					e.lastRun = String.valueOf(currentTime);
-				}
-			}
+			prevTimeSec = new Long(timeSec);
+			
+			this.executeEvents(timeSec);
 			
 			while(timeSec==System.currentTimeMillis()/1000){
 				try {
@@ -167,6 +161,30 @@ public class Scheduler {
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
+			}
+		}
+	}
+	
+	public void executeEvents(long timeSec){
+		String currentTime = getGMTTime(timeSec);
+		Date currentDate = convert(currentTime);
+		
+		for(Event e : events){
+			for(String time : e.getTimes()){
+				if(time.equals(currentTime)){
+					System.out.println("Running " + e.getName());
+					e.run();
+					break;
+				}
+			}
+		}
+		
+		for(TimedEvent e : timedEvents){
+			long difference = difference(convert(e.lastRun), currentDate).getTime();
+			if(difference > e.getFrequency()*60000){
+				System.out.println("Running " + e.getName());
+				e.run();
+				e.lastRun = String.valueOf(currentTime);
 			}
 		}
 	}
@@ -191,6 +209,10 @@ public class Scheduler {
 	 */
 	public static String getGMTTime() {
 		return getGMTTime("HH:mm:ss");
+	}
+	
+	public static String getGMTTime(long sec){
+		return SDF.format(new Date(sec*1000));
 	}
 	
 	/**
