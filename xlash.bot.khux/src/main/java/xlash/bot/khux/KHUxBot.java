@@ -65,7 +65,7 @@ public class KHUxBot {
 		} else {
 			System.out.println("Running bot version: " + VERSION);
 			System.err.println("NOTE: This is a temporary update. It provides the new lux times for NA's raid week "
-					+ "by replacing the old ones. At the end of the week, I will released another update "
+					+ "by replacing the old ones. At the end of the week, I will release another update "
 					+ "replacing the old lux times.");
 			findUpdate();
 			config = new Config();
