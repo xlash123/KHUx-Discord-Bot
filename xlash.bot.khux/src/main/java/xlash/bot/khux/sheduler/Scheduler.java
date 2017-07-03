@@ -12,10 +12,8 @@ public class Scheduler {
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 	
 	public volatile ArrayList<Event> events = new ArrayList<Event>();
-	public volatile ArrayList<Event> disabledEvents = new ArrayList<Event>();
 	
 	public volatile ArrayList<TimedEvent> timedEvents = new ArrayList<TimedEvent>();
-	public volatile ArrayList<TimedEvent> disabledTimedEvents = new ArrayList<TimedEvent>();
 	
 	public Scheduler(){
 		SDF.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -29,48 +27,13 @@ public class Scheduler {
 	}
 	
 	public void addTimedEvent(TimedEvent event){
-		for(Event e : events){
+		for(TimedEvent e : timedEvents){
 			if(e.getName().equals(event.getName())){
 				System.err.println("An event with name " + e.getName() + " already exists. Event not added.");
 				return;
 			}
 		}
 		this.timedEvents.add(event);
-	}
-	
-	public void addDisabledTimedEvent(TimedEvent event){
-		for(TimedEvent e : disabledTimedEvents){
-			if(e.getName().equals(event.getName())){
-				System.err.println("An event with name " + e.getName() + " already exists. Event not added.");
-				return;
-			}
-		}
-		this.disabledTimedEvents.add(event);
-		System.out.println("Added disabled event " + event.getName());
-	}
-	
-	public void disableTimedEvent(String name){
-		for(TimedEvent e : timedEvents){
-			if(e.getName().equals(name)){
-				timedEvents.remove(e);
-				disabledTimedEvents.add(e);
-				System.out.println("Disabled event " + name);
-				return;
-			}
-		}
-		System.out.println("Failed to disable event " + name);
-	}
-	
-	public void enableTimedEvent(String name){
-		for(TimedEvent e : disabledTimedEvents){
-			if(e.getName().equals(name)){
-				disabledTimedEvents.remove(e);
-				addTimedEvent(e);
-				System.out.println("Enabled event " + name);
-				return;
-			}
-		}
-		System.out.println("Failed to enabled event " + name);
 	}
 	
 	public void removeTimedEvent(String name){
@@ -93,17 +56,6 @@ public class Scheduler {
 		System.out.println("Added enabled event " + event.getName());
 	}
 	
-	public void addDisabledEvent(Event event){
-		for(Event e : disabledEvents){
-			if(e.getName().equals(event.getName())){
-				System.err.println("An event with name " + e.getName() + " already exists. Event not added.");
-				return;
-			}
-		}
-		this.disabledEvents.add(event);
-		System.out.println("Added disabled event " + event.getName());
-	}
-	
 	public void removeEvent(String name){
 		for(Event e : events){
 			if(e.getName().equals(name)){
@@ -113,28 +65,26 @@ public class Scheduler {
 		}
 	}
 	
-	public void disableEvent(String name){
+	public void enableEvent(String name){
 		for(Event e : events){
 			if(e.getName().equals(name)){
-				events.remove(e);
-				disabledEvents.add(e);
-				System.out.println("Disabled event " + name);
-				return;
-			}
-		}
-		System.out.println("Failed to disable event " + name);
-	}
-	
-	public void enableEvent(String name){
-		for(Event e : disabledEvents){
-			if(e.getName().equals(name)){
-				disabledEvents.remove(e);
-				addEvent(e);
+				e.enabled = true;
 				System.out.println("Enabled event " + name);
 				return;
 			}
 		}
 		System.out.println("Failed to enabled event " + name);
+	}
+	
+	public void enableTimedEvent(String name){
+		for(TimedEvent e : timedEvents){
+			if(e.getName().equals(name)){
+				e.enabled = true;
+				System.out.println("Enabled timed event " + name);
+				return;
+			}
+		}
+		System.out.println("Failed to enabled timed event " + name);
 	}
 	
 	private void scheduler(){
@@ -171,7 +121,7 @@ public class Scheduler {
 		
 		for(Event e : events){
 			for(String time : e.getTimes()){
-				if(time.equals(currentTime)){
+				if(e.enabled && time.equals(currentTime)){
 					System.out.println("Running " + e.getName());
 					e.run();
 					break;
@@ -180,11 +130,13 @@ public class Scheduler {
 		}
 		
 		for(TimedEvent e : timedEvents){
-			long difference = difference(convert(e.lastRun), currentDate).getTime();
-			if(difference > e.getFrequency()*60000){
-				System.out.println("Running " + e.getName());
-				e.run();
-				e.lastRun = String.valueOf(currentTime);
+			if(e.enabled){
+				long difference = difference(convert(e.lastRun), currentDate).getTime();
+				if(difference > e.getFrequency()*60000){
+					System.out.println("Running " + e.getName());
+					e.run();
+					e.lastRun = String.valueOf(currentTime);
+				}
 			}
 		}
 	}

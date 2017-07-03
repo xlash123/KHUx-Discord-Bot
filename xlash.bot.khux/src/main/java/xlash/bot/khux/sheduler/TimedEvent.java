@@ -1,10 +1,17 @@
 package xlash.bot.khux.sheduler;
 
 public abstract class TimedEvent {
+
+	public final String name;
+	public int frequency;
+	public boolean enabled;
 	
 	public String lastRun;
 	
-	public TimedEvent(){
+	public TimedEvent(String name, boolean enabled, int frequency){
+		this.name = name;
+		this.frequency = frequency;
+		this.enabled = enabled;
 		lastRun = "00:00:00";
 	}
 	
@@ -12,10 +19,14 @@ public abstract class TimedEvent {
 	 * Gets the frequency of this event in minutes
 	 * @return
 	 */
-	public abstract int getFrequency();
+	public int getFrequency(){
+		return frequency;
+	}
 	
 	public abstract void run();
 	
-	public abstract String getName();
+	public final String getName(){
+		return name;
+	}
 
 }
