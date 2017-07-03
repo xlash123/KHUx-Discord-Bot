@@ -32,7 +32,7 @@ import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.2.6";
+	public static final String VERSION = "1.2.7.5";
 
 	public static DiscordAPI api;
 
@@ -64,6 +64,9 @@ public class KHUxBot {
 			}
 		} else {
 			System.out.println("Running bot version: " + VERSION);
+			System.err.println("NOTE: This is a temporary update. It provides the new lux times for NA's raid week "
+					+ "by replacing the old ones. At the end of the week, I will released another update "
+					+ "replacing the old lux times.");
 			findUpdate();
 			config = new Config();
 			config.loadConfig();
@@ -117,7 +120,8 @@ public class KHUxBot {
 
 			@Override
 			public String[] getTimes() {
-				return new String[]{"03:00:00", "09:00:00", "15:00:00", "21:00:00"};
+//				return new String[]{"03:00:00", "09:00:00", "15:00:00", "21:00:00"};
+				return new String[]{"19:00:00", "2:00:00"};
 			}
 
 			@Override
@@ -135,7 +139,8 @@ public class KHUxBot {
 
 			@Override
 			public String[] getTimes() {
-				return new String[]{"04:00:00", "10:00:00", "16:00:00", "22:00:00"};
+//				return new String[]{"04:00:00", "10:00:00", "16:00:00", "22:00:00"};
+				return new String[]{"20:00:00", "3:00:00"};
 			}
 
 			@Override
