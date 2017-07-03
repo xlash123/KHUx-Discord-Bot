@@ -76,6 +76,17 @@ public class Scheduler {
 		System.out.println("Failed to enabled event " + name);
 	}
 	
+	public void disableEvent(String name){
+		for(Event e : events){
+			if(e.getName().equals(name)){
+				e.enabled = false;
+				System.out.println("Disabled event " + name);
+				return;
+			}
+		}
+		System.out.println("Failed to disable event " + name);
+	}
+	
 	public void enableTimedEvent(String name){
 		for(TimedEvent e : timedEvents){
 			if(e.getName().equals(name)){
@@ -85,6 +96,17 @@ public class Scheduler {
 			}
 		}
 		System.out.println("Failed to enabled timed event " + name);
+	}
+	
+	public void disableTimedEvent(String name){
+		for(TimedEvent e : timedEvents){
+			if(e.getName().equals(name)){
+				e.enabled = false;
+				System.out.println("Disabled timed event " + name);
+				return;
+			}
+		}
+		System.out.println("Failed to disable timed event " + name);
 	}
 	
 	private void scheduler(){
