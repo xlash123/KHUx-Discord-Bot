@@ -32,7 +32,7 @@ import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.2.7";
+	public static final String VERSION = "1.2.7.6";
 
 	public static DiscordAPI api;
 
@@ -64,6 +64,9 @@ public class KHUxBot {
 			}
 		} else {
 			System.out.println("Running bot version: " + VERSION);
+			System.err.println("NOTE: This is a temporary update. It provides the new lux times for NA's raid week "
+					+ "by replacing the old ones. At the end of the week, I will release another update "
+					+ "replacing the old lux times.");
 			findUpdate();
 			config = new Config();
 			config.loadConfig();
@@ -113,111 +116,43 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-		scheduler.addDisabledEvent(new Event(){
-
-			@Override
-			public String[] getTimes() {
-				return new String[]{"03:00:00", "09:00:00", "15:00:00", "21:00:00"};
-			}
-
+//		"03:00:00", "09:00:00", "15:00:00", "21:00:00"
+		scheduler.addEvent(new Event("NA Lux On", false, "02:00:00", "19:00:00"){
 			@Override
 			public void run() {
 				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOnPrompt);
 			}
-
-			@Override
-			public String getName() {
-				return "NA Lux On";
-			}
-			
 		});
-		scheduler.addDisabledEvent(new Event(){
-
-			@Override
-			public String[] getTimes() {
-				return new String[]{"04:00:00", "10:00:00", "16:00:00", "22:00:00"};
-			}
-
+		//"04:00:00", "10:00:00", "16:00:00", "22:00:00"
+		scheduler.addEvent(new Event("NA Lux Off", false, "03:00:00", "20:00:00"){
 			@Override
 			public void run() {
 				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOffPrompt);
 			}
-
-			@Override
-			public String getName() {
-				return "NA Lux Off";
-			}
-			
 		});
-		scheduler.addDisabledEvent(new Event(){
-
-			@Override
-			public String[] getTimes() {
-				return new String[]{"03:00:00", "13:00:00"};
-			}
-
+		scheduler.addEvent(new Event("JP Lux On", false, "03:00:00", "13:00:00"){
 			@Override
 			public void run() {
 				api.getChannelById(config.luxChannelJP).sendMessage("JP: " + config.luxOnPrompt);
 			}
-
-			@Override
-			public String getName() {
-				return "JP Lux On";
-			}
-			
 		});
-		scheduler.addDisabledEvent(new Event(){
-
-			@Override
-			public String[] getTimes() {
-				return new String[]{"04:00:00", "14:00:00"};
-			}
-
+		scheduler.addEvent(new Event("JP Lux Off", false, "04:00:00", "14:00:00"){
 			@Override
 			public void run() {
 				api.getChannelById(config.luxChannelJP).sendMessage("JP: " + config.luxOffPrompt);
 			}
-
-			@Override
-			public String getName() {
-				return "JP Lux Off";
-			}
-			
 		});
-		scheduler.addDisabledTimedEvent(new TimedEvent() {
-			
+		scheduler.addTimedEvent(new TimedEvent("Twitter Update", true, 2) {
 			@Override
 			public void run() {
 				twitterHandler.getTwitterUpdate(api);
 			}
-			
-			@Override
-			public String getName() {
-				return "Twitter Update";
-			}
-			
-			@Override
-			public int getFrequency() {
-				return 3;
-			}
 		});
-		scheduler.addTimedEvent(new TimedEvent() {
-			
+		scheduler.addTimedEvent(new TimedEvent("Bot Update", true, 20) {
 			@Override
 			public void run() {
 				config.saveConfig();
 				findUpdate();
-			}
-			
-			@Override
-			public String getName() {
-				return "Bot Update";
-			}
-			
-			@Override
-			public int getFrequency() {
-				return 20;
 			}
 		});
 		System.out.println("Initialization finished!");
