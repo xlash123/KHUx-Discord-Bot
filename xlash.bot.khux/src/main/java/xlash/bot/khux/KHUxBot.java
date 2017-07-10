@@ -116,15 +116,13 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-//		"03:00:00", "09:00:00", "15:00:00", "21:00:00"
-		scheduler.addEvent(new Event("NA Lux On", false, "02:00:00", "19:00:00"){
+		scheduler.addEvent(new Event("NA Lux On", false, "03:00:00", "09:00:00", "15:00:00", "21:00:00"){
 			@Override
 			public void run() {
 				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOnPrompt);
 			}
 		});
-		//"04:00:00", "10:00:00", "16:00:00", "22:00:00"
-		scheduler.addEvent(new Event("NA Lux Off", false, "03:00:00", "20:00:00"){
+		scheduler.addEvent(new Event("NA Lux Off", false, "04:00:00", "10:00:00", "16:00:00", "22:00:00"){
 			@Override
 			public void run() {
 				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOffPrompt);
