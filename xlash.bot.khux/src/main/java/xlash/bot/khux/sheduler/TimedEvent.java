@@ -1,5 +1,9 @@
 package xlash.bot.khux.sheduler;
 
+/**
+ * An event that runs every x minutes
+ *
+ */
 public abstract class TimedEvent {
 
 	public final String name;
@@ -8,6 +12,12 @@ public abstract class TimedEvent {
 	
 	public String lastRun;
 	
+	/**
+	 * Create an event that runs every x minutes
+	 * @param name Unique name
+	 * @param enabled Determines if the event will run
+	 * @param frequency in minutes
+	 */
 	public TimedEvent(String name, boolean enabled, int frequency){
 		this.name = name;
 		this.frequency = frequency;

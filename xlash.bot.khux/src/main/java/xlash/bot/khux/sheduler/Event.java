@@ -1,5 +1,9 @@
 package xlash.bot.khux.sheduler;
 
+/**
+ * An event that runs at a specific time
+ *
+ */
 public abstract class Event {
 	
 	public final String name;

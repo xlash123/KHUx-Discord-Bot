@@ -3,10 +3,13 @@ package xlash.bot.khux.sheduler;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+/**
+ * Schedules things
+ *
+ */
 public class Scheduler {
 	
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
@@ -15,6 +18,9 @@ public class Scheduler {
 	
 	public volatile ArrayList<TimedEvent> timedEvents = new ArrayList<TimedEvent>();
 	
+	/**
+	 * Initializes a scheduler.
+	 */
 	public Scheduler(){
 		SDF.setTimeZone(TimeZone.getTimeZone("GMT"));
 		Thread scheduler = new Thread("Scheduler"){
@@ -26,6 +32,10 @@ public class Scheduler {
 		scheduler.start();
 	}
 	
+	/**
+	 * Add an timed event
+	 * @param event
+	 */
 	public void addTimedEvent(TimedEvent event){
 		for(TimedEvent e : timedEvents){
 			if(e.getName().equals(event.getName())){
@@ -35,7 +45,10 @@ public class Scheduler {
 		}
 		this.timedEvents.add(event);
 	}
-	
+	/**
+	 * Remove a timed event
+	 * @param name
+	 */
 	public void removeTimedEvent(String name){
 		for(TimedEvent e : timedEvents){
 			if(e.getName().equals(name)){
@@ -45,6 +58,10 @@ public class Scheduler {
 		}
 	}
 	
+	/**
+	 * Add an event
+	 * @param event
+	 */
 	public void addEvent(Event event){
 		for(Event e : events){
 			if(e.getName().equals(event.getName())){
@@ -56,6 +73,10 @@ public class Scheduler {
 		System.out.println("Added enabled event " + event.getName());
 	}
 	
+	/**
+	 * Remove an event
+	 * @param name
+	 */
 	public void removeEvent(String name){
 		for(Event e : events){
 			if(e.getName().equals(name)){
@@ -65,6 +86,10 @@ public class Scheduler {
 		}
 	}
 	
+	/**
+	 * Enable an event
+	 * @param name
+	 */
 	public void enableEvent(String name){
 		for(Event e : events){
 			if(e.getName().equals(name)){
@@ -76,6 +101,10 @@ public class Scheduler {
 		System.out.println("Failed to enabled event " + name);
 	}
 	
+	/**
+	 * Disable an event
+	 * @param name
+	 */
 	public void disableEvent(String name){
 		for(Event e : events){
 			if(e.getName().equals(name)){
@@ -87,6 +116,10 @@ public class Scheduler {
 		System.out.println("Failed to disable event " + name);
 	}
 	
+	/**
+	 * Enable a timed event
+	 * @param name
+	 */
 	public void enableTimedEvent(String name){
 		for(TimedEvent e : timedEvents){
 			if(e.getName().equals(name)){
@@ -98,6 +131,10 @@ public class Scheduler {
 		System.out.println("Failed to enabled timed event " + name);
 	}
 	
+	/**
+	 * Disable a timed event
+	 * @param name
+	 */
 	public void disableTimedEvent(String name){
 		for(TimedEvent e : timedEvents){
 			if(e.getName().equals(name)){
@@ -109,6 +146,9 @@ public class Scheduler {
 		System.out.println("Failed to disable timed event " + name);
 	}
 	
+	/**
+	 * Runs the scheduler to do things at the events' specified times
+	 */
 	private void scheduler(){
 		long timeSec = System.currentTimeMillis()/1000;
 		long prevTimeSec = new Long(timeSec);
@@ -137,7 +177,11 @@ public class Scheduler {
 		}
 	}
 	
-	public void executeEvents(long timeSec){
+	/**
+	 * Executes any events that should run at the specified UNIX time
+	 * @param timeSec in UNIX time (milliseconds)
+	 */
+	private void executeEvents(long timeSec){
 		String currentTime = getGMTTime(timeSec);
 		Date currentDate = convert(currentTime);
 		
