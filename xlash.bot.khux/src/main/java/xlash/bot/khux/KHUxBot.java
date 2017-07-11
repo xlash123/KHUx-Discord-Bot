@@ -3,6 +3,7 @@ package xlash.bot.khux;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Random;
 import java.util.Scanner;
 
 import org.jsoup.Jsoup;
@@ -15,8 +16,10 @@ import de.btobastian.javacord.Javacord;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
+import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
+import xlash.bot.khux.commands.UnAdmin;
 import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
@@ -32,7 +35,7 @@ import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.2.7.9";
+	public static final String VERSION = "1.3";
 
 	public static DiscordAPI api;
 
@@ -45,6 +48,8 @@ public class KHUxBot {
 	public volatile static boolean shouldTwitterUpdate;
 	public volatile static boolean shouldLuxNA;
 	public volatile static boolean shouldLuxJP;
+	
+	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "Whomst'd've are you?"};
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
@@ -166,6 +171,8 @@ public class KHUxBot {
 		commandHandler.registerCommand(new ResetCommand());
 		commandHandler.registerCommand(new DefaultCommand());
 		commandHandler.registerCommand(new ConfigCommand());
+		commandHandler.registerCommand(new AdminCommand());
+		commandHandler.registerCommand(new UnAdmin());
 	}
 
 	public void connect(DiscordAPI api) {
@@ -178,8 +185,10 @@ public class KHUxBot {
 						commandHandler.executeCommand(message);
 						for(User u : message.getMentions()){
 							if(u.isYourself()){
-								message.reply("Don't at me, bro.");
-								//TODO Have a list of messages to choose from.
+								Random rand = new Random();
+								if(u.getId().equals("137604437765128192") && rand.nextFloat() < .2f) message.reply("You should uninstall.");
+								int i = rand.nextInt(COMEBACKS.length);
+								message.reply(COMEBACKS[i]);
 							}
 						}
 					}
