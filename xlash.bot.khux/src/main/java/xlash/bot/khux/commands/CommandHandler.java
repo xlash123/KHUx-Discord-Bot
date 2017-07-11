@@ -1,13 +1,10 @@
 package xlash.bot.khux.commands;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.permissions.PermissionState;
-import de.btobastian.javacord.entities.permissions.PermissionType;
-import de.btobastian.javacord.entities.permissions.Role;
+import xlash.bot.khux.KHUxBot;
 
 public class CommandHandler {
 	
@@ -27,11 +24,11 @@ public class CommandHandler {
 				if(s.equalsIgnoreCase(parts[0])){
 					if(com.isAdmin()){
 						User user = message.getAuthor();
-						Collection<Role> roles = user.getRoles(message.getChannelReceiver().getServer());
 						boolean admin = false;
-						for(Role r : roles){
-							if(r.getPermissions().getState(PermissionType.ADMINISTATOR)==PermissionState.ALLOWED){
+						for(String id : KHUxBot.config.admins){
+							if(user.getId().equals(id)){
 								admin = true;
+								break;
 							}
 						}
 						if(!admin){

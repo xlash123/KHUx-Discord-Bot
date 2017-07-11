@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 
 import xlash.bot.khux.GameEnum;
@@ -21,6 +23,8 @@ public class Config {
 	
 	public volatile String luxOnPrompt;
 	public volatile String luxOffPrompt;
+	
+	public volatile ArrayList<String> admins;
 	
 	public Config(){
 		init();
@@ -44,6 +48,7 @@ public class Config {
 		if(defaultGame == null) defaultGame = GameEnum.NA;
 		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
 		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
+		if(admins == null) admins = new ArrayList<String>();
 	}
 	
 	/**
@@ -62,6 +67,7 @@ public class Config {
 			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
 			this.luxOnPrompt = p.getProperty("Lux_On_Prompt");
 			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
+			this.admins.addAll(Arrays.asList(p.getProperty("Bot_Admins").split(",")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -82,6 +88,12 @@ public class Config {
 		p.setProperty("Default_Game", defaultGame.toString());
 		p.setProperty("Lux_On_Prompt", luxOnPrompt);
 		p.setProperty("Lux_Off_Prompt", luxOffPrompt);
+		String toSave = "";
+		for(int i=0; i<admins.size(); i++){
+			toSave += admins.get(i);
+			if(i+1<admins.size()) toSave += ",";
+		}
+		p.setProperty("Bot_Admins", toSave);
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(DIRECTORY));
