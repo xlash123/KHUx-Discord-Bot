@@ -3,7 +3,6 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
-import xlash.bot.khux.config.Config;
 
 public class LuxCommand extends CommandBase{
 	
