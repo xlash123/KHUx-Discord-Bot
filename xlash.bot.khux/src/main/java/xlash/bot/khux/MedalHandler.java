@@ -2,6 +2,7 @@ package xlash.bot.khux;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -12,11 +13,11 @@ import org.jsoup.select.Elements;
 
 public class MedalHandler {
 
-	public HashMap<String, String> nicknames = new HashMap<String, String>();
+	public HashMap<String, ArrayList<String>> nicknames = new HashMap<String, ArrayList<String>>();
 	public HashMap<String, String> medalNamesAndLink = new HashMap<String, String>();
 	public HashMap<String, String> medalDescriptions = new HashMap<String, String>();
 
-	public HashMap<String, String> jpNicknames = new HashMap<String, String>();
+	public HashMap<String, ArrayList<String>> jpNicknames = new HashMap<String, ArrayList<String>>();
 	public HashMap<String, String> jpMedalNamesAndLink = new HashMap<String, String>();
 	public HashMap<String, String> jpMedalDescriptions = new HashMap<String, String>();
 
@@ -94,15 +95,16 @@ public class MedalHandler {
 
 	private void naNicknames() {
 		for (String name : this.medalNamesAndLink.keySet()) {
+			ArrayList<String> toAdd = new ArrayList<String>();
 			String original = name.substring(0, name.length());
 			name = name.replace("(EX)", "EX");
 			if (name.contains("\u00E9")) {
 				name = name.replace("\u00E9", "e");
-				nicknames.put(name, original);
+				toAdd.add(name);
 			}
 			if (name.contains("\u00E8")) {
 				name = name.replace("\u00E8", "e");
-				nicknames.put(name, original);
+				toAdd.add(name);
 			}
 			name = name.replace("KH II ", "KH2");
 			name = name.replace("KHII", "KH2");
@@ -141,25 +143,34 @@ public class MedalHandler {
 			}
 
 			name = name.replace(" ", "");
-			nicknames.put(name, original);
+			toAdd.add(name);
+			nicknames.put(original, toAdd);
 		}
-		nicknames.put("Tieri", "Illustrated KH II Kairi");
-		nicknames.put("Pooglet", "Pooh & Piglet");
-		nicknames.put("BronzeDonald", "Donald A");
+		addNicknameToNA("Tieri", "Illustrated KH II Kairi");
+		addNicknameToNA("Pooglet", "Pooh & Piglet");
+		addNicknameToNA("BronzeDonald", "Donald A");
+	}
+	
+	public void addNicknameToNA(String nickname, String original){
+		ArrayList<String> list = nicknames.get(original);
+		if(list != null && !list.contains(nickname)){
+			list.add(nickname);
+		}
 	}
 
 	private void jpNicknames() {
 		for (String name : this.jpMedalNamesAndLink.keySet()) {
+			ArrayList<String> toAdd = new ArrayList<String>();
 			String original = name.substring(0, name.length());
 			name = name.replace("Ver", "");
 			name = name.replace("(EX)", "EX");
 			if (name.contains("\u00E9")) {
 				name = name.replace("\u00E9", "e");
-				nicknames.put(name, original);
+				toAdd.add(name);
 			}
 			if (name.contains("\u00E8")) {
 				name = name.replace("\u00E8", "e");
-				nicknames.put(name, original);
+				toAdd.add(name);
 			}
 			name = name.replace("KH II ", "KH2");
 			name = name.replace("KHII", "KH2");
@@ -211,11 +222,19 @@ public class MedalHandler {
 			}
 
 			name = name.replace(" ", "");
-			jpNicknames.put(name, original);
+			toAdd.add(name);
+			jpNicknames.put(original, toAdd);
 		}
-		jpNicknames.put("Tieri", "Illustrated KH II Kairi");
-		jpNicknames.put("Pooglet", "Pooh & Piglet");
-		jpNicknames.put("BronzeDonald", "Donald A");
+		addNicknameToJP("Tieri", "Illustrated KH II Kairi");
+		addNicknameToJP("Pooglet", "Pooh & Piglet");
+		addNicknameToJP("BronzeDonald", "Donald A");
+	}
+	
+	public void addNicknameToJP(String nickname, String original){
+		ArrayList<String> list = jpNicknames.get(original);
+		if(list != null && !list.contains(nickname)){
+			list.add(nickname);
+		}
 	}
 
 	/**
@@ -303,18 +322,22 @@ public class MedalHandler {
 				if (test.equalsIgnoreCase(name))
 					return test;
 			}
-			for (String test : this.nicknames.keySet()) {
-				if (test.equalsIgnoreCase(name.replace(" ", "")))
-					return nicknames.get(test);
+			for (String realName : this.nicknames.keySet()) {
+				for(String test : this.nicknames.get(realName)){
+					if (test.equalsIgnoreCase(name.replace(" ", "")))
+						return realName;
+				}
 			}
 		} else {
 			for (String test : this.jpMedalNamesAndLink.keySet()) {
 				if (test.equalsIgnoreCase(name))
 					return test;
 			}
-			for (String test : this.jpNicknames.keySet()) {
-				if (test.equalsIgnoreCase(name.replace(" ", "")))
-					return jpNicknames.get(test);
+			for (String realName : this.jpNicknames.keySet()) {
+				for(String test : this.jpNicknames.get(realName)){
+					if (test.equalsIgnoreCase(name.replace(" ", "")))
+						return realName;
+				}
 			}
 		}
 		//Now we search with words to get a most likely candidate.
