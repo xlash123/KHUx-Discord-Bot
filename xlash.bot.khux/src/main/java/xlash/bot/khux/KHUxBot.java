@@ -24,6 +24,7 @@ import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
 import xlash.bot.khux.commands.MedalJPCommand;
+import xlash.bot.khux.commands.MedalListCommand;
 import xlash.bot.khux.commands.MedalNACommand;
 import xlash.bot.khux.commands.RefreshCommand;
 import xlash.bot.khux.commands.ResetCommand;
@@ -69,9 +70,6 @@ public class KHUxBot {
 			}
 		} else {
 			System.out.println("Running bot version: " + VERSION);
-			System.err.println("NOTE: This is a temporary update. It provides the new lux times for NA's raid week "
-					+ "by replacing the old ones. At the end of the week, I will release another update "
-					+ "replacing the old lux times.");
 			findUpdate();
 			config = new Config();
 			config.loadConfig();
@@ -173,6 +171,7 @@ public class KHUxBot {
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new AdminCommand());
 		commandHandler.registerCommand(new UnAdmin());
+		commandHandler.registerCommand(new MedalListCommand());
 	}
 
 	public void connect(DiscordAPI api) {
