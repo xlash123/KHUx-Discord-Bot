@@ -3,6 +3,7 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.util.UserUtil;
 
 public class AdminCommand extends CommandBase{
 
@@ -27,7 +28,7 @@ public class AdminCommand extends CommandBase{
 			if(!KHUxBot.config.admins.contains(u.getId())){
 				KHUxBot.config.admins.add(u.getId());
 			}
-			newAdmins += u.getNickname(message.getChannelReceiver().getServer()) + ", ";
+			newAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
 			iterations++;
 		}
 		if(!newAdmins.isEmpty()){
@@ -37,7 +38,8 @@ public class AdminCommand extends CommandBase{
 				newAdmins = newAdmins.replaceAll(",", "");
 			}
 		}
-		message.reply(newAdmins + " are now admins.");
+		if(iterations> 1) message.reply(newAdmins + " are now admins.");
+		else message.reply(newAdmins + " is now an admin.");
 		if(iterations > 0){
 			KHUxBot.config.saveConfig();
 			return;
