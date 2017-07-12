@@ -17,7 +17,7 @@ public abstract class CommandBase{
 	}
 	
 	public void printDescriptionUsage(Message message){
-		message.reply(this.getUsage() + "\n" + this.getDescription());
+		message.reply(this.getDescription() + "\n" + this.getUsage());
 	}
 
 }
