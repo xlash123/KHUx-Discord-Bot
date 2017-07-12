@@ -67,7 +67,8 @@ public class Config {
 			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
 			this.luxOnPrompt = p.getProperty("Lux_On_Prompt");
 			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
-			this.admins.addAll(Arrays.asList(p.getProperty("Bot_Admins").split(",")));
+			String adminsString = p.getProperty("Bot_Admins");
+			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
