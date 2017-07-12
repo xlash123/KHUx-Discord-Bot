@@ -29,8 +29,7 @@ public class MedalListCommand extends CommandBase{
 		}else{
 			toSend += getList(KHUxBot.medalHandler.jpNicknames);
 		}
-		toSend += "```";
-		u.sendMessage(toSend);
+		sendMessageUnderRate(toSend, u);
 	}
 	
 	private String getList(HashMap<String, ArrayList<String>> nicknames){
@@ -40,13 +39,43 @@ public class MedalListCommand extends CommandBase{
 		while(iKey.hasNext()){
 			String realName = iKey.next();
 			ArrayList<String> listOfNicks = iValue.next();
-			out += "\u2022" + realName + " ";
+			out += "--" + realName + ": ";
 			for(int i=0; i<listOfNicks.size(); i++){
 				out += listOfNicks.get(i);
-				if(i+1<listOfNicks.size()) out += "; ";
+				if(i+1<listOfNicks.size()) {
+					out += ", ";
+				} else out += "\n";
 			}
 		}
+		out += "```";
 		return out;
+	}
+	
+	private void sendMessageUnderRate(String initial, User u) {
+		while(initial.length() != 0) {
+			System.err.println("Initial has " + initial.length());
+			String toSend;
+			if(initial.length() > 2000) {
+				toSend = initial.substring(0, 2000);
+				int cutOff;
+				toSend = toSend.substring(0, cutOff = toSend.lastIndexOf("\n"));
+				if(toSend.length()+3 > 2000) {
+					toSend = toSend.substring(0, cutOff = toSend.lastIndexOf("\n"));
+				}
+				toSend += "```";
+				initial = "```" + initial.substring(cutOff, initial.length());
+			}else {
+				toSend = new String(initial);
+				initial = "";
+			}
+			System.err.println("Just sent " + toSend.length() + ". More to go: " + initial.length());
+			u.sendMessage(toSend);
+			try {
+				Thread.sleep(16);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
