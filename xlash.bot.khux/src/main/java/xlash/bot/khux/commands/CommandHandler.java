@@ -1,9 +1,13 @@
 package xlash.bot.khux.commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.permissions.PermissionState;
+import de.btobastian.javacord.entities.permissions.PermissionType;
+import de.btobastian.javacord.entities.permissions.Role;
 import xlash.bot.khux.KHUxBot;
 
 public class CommandHandler {
@@ -20,8 +24,8 @@ public class CommandHandler {
 		String content = message.getContent();
 		String[] parts = content.split(" ");
 		for(CommandBase com : commands){
-			for(String s : com.getAliases()){
-				if(s.equalsIgnoreCase(parts[0])){
+			for(String alias : com.getAliases()){
+				if(alias.equalsIgnoreCase(parts[0])){
 					if(com.isAdmin()){
 						User user = message.getAuthor();
 						boolean admin = false;
@@ -31,13 +35,22 @@ public class CommandHandler {
 								break;
 							}
 						}
+						Collection<Role> roles = user.getRoles(message.getChannelReceiver().getServer());
+						for(Role r : roles){
+							if(r.getPermissions().getState(PermissionType.ADMINISTATOR)==PermissionState.ALLOWED){
+								admin = true;
+							}
+						}
 						if(!admin){
 							message.reply("Only admins may use this command.");
 							return;
 						}
 					}
 					String argsString = content.substring(content.indexOf(" ")+1);
-					com.onCommand(argsString.split(" "), message);
+					if(argsString.equals(content)) argsString = "";
+					String[] argsArray = argsString.split(" ");
+					if(argsArray[0].isEmpty()) argsArray = new String[0];
+					com.onCommand(argsArray, message);
 				}
 			}
 		}
