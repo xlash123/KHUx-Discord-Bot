@@ -3,6 +3,7 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.UserUtil;
 
 public class UnAdmin extends CommandBase{
@@ -22,15 +23,16 @@ public class UnAdmin extends CommandBase{
 			message.reply("No");
 			return;
 		}
+		ServerConfig config = this.getServerConfig(message);
 		String unAdmins = "";
 		int iterations = 0;
 		for(User u : message.getMentions()){
-			if(!KHUxBot.config.admins.contains(u.getId())){
-				if(KHUxBot.config.admins.size()<=1){
+			if(!config.admins.contains(u.getId())){
+				if(config.admins.size()<=1){
 					message.reply("You must have at least one admin. " + UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + " will remain admin.");
 					return;
 				}
-				KHUxBot.config.admins.add(u.getId());
+				config.admins.add(u.getId());
 			}
 			unAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
 			iterations++;
@@ -45,7 +47,7 @@ public class UnAdmin extends CommandBase{
 		if(iterations > 1) message.reply(unAdmins + " are no longer admins.");
 		else message.reply(unAdmins + " is no longer an admin.");
 		if(iterations > 0){
-			KHUxBot.config.saveConfig();
+			config.saveConfig();
 			return;
 		}
 		message.reply("Unknown user(s). You must @mention real users on this server.");

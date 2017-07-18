@@ -3,6 +3,7 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 
 public class DefaultCommand extends CommandBase{
 	
@@ -17,12 +18,13 @@ public class DefaultCommand extends CommandBase{
 			this.printDescriptionUsage(message);
 			return;
 		}
+		ServerConfig config = this.getServerConfig(message);
 		if(args[0].equalsIgnoreCase("get")){
-			message.reply("Default game is currently " + KHUxBot.config.defaultGame.toString());
+			message.reply("Default game is currently " + config.defaultGame.toString());
 			return;
 		}
-		KHUxBot.config.defaultGame = GameEnum.parseString(args[0]);
-		message.reply("Default game changed to " + KHUxBot.config.defaultGame.toString());
+		config.defaultGame = GameEnum.parseString(args[0]);
+		message.reply("Default game changed to " + config.defaultGame.toString());
 	}
 
 	@Override

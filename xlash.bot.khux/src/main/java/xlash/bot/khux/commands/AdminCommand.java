@@ -3,6 +3,7 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.UserUtil;
 
 public class AdminCommand extends CommandBase{
@@ -22,11 +23,12 @@ public class AdminCommand extends CommandBase{
 			message.reply("No");
 			return;
 		}
+		ServerConfig config = KHUxBot.getServerConfig(message.getChannelReceiver().getServer());
 		String newAdmins = "";
 		int iterations = 0;
 		for(User u : message.getMentions()){
-			if(!KHUxBot.config.admins.contains(u.getId())){
-				KHUxBot.config.admins.add(u.getId());
+			if(!config.admins.contains(u.getId())){
+				config.admins.add(u.getId());
 			}
 			newAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
 			iterations++;
@@ -41,7 +43,7 @@ public class AdminCommand extends CommandBase{
 		if(iterations> 1) message.reply(newAdmins + " are now admins.");
 		else message.reply(newAdmins + " is now an admin.");
 		if(iterations > 0){
-			KHUxBot.config.saveConfig();
+			config.saveConfig();
 			return;
 		}
 		message.reply("Unknown user(s). You must @mention real users on this server.");

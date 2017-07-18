@@ -2,6 +2,7 @@ package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 
 public class TweetCommand extends CommandBase{
 	
@@ -19,29 +20,30 @@ public class TweetCommand extends CommandBase{
 		for(int i=0; i<args.length; i++){
 			args[i] = args[i].toLowerCase();
 		}
+		ServerConfig config = this.getServerConfig(message);
 		switch(args[0]){
 		case "on":
-    		KHUxBot.config.updateChannel = message.getChannelReceiver().getId();
-    		KHUxBot.scheduler.enableTimedEvent("Twitter Update");
-    		KHUxBot.shouldTwitterUpdate = true;
+    		config.updateChannel = message.getChannelReceiver().getId();
     		message.reply("Twitter updates are set to post on this channel.");
 			break;
 		case "off":
-    		KHUxBot.config.updateChannel = "";
-    		KHUxBot.scheduler.disableTimedEvent("Twitter Update");
-    		KHUxBot.shouldTwitterUpdate = false;
+    		config.updateChannel = "";
     		message.reply("Twitter updates have been turned off.");
     		break;
 		case "get":
-			message.reply(KHUxBot.twitterHandler.getTwitterUpdateLink(0));
+			if(!KHUxBot.twitterHandler.sendTwitterUpdate(message.getChannelReceiver())){
+				message.getChannelReceiver().sendMessage(KHUxBot.twitterHandler.getTwitterUpdateLink(0));
+			}
 			break;
 		case "status":
-			if(KHUxBot.shouldTwitterUpdate)message.reply("Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(KHUxBot.config.updateChannel).getName());
+			if(!config.updateChannel.isEmpty())message.reply("Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannel).getName());
     		else message.reply("Twitter updates are currently turned off.");
-			break;
+			return;
 			default:
 				this.printDescriptionUsage(message);
+				return;
 		}
+		config.saveConfig();
 	}
 
 	@Override

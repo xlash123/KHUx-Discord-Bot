@@ -2,6 +2,7 @@ package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 
 public class MedalCommand extends CommandBase{
 	
@@ -16,17 +17,18 @@ public class MedalCommand extends CommandBase{
 			return;
 		}
 		while(KHUxBot.medalHandler.isDisabled()){}
+		ServerConfig config = this.getServerConfig(message);
 		String medalName = "";
 		for(int i=0; i<args.length; i++){
 			medalName += args[i] + " ";
 		}
 		medalName = medalName.trim();
-		String realName = KHUxBot.medalHandler.getRealNameByNickname(medalName, KHUxBot.config.defaultGame);
+		String realName = KHUxBot.medalHandler.getRealNameByNickname(medalName, config.defaultGame);
 		if(realName==null){
 			message.reply("I don't know what medal that is.");
 			return;
 		}
-		message.reply(KHUxBot.medalHandler.getMedalInfo(realName, KHUxBot.config.defaultGame));
+		message.reply(KHUxBot.medalHandler.getMedalInfo(realName, config.defaultGame));
 	}
 
 	@Override
