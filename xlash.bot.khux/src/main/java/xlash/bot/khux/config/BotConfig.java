@@ -11,24 +11,15 @@ import java.util.Properties;
 
 import xlash.bot.khux.GameEnum;
 
-public class Config {
+public class BotConfig {
 	
-	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/config.properties";
+	public static final String FILE_NAME = System.getProperty("user.dir") + "/khuxbot config/config.properties";
 	
 	public String botToken;
-	public volatile String updateChannel;
-	public volatile String luxChannelNA;
-	public volatile String luxChannelJP;
-	public volatile GameEnum defaultGame;
 	
-	public volatile String luxOnPrompt;
-	public volatile String luxOffPrompt;
-	
-	public volatile ArrayList<String> admins;
-	
-	public Config(){
+	public BotConfig(){
 		init();
-		File file = new File(DIRECTORY);
+		File file = new File(FILE_NAME);
 		if(!file.exists()){
 			try {
 				file.getParentFile().mkdirs();
@@ -42,13 +33,6 @@ public class Config {
 	
 	public void init(){
 		if(botToken == null) botToken = "";
-		if(updateChannel == null) updateChannel = "";
-		if(luxChannelNA == null) luxChannelNA = "";
-		if(luxChannelJP == null) luxChannelJP = "";
-		if(defaultGame == null) defaultGame = GameEnum.NA;
-		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
-		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
-		if(admins == null) admins = new ArrayList<String>();
 	}
 	
 	/**
@@ -57,18 +41,10 @@ public class Config {
 	public void loadConfig(){
 		FileInputStream in;
 		try {
-			in = new FileInputStream(new File(DIRECTORY));
+			in = new FileInputStream(new File(FILE_NAME));
 			Properties p = new Properties();
 			p.load(in);
 			this.botToken = p.getProperty("Bot_Token");
-			this.updateChannel = p.getProperty("Update_Channel");
-			this.luxChannelNA = p.getProperty("Lux_Channel_NA");
-			this.luxChannelJP = p.getProperty("Lux_Channel_JP");
-			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
-			this.luxOnPrompt = p.getProperty("Lux_On_Prompt");
-			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
-			String adminsString = p.getProperty("Bot_Admins");
-			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -83,21 +59,11 @@ public class Config {
 	public void saveConfig(){
 		Properties p = new Properties();
 		p.setProperty("Bot_Token", botToken);
-		p.setProperty("Update_Channel", updateChannel);
-		p.setProperty("Lux_Channel_NA", luxChannelNA);
-		p.setProperty("Lux_Channel_JP", luxChannelJP);
-		p.setProperty("Default_Game", defaultGame.toString());
-		p.setProperty("Lux_On_Prompt", luxOnPrompt);
-		p.setProperty("Lux_Off_Prompt", luxOffPrompt);
 		String toSave = "";
-		for(int i=0; i<admins.size(); i++){
-			toSave += admins.get(i);
-			if(i+1<admins.size()) toSave += ",";
-		}
 		p.setProperty("Bot_Admins", toSave);
 		FileOutputStream os;
 		try {
-			os = new FileOutputStream(new File(DIRECTORY));
+			os = new FileOutputStream(new File(FILE_NAME));
 			p.store(os, "This is the config file for the KHUx Bot");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
