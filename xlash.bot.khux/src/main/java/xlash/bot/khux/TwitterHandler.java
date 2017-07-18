@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import de.btobastian.javacord.DiscordAPI;
+import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.Server;
 
 public class TwitterHandler {
 	
@@ -18,8 +20,10 @@ public class TwitterHandler {
 	/**
 	 * Posts the newest Tweets to the channel specified in config.
 	 * @param api The api that sends the message.
+	 * @return boolean if something was sent.
 	 */
-	public void getTwitterUpdate(DiscordAPI api){
+	public boolean sendTwitterUpdate(Channel channel){
+		boolean flag = false;
 		ArrayList<String> links = new ArrayList<String>();
 		String current;
 		for(int i=0; i<8; i++){
@@ -29,9 +33,11 @@ public class TwitterHandler {
 			}else break;
 		}
 		for(String link : links){
-			if(link!=null) api.getChannelById(KHUxBot.config.updateChannel).sendMessage(link);
+			flag = true;
+			if(link!=null) channel.sendMessage(link);
 		}
 		if(links.size()>0) lastTwitterUpdate = links.get(links.size()-1);
+		return flag;
 	}
 	
 	/**
