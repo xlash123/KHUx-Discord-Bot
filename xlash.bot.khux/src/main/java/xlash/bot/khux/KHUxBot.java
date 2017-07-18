@@ -3,6 +3,7 @@ package xlash.bot.khux;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -13,9 +14,12 @@ import com.google.common.util.concurrent.FutureCallback;
 
 import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.Javacord;
+import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
+import de.btobastian.javacord.listener.server.ServerJoinListener;
 import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
@@ -29,27 +33,25 @@ import xlash.bot.khux.commands.MedalNACommand;
 import xlash.bot.khux.commands.RefreshCommand;
 import xlash.bot.khux.commands.ResetCommand;
 import xlash.bot.khux.commands.TweetCommand;
-import xlash.bot.khux.config.Config;
+import xlash.bot.khux.config.BotConfig;
+import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.sheduler.Event;
 import xlash.bot.khux.sheduler.Scheduler;
 import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.3";
+	public static final String VERSION = "2.0";
 
 	public static DiscordAPI api;
 
 	public static MedalHandler medalHandler;
 	public static TwitterHandler twitterHandler;
 	public static CommandHandler commandHandler;
-	public static Config config;
+	public static BotConfig botConfig;
+	public static ArrayList<ServerConfig> serverConfigs = new ArrayList<ServerConfig>();
 	public static Scheduler scheduler;
 
-	public volatile static boolean shouldTwitterUpdate;
-	public volatile static boolean shouldLuxNA;
-	public volatile static boolean shouldLuxJP;
-	
 	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "Whomst'd've are you?"};
 
 	public static void main(String[] args) {
@@ -71,46 +73,37 @@ public class KHUxBot {
 		} else {
 			System.out.println("Running bot version: " + VERSION);
 			findUpdate();
-			config = new Config();
-			config.loadConfig();
-			if (config.botToken == null || config.botToken.isEmpty()) {
+			botConfig = new BotConfig();
+			botConfig.loadConfig();
+			if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
 				System.out.println("This is your first time running this bot. Thanks for installing!");
 				System.out.println("To being using the bot, please enter your bot token.");
-				System.out.println(
-						"If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
+				System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
+				System.out.print("Enter token: ");
 				Scanner in = new Scanner(System.in);
-				config.botToken = in.nextLine();
+				botConfig.botToken = in.nextLine();
 				in.close();
 			}
-			config.saveConfig();
+			botConfig.saveConfig();
 			new KHUxBot();
 		}
 	}
 
 	public KHUxBot() {
 		this.initialize();
-		api = Javacord.getApi(config.botToken, true);
+		api = Javacord.getApi(botConfig.botToken, true);
 		api.setAutoReconnect(false);
 		commandHandler = new CommandHandler();
 		registerCommands();
 		connect(api);
-		System.out.println("Waiting for server response...");
-		while (api.getServers().size() == 0) {
-		}
-		System.out.println("Server connected! Let's go!");
-		shouldTwitterUpdate = api.getChannelById(config.updateChannel) != null;
-		if(shouldTwitterUpdate){
-			scheduler.enableTimedEvent("Twitter Update");
-		}
-		shouldLuxNA = api.getChannelById(config.luxChannelNA) != null;
-		shouldLuxJP = api.getChannelById(config.luxChannelJP) != null;
-		if(shouldLuxNA){
-			scheduler.enableEvent("NA Lux On");
-			scheduler.enableEvent("NA Lux Off");
-		}
-		if(shouldLuxJP){
-			scheduler.enableEvent("JP Lux On");
-			scheduler.enableEvent("JP Lux Off");
+		System.out.println("Bot setup complete!");
+	}
+	
+	public void initializeServer(Server newServer){
+		ServerConfig config = getServerConfig(newServer);
+		if(config==null){
+			config = new ServerConfig(newServer);
+			config.saveConfig();
 		}
 	}
 
@@ -119,44 +112,98 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-		scheduler.addEvent(new Event("NA Lux On", false, "03:00:00", "09:00:00", "15:00:00", "21:00:00"){
+		scheduler.addEvent(new Event("NA Lux On", true, "03:00:00", "09:00:00", "15:00:00", "21:00:00"){
 			@Override
 			public void run() {
-				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOnPrompt);
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.luxChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.luxChannelNA);
+						if(channel != null){
+							channel.sendMessage("NA: " + config.luxOnPrompt);
+						}
+					}
+				}
 			}
 		});
-		scheduler.addEvent(new Event("NA Lux Off", false, "04:00:00", "10:00:00", "16:00:00", "22:00:00"){
+		scheduler.addEvent(new Event("NA Lux Off", true, "04:00:00", "10:00:00", "16:00:00", "22:00:00"){
 			@Override
 			public void run() {
-				api.getChannelById(config.luxChannelNA).sendMessage("NA: " + config.luxOffPrompt);
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.luxChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.luxChannelNA);
+						if(channel != null){
+							channel.sendMessage("NA: " + config.luxOffPrompt);
+						}
+					}
+				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux On", false, "03:00:00", "13:00:00"){
+		scheduler.addEvent(new Event("JP Lux On", true, "03:00:00", "13:00:00"){
 			@Override
 			public void run() {
-				api.getChannelById(config.luxChannelJP).sendMessage("JP: " + config.luxOnPrompt);
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.luxChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.luxChannelJP);
+						if(channel != null){
+							channel.sendMessage("JP: " + config.luxOnPrompt);
+						}
+					}
+				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux Off", false, "04:00:00", "14:00:00"){
+		scheduler.addEvent(new Event("JP Lux Off", true, "04:00:00", "14:00:00"){
 			@Override
 			public void run() {
-				api.getChannelById(config.luxChannelJP).sendMessage("JP: " + config.luxOffPrompt);
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.luxChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.luxChannelJP);
+						if(channel != null){
+							channel.sendMessage("JP: " + config.luxOffPrompt);
+						}
+					}
+				}
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update", true, 2) {
 			@Override
 			public void run() {
-				twitterHandler.getTwitterUpdate(api);
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.updateChannel.isEmpty()){
+						Channel channel = server.getChannelById(config.updateChannel);
+						if(channel != null){
+							twitterHandler.sendTwitterUpdate(channel);
+						}
+					}
+				}
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Bot Update", true, 20) {
 			@Override
 			public void run() {
-				config.saveConfig();
 				findUpdate();
 			}
 		});
 		System.out.println("Initialization finished!");
+	}
+	
+	/**
+	 * Returns the ServerConfig class for the specified server.
+	 * @param server to grab config for
+	 * @return ServerConfig, or null if not registered.
+	 */
+	public static ServerConfig getServerConfig(Server server){
+		String id = server.getId();
+		for(ServerConfig config : serverConfigs){
+			if(id.equals(config.serverId)){
+				return config;
+			}
+		}
+		return null;
 	}
 	
 	public void registerCommands(){
@@ -185,13 +232,20 @@ public class KHUxBot {
 						for(User u : message.getMentions()){
 							if(u.isYourself()){
 								Random rand = new Random();
-								if(u.getId().equals("137604437765128192") && rand.nextFloat() < .2f) message.reply("You should uninstall.");
 								int i = rand.nextInt(COMEBACKS.length);
 								message.reply(COMEBACKS[i]);
 							}
 						}
 					}
 					
+				});
+				api.registerListener(new ServerJoinListener() {
+					
+					@Override
+					public void onServerJoin(DiscordAPI api, Server server) {
+						System.out.println("Got new server " + server.getName() + ":" + server.getId());
+						initializeServer(server);
+					}
 				});
 			}
 
@@ -207,7 +261,7 @@ public class KHUxBot {
 			String newVersion = doc.getElementsByClass("css-truncate-target").get(0).text();
 			if (!VERSION.equals(newVersion)) {
 				System.out.println(
-						"New update avaialbe. Download at - https://github.com/xlash123/KHUx-Discord-Bot/releases");
+						"New update available. Download at - https://github.com/xlash123/KHUx-Discord-Bot/releases");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
