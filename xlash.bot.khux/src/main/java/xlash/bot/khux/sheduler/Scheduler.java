@@ -27,6 +27,7 @@ public class Scheduler {
 			@Override
 			public void run(){
 				scheduler();
+				System.err.println("Scheduler failed.");
 			}
 		};
 		scheduler.start();
@@ -156,11 +157,13 @@ public class Scheduler {
 		while(true){
 			timeSec = System.currentTimeMillis()/1000;
 			
-			//Safety just in case 2 seconds pass in one tick
+			//Safety just in case 2 or more seconds pass in one tick
 			if(timeSec-prevTimeSec > 1){
+				System.err.println("Scheduler is behind by " + (timeSec-prevTimeSec) + " seconds");
 				for(int i=1; prevTimeSec+i<timeSec; i++){
 					this.executeEvents(prevTimeSec+i);
 				}
+				System.err.println("System has caught up.");
 			}
 			
 			prevTimeSec = new Long(timeSec);
@@ -169,7 +172,7 @@ public class Scheduler {
 			
 			while(timeSec==System.currentTimeMillis()/1000){
 				try {
-					Thread.sleep(100);
+					Thread.sleep(50);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -189,7 +192,11 @@ public class Scheduler {
 			for(String time : e.getTimes()){
 				if(e.enabled && time.equals(currentTime)){
 					System.out.println("Running " + e.getName());
-					e.run();
+					try{
+						e.run();
+					}catch(Exception e1){
+						System.err.println("Error occured while running " + e.getName() + "\n" + e1.getStackTrace());
+					}
 					break;
 				}
 			}
@@ -200,7 +207,11 @@ public class Scheduler {
 				long difference = difference(convert(e.lastRun), currentDate).getTime();
 				if(difference > e.getFrequency()*60000){
 					System.out.println("Running " + e.getName());
-					e.run();
+					try{
+						e.run();
+					}catch(Exception e1){
+						System.err.println("Error occured while running " + e.getName() + "\n" + e1.getStackTrace());
+					}
 					e.lastRun = String.valueOf(currentTime);
 				}
 			}
