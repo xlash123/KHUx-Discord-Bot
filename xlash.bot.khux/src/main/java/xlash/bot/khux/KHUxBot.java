@@ -41,7 +41,7 @@ import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "2.0";
+	public static final String VERSION = "1.4.0";
 
 	public static DiscordAPI api;
 
@@ -54,6 +54,11 @@ public class KHUxBot {
 
 	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "Whomst'd've are you?"};
 
+	/**
+	 * Starts the bot. If you're running this in a development environment, make sure you are 
+	 * running it with parameter "run", else nothing will happen.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		if (args.length == 0) {
 			String runningFile;
@@ -65,6 +70,7 @@ public class KHUxBot {
 						"\"" + runningFile + "\"", "run");
 				builder.redirectErrorStream(true);
 				builder.start();
+				System.out.println("If you're reading this, run with argument 'run'.");
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -95,6 +101,7 @@ public class KHUxBot {
 		api.setAutoReconnect(false);
 		commandHandler = new CommandHandler();
 		registerCommands();
+		
 		connect(api);
 		System.out.println("Bot setup complete!");
 	}
