@@ -195,7 +195,8 @@ public class Scheduler {
 					try{
 						e.run();
 					}catch(Exception e1){
-						System.err.println("Error occured while running " + e.getName() + "\n" + e1.getStackTrace());
+						System.err.println("Error occured while running event: " + e.getName());
+						e1.printStackTrace();
 					}
 					break;
 				}
