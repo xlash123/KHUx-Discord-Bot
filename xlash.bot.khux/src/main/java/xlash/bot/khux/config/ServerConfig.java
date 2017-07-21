@@ -15,6 +15,7 @@ import xlash.bot.khux.GameEnum;
 public class ServerConfig {
 	
 	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/";
+	public final String fileName;
 	
 	public volatile String updateChannel;
 	public volatile String luxChannelNA;
@@ -30,8 +31,9 @@ public class ServerConfig {
 	
 	public volatile ArrayList<String> admins;
 	
-	private ServerConfig(String fileName){
-		this.serverId = fileName + ".properties";
+	public ServerConfig(String serverId){
+		this.serverId = serverId;
+		this.fileName = serverId + ".properties";
 		init();
 		File file = new File(DIRECTORY);
 		if(!file.exists()){
@@ -42,6 +44,8 @@ public class ServerConfig {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}else{
+			loadConfig();
 		}
 	}
 	
@@ -65,7 +69,7 @@ public class ServerConfig {
 	public void loadConfig(){
 		FileInputStream in;
 		try {
-			in = new FileInputStream(new File(DIRECTORY + serverId));
+			in = new FileInputStream(new File(fileName));
 			Properties p = new Properties();
 			p.load(in);
 			this.botToken = p.getProperty("Bot_Token");
@@ -89,8 +93,8 @@ public class ServerConfig {
 	 * Saves the config file.
 	 */
 	public void saveConfig(){
+		init();
 		Properties p = new Properties();
-		p.setProperty("Bot_Token", botToken);
 		p.setProperty("Update_Channel", updateChannel);
 		p.setProperty("Lux_Channel_NA", luxChannelNA);
 		p.setProperty("Lux_Channel_JP", luxChannelJP);
@@ -105,7 +109,7 @@ public class ServerConfig {
 		p.setProperty("Bot_Admins", toSave);
 		FileOutputStream os;
 		try {
-			os = new FileOutputStream(new File(DIRECTORY + serverId));
+			os = new FileOutputStream(new File(fileName));
 			p.store(os, "This is the config file for the Discord server of ID: " + serverId);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
