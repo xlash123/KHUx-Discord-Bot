@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -94,76 +95,29 @@ public class MedalHandler {
 	}
 
 	private void naNicknames() {
-		for (String name : this.medalNamesAndLink.keySet()) {
-			ArrayList<String> toAdd = new ArrayList<String>();
-			String original = name.substring(0, name.length());
-			name = name.replace("(EX)", "EX");
-			if (name.contains("\u00E9")) {
-				name = name.replace("\u00E9", "e");
-				toAdd.add(name);
-			}
-			if (name.contains("\u00E8")) {
-				name = name.replace("\u00E8", "e");
-				toAdd.add(name);
-			}
-			name = name.replace("KH II ", "KH2");
-			name = name.replace("KHII", "KH2");
-			name = name.replace("The ", "");
-			name = name.replace("WORLD OF FF", "WOFF");
-			name = name.replace("Timeless River", "TR");
-			name = name.replace("Halloween", "HT");
-			name = name.replace("Atlantica", "AT");
-			name = name.replace("Key Art ", "KA");
-			name = name.replace("(Medal)", "");
-			if (name.contains("Illustrated")) {
-				name = name.replace("Illustrated", "i");
-				if (name.split(" ").length > 1) {
-					String[] words = name.split(" ");
-					if (name.contains("&")) {
-						String product = "";
-						boolean skip = name.split("&").length > 2;
-						for (String word : words) {
-							if (skip && word.equals("&"))
-								continue;
-							product += word.substring(0, 1);
-						}
-						name = product;
-					}
-				}
-			} else if (name.contains("&")) {
-				String[] words = name.split(" ");
-				String product = "";
-				boolean skip = name.split("&").length > 2;
-				for (String word : words) {
-					if (skip && word.equals("&"))
-						continue;
-					product += word.substring(0, 1);
-				}
-				name = product;
-			}
-
-			name = name.replace(" ", "");
-			toAdd.add(name);
-			nicknames.put(original, toAdd);
-		}
-		addNicknameToNA("Tieri", "Illustrated KH II Kairi");
-		addNicknameToNA("Pooglet", "Pooh & Piglet");
-		addNicknameToNA("BronzeDonald", "Donald A");
-	}
-	
-	public void addNicknameToNA(String nickname, String original){
-		ArrayList<String> list = nicknames.get(original);
-		if(list != null && !list.contains(nickname)){
-			list.add(nickname);
-		}
+		this.compileNicknames(this.medalNamesAndLink.keySet(), this.nicknames);
+		addNicknameToList("Tieri", "Illustrated KH II Kairi", this.nicknames);
+		addNicknameToList("Pooglet", "Pooh & Piglet", this.nicknames);
+		addNicknameToList("BronzeDonald", "Donald A", this.nicknames);
 	}
 
 	private void jpNicknames() {
-		for (String name : this.jpMedalNamesAndLink.keySet()) {
+		this.compileNicknames(this.jpMedalNamesAndLink.keySet(), jpNicknames);
+		addNicknameToList("Tieri", "Illustrated KH II Kairi", this.jpNicknames);
+		addNicknameToList("Pooglet", "Pooh & Piglet", this.jpNicknames);
+		addNicknameToList("BronzeDonald", "Donald A", this.jpNicknames);
+	}
+	
+	public void compileNicknames(Set<String> realNames, HashMap<String, ArrayList<String>> nickList){
+		for (String name : realNames) {
 			ArrayList<String> toAdd = new ArrayList<String>();
 			String original = name.substring(0, name.length());
 			name = name.replace("Ver", "");
 			name = name.replace("(EX)", "EX");
+			if(name.contains("\"")){
+				name = name.replace("\"", "");
+				toAdd.add(name);
+			}
 			if (name.contains("\u00E9")) {
 				name = name.replace("\u00E9", "e");
 				toAdd.add(name);
@@ -174,10 +128,11 @@ public class MedalHandler {
 			}
 			name = name.replace("KH II ", "KH2");
 			name = name.replace("KHII", "KH2");
+			name = name.replace("KH 3", "KH3");
 			name = name.replace("The ", "");
 			name = name.replace("WORLD OF FF", "WOFF");
 			name = name.replace("Timeless River", "TR");
-			name = name.replace("Halloween", "HT");
+			name = name.replace("Halloween", "H");
 			name = name.replace("Atlantica", "AT");
 			name = name.replace("Key Art ", "KA");
 			name = name.replace("(Medal)", "");
@@ -223,15 +178,12 @@ public class MedalHandler {
 
 			name = name.replace(" ", "");
 			toAdd.add(name);
-			jpNicknames.put(original, toAdd);
+			nickList.put(original, toAdd);
 		}
-		addNicknameToJP("Tieri", "Illustrated KH II Kairi");
-		addNicknameToJP("Pooglet", "Pooh & Piglet");
-		addNicknameToJP("BronzeDonald", "Donald A");
 	}
 	
-	public void addNicknameToJP(String nickname, String original){
-		ArrayList<String> list = jpNicknames.get(original);
+	public void addNicknameToList(String nickname, String original, HashMap<String, ArrayList<String>> nickList){
+		ArrayList<String> list = nickList.get(original);
 		if(list != null && !list.contains(nickname)){
 			list.add(nickname);
 		}
@@ -342,89 +294,58 @@ public class MedalHandler {
 		}
 		//Now we search with words to get a most likely candidate.
 		String[] words = name.split(" ");
+		HashMap<String, Float> percentMatch = new HashMap<String, Float>();
 		if(game==GameEnum.NA){
-			HashMap<String, Float> percentMatch = new HashMap<String, Float>();
-			for(String test : this.medalNamesAndLink.keySet()){
-				int matchLength = 0;
-				String compare = test.toLowerCase();
-				String[] testWords = compare.split(" ");
-				HashMap<String, Integer> repeats = new HashMap<String, Integer>();
-				for(String w : words){
-					int numOfOcc = 0;
-					if(repeats.get(w) != null) numOfOcc = repeats.get(w);
-					int initOcc = numOfOcc;
-					for(String tw : testWords){
-						if(tw.equals(w)){
-							numOfOcc--;
-							if(numOfOcc<0){
-								matchLength += tw.length();
-								repeats.put(w, initOcc+1);
-								break;
-							}
-						}
-					}
-				}
-				float higher = Math.max(test.length()-testWords.length, name.length()-words.length);
-				percentMatch.put(test, matchLength/higher);
-			}
-			Iterator<String> names = percentMatch.keySet().iterator();
-			Iterator<Float> percents = percentMatch.values().iterator();
-			String winner = null;
-			float winnerPer = 0;
-			for(int i=0; i<percentMatch.size(); i++){
-				String currentName = names.next();
-				float currentPercent = percents.next();
-				if(currentPercent == 1){
-					return currentName;
-				}
-				if(currentPercent > winnerPer && currentPercent >= .7f){
-					winner = currentName;
-					winnerPer = currentPercent;
-				}
-			}
-			return winner;
+			this.putPercentMatchForWordsInList(name, words, percentMatch, this.medalNamesAndLink.keySet());
 		} else {
-			HashMap<String, Float> percentMatch = new HashMap<String, Float>();
-			for(String test : this.jpMedalNamesAndLink.keySet()){
-				int matchLength = 0;
-				String compare = test.toLowerCase();
-				String[] testWords = compare.split(" ");
-				HashMap<String, Integer> repeats = new HashMap<String, Integer>();
-				for(String w : words){
-					int numOfOcc = 0;
-					if(repeats.get(w) != null) numOfOcc = repeats.get(w);
-					int initOcc = numOfOcc;
-					for(String tw : testWords){
-						if(tw.equals(w)){
-							numOfOcc--;
-							if(numOfOcc<0){
-								matchLength += tw.length();
-								repeats.put(w, initOcc+1);
-								break;
-							}
+			this.putPercentMatchForWordsInList(name, words, percentMatch, this.jpMedalNamesAndLink.keySet());
+		}
+		return this.getBestChance(percentMatch);
+	}
+	
+	public void putPercentMatchForWordsInList(String name, String[] words, HashMap<String, Float> percentMatch, Set<String> names){
+		for(String test : names){
+			int matchLength = 0;
+			String compare = test.toLowerCase();
+			String[] testWords = compare.split(" ");
+			HashMap<String, Integer> repeats = new HashMap<String, Integer>();
+			for(String w : words){
+				int numOfOcc = 0;
+				if(repeats.get(w) != null) numOfOcc = repeats.get(w);
+				int initOcc = numOfOcc;
+				for(String tw : testWords){
+					if(tw.equals(w)){
+						numOfOcc--;
+						if(numOfOcc<0){
+							matchLength += tw.length();
+							repeats.put(w, initOcc+1);
+							break;
 						}
 					}
 				}
-				float higher = Math.max(test.length()-testWords.length, name.length()-words.length);
-				percentMatch.put(test, matchLength/higher);
 			}
-			Iterator<String> names = percentMatch.keySet().iterator();
-			Iterator<Float> percents = percentMatch.values().iterator();
-			String winner = null;
-			float winnerPer = 0;
-			for(int i=0; i<percentMatch.size(); i++){
-				String currentName = names.next();
-				float currentPercent = percents.next();
-				if(currentPercent == 1){
-					return currentName;
-				}
-				if(currentPercent > winnerPer && currentPercent >= .7f){
-					winner = currentName;
-					winnerPer = currentPercent;
-				}
-			}
-			return winner;
+			float higher = Math.max(test.length()-testWords.length, name.length()-words.length);
+			percentMatch.put(test, matchLength/higher);
 		}
+	}
+	
+	public String getBestChance(HashMap<String, Float> percentMatch){
+		Iterator<String> names = percentMatch.keySet().iterator();
+		Iterator<Float> percents = percentMatch.values().iterator();
+		String winner = null;
+		float winnerPer = 0;
+		for(int i=0; i<percentMatch.size(); i++){
+			String currentName = names.next();
+			float currentPercent = percents.next();
+			if(currentPercent == 1){
+				return currentName;
+			}
+			if(currentPercent > winnerPer && currentPercent >= .8f){
+				winner = currentName;
+				winnerPer = currentPercent;
+			}
+		}
+		return winner;
 	}
 
 	/**
