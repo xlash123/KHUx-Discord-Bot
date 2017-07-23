@@ -38,6 +38,7 @@ public class AdminCommand extends CommandBase{
 			newAdmins = newAdmins.substring(0, newAdmins.lastIndexOf(',')+1) + " and" + newAdmins.substring(newAdmins.lastIndexOf(',')+1);
 			if(iterations<2){
 				newAdmins = newAdmins.replaceAll(",", "");
+				newAdmins = newAdmins.substring(3);
 			}
 		}
 		if(iterations> 1) message.reply(newAdmins + " are now admins.");
