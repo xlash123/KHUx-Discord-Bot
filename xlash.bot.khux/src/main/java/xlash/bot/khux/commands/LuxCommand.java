@@ -3,6 +3,7 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 
 public class LuxCommand extends CommandBase{
 	
@@ -20,66 +21,61 @@ public class LuxCommand extends CommandBase{
 		for(int i=0; i<args.length; i++){
 			args[i] = args[i].toLowerCase();
 		}
-		GameEnum game = KHUxBot.config.defaultGame;
+		ServerConfig config = this.getServerConfig(message);
+		GameEnum game = config.defaultGame;
 		if(args.length > 1){
 			game = GameEnum.parseString(args[1]);
 		}
 		switch(args[0]){
 		case "on":
 			if(game==GameEnum.NA){
-				if(KHUxBot.shouldLuxNA){
+				if(!config.luxChannelNA.isEmpty()){
 					message.reply("NA Lux reminders are already on.");
 					return;
 				}
-				KHUxBot.config.luxChannelNA = message.getChannelReceiver().getId();
-				KHUxBot.shouldLuxNA = true;
+				config.luxChannelNA = message.getChannelReceiver().getId();
 			}else{
-				if(KHUxBot.shouldLuxJP){
+				if(!config.luxChannelJP.isEmpty()){
 					message.reply("JP Lux reminders are already on.");
 					return;
 				}
-				KHUxBot.config.luxChannelJP = message.getChannelReceiver().getId();
-				KHUxBot.shouldLuxJP = true;
+				config.luxChannelJP = message.getChannelReceiver().getId();
 			}
-			KHUxBot.scheduler.enableEvent(game + " Lux On");
-			KHUxBot.scheduler.enableEvent(game + " Lux Off");
 			message.reply("Double lux reminders for " + game + " have been turned on.");
 			break;
 		case "off":
 			if(game==GameEnum.NA){
-				if(!KHUxBot.shouldLuxNA){
+				if(config.luxChannelNA.isEmpty()){
 					message.reply("NA Lux reminders are already off.");
 					return;
 				}
-				KHUxBot.config.luxChannelNA = "";
-				KHUxBot.shouldLuxNA = false;
+				config.luxChannelNA = "";
 			}else{
-				if(!KHUxBot.shouldLuxJP){
+				if(!config.luxChannelJP.isEmpty()){
 					message.reply("JP Lux reminders are already off.");
 					return;
 				}
-				KHUxBot.config.luxChannelJP = "";
-				KHUxBot.shouldLuxJP = false;
+				config.luxChannelJP = "";
 			}
-			KHUxBot.scheduler.disableEvent(game + " Lux On");
-			KHUxBot.scheduler.disableEvent(game + " Lux Off");
 			message.reply("Double lux reminders for " + game + " have been turned off.");
     		break;
 		case "status":
-			if (KHUxBot.shouldLuxNA)
+			if (!config.luxChannelNA.isEmpty())
 				message.reply("Double lux reminders for NA are set for channel: #"
-						+ KHUxBot.api.getChannelById(KHUxBot.config.luxChannelNA).getName());
+						+ KHUxBot.api.getChannelById(config.luxChannelNA).getName());
 			else
 				message.reply("Double lux reminders for NA are currently turned off.");
-			if (KHUxBot.shouldLuxJP)
+			if (!config.luxChannelJP.isEmpty())
 				message.reply("Double lux reminders for JP are set for channel: #"
-						+ KHUxBot.api.getChannelById(KHUxBot.config.luxChannelJP).getName());
+						+ KHUxBot.api.getChannelById(config.luxChannelJP).getName());
 			else
 				message.reply("Double lux reminders for JP are currently turned off.");
-			break;
+			return;
 			default:
 				this.printDescriptionUsage(message);
+				return;
 		}
+		config.saveConfig();
 	}
 
 	@Override

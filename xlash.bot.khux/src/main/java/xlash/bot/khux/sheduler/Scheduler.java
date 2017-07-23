@@ -18,18 +18,28 @@ public class Scheduler {
 	
 	public volatile ArrayList<TimedEvent> timedEvents = new ArrayList<TimedEvent>();
 	
+	public final Thread schedulerThread;
+	
 	/**
 	 * Initializes a scheduler.
 	 */
 	public Scheduler(){
 		SDF.setTimeZone(TimeZone.getTimeZone("GMT"));
-		Thread scheduler = new Thread("Scheduler"){
+		schedulerThread = new Thread("Scheduler"){
 			@Override
 			public void run(){
 				scheduler();
+				System.err.println("Scheduler failed.");
 			}
 		};
-		scheduler.start();
+	}
+	
+	public void startThread(){
+		this.schedulerThread.start();
+	}
+	
+	public void stopThread(){
+		this.schedulerThread.interrupt();
 	}
 	
 	/**
@@ -150,26 +160,31 @@ public class Scheduler {
 	 * Runs the scheduler to do things at the events' specified times
 	 */
 	private void scheduler(){
+		System.out.println("Starting scheduler");
 		long timeSec = System.currentTimeMillis()/1000;
 		long prevTimeSec = new Long(timeSec);
 		
 		while(true){
 			timeSec = System.currentTimeMillis()/1000;
 			
-			//Safety just in case 2 seconds pass in one tick
+			//Safety just in case 2 or more seconds pass in one tick
 			if(timeSec-prevTimeSec > 1){
+				System.err.println("Scheduler is behind by " + (timeSec-prevTimeSec) + " seconds");
 				for(int i=1; prevTimeSec+i<timeSec; i++){
 					this.executeEvents(prevTimeSec+i);
 				}
+				System.err.println("System has caught up.");
 			}
 			
 			prevTimeSec = new Long(timeSec);
 			
-			this.executeEvents(timeSec);
+			synchronized(this.events){
+				this.executeEvents(timeSec);
+			}
 			
 			while(timeSec==System.currentTimeMillis()/1000){
 				try {
-					Thread.sleep(100);
+					Thread.sleep(50);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -189,7 +204,13 @@ public class Scheduler {
 			for(String time : e.getTimes()){
 				if(e.enabled && time.equals(currentTime)){
 					System.out.println("Running " + e.getName());
-					e.run();
+					try{
+						e.run();
+						System.out.println("Passed " + e.getName());
+					}catch(Exception e1){
+						System.err.println("Error occured while running event: " + e.getName());
+						e1.printStackTrace();
+					}
 					break;
 				}
 			}
@@ -200,7 +221,12 @@ public class Scheduler {
 				long difference = difference(convert(e.lastRun), currentDate).getTime();
 				if(difference > e.getFrequency()*60000){
 					System.out.println("Running " + e.getName());
-					e.run();
+					try{
+						e.run();
+					}catch(Exception e1){
+						System.err.println("Error occured while running timed event: " + e.getName());
+						e1.printStackTrace();
+					}
 					e.lastRun = String.valueOf(currentTime);
 				}
 			}

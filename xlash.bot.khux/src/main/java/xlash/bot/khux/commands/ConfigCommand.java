@@ -2,6 +2,7 @@ package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 
 public class ConfigCommand extends CommandBase{
 
@@ -15,13 +16,14 @@ public class ConfigCommand extends CommandBase{
 		if(args.length==0){
 			this.printDescriptionUsage(message);
 		}else{
+			ServerConfig config = this.getServerConfig(message);
 			switch(args[0].toLowerCase()){
 			case "load":
-				KHUxBot.config.loadConfig();
+				config.loadConfig();
 				message.reply("Configuration file reloaded.");
 				break;
 			case "save":
-				KHUxBot.config.saveConfig();
+				config.saveConfig();
 				message.reply("Configuration file saved.");
 				break;
 				default:

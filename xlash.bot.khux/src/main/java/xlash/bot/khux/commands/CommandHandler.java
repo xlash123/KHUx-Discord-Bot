@@ -9,6 +9,7 @@ import de.btobastian.javacord.entities.permissions.PermissionState;
 import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.config.ServerConfig;
 
 public class CommandHandler {
 	
@@ -29,7 +30,8 @@ public class CommandHandler {
 					if(com.isAdmin()){
 						User user = message.getAuthor();
 						boolean admin = false;
-						for(String id : KHUxBot.config.admins){
+						ServerConfig config = KHUxBot.getServerConfig(message.getChannelReceiver().getServer());
+						for(String id : config.admins){
 							if(user.getId().equals(id)){
 								admin = true;
 								break;
