@@ -20,6 +20,7 @@ import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
+import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
@@ -103,7 +104,7 @@ public class KHUxBot {
 		registerCommands();
 		
 		connect(api);
-		System.out.println("Bot setup complete!");
+		System.out.println("Bot setup complete! Connecting to servers...");
 	}
 	
 	public void initializeServer(Server newServer){
@@ -111,6 +112,7 @@ public class KHUxBot {
 		if(config==null){
 			config = new ServerConfig(newServer);
 			config.saveConfig();
+			serverConfigs.add(config);
 		}
 	}
 
@@ -231,6 +233,9 @@ public class KHUxBot {
 	public void connect(DiscordAPI api) {
 		api.connect(new FutureCallback<DiscordAPI>() {
 			public void onSuccess(DiscordAPI api) {
+				for(Server server : api.getServers()){
+					initializeServer(server);
+				}
 				api.registerListener(new MessageCreateListener(){
 
 					@Override
@@ -246,6 +251,7 @@ public class KHUxBot {
 					}
 					
 				});
+				
 				api.registerListener(new ServerJoinListener() {
 					
 					@Override
@@ -254,6 +260,22 @@ public class KHUxBot {
 						initializeServer(server);
 					}
 				});
+				
+				api.registerListener(new ServerLeaveListener() {
+					@Override
+					public void onServerLeave(DiscordAPI api, Server server) {
+						synchronized(serverConfigs){
+							System.out.println("Removing " + server.getName());
+							serverConfigs.remove(getServerConfig(server));
+						}
+					}
+				});
+				
+				scheduler.startThread();
+				System.out.println("Connected to " + api.getServers().size() + " servers:");
+				for(Server server : api.getServers()){
+					System.out.println(">" + server.getName());
+				}
 			}
 
 			public void onFailure(Throwable t) {
