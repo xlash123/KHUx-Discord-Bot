@@ -156,6 +156,24 @@ public class Scheduler {
 		System.out.println("Failed to disable timed event " + name);
 	}
 	
+	public Event getEvent(String name){
+		for(Event e : events){
+			if(e.getName().equals(name)){
+				return e;
+			}
+		}
+		return null;
+	}
+	
+	public TimedEvent getTimedEvent(String name){
+		for(TimedEvent e : timedEvents){
+			if(e.getName().equals(name)){
+				return e;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Runs the scheduler to do things at the events' specified times
 	 */
