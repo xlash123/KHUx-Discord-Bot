@@ -110,10 +110,20 @@ public class MedalHandler {
 	
 	public void compileNicknames(Set<String> realNames, HashMap<String, ArrayList<String>> nickList){
 		for (String name : realNames) {
-			ArrayList<String> toAdd = new ArrayList<String>();
+			ArrayList<String> toAdd = new ArrayList<String>(){
+				@Override
+				public boolean add(String e){
+					e = e.replaceAll("\\s{2,}", " ").trim();
+					return super.add(e);
+				}
+			};
 			String original = name.substring(0, name.length());
 			name = name.replace("Ver", "");
 			name = name.replace("(EX)", "EX");
+			if(name.contains("Art") && name.contains("EX")){
+				name = name.replace("Art", "");
+				toAdd.add(name);
+			}
 			if(name.contains("\"")){
 				name = name.replace("\"", "");
 				toAdd.add(name);
@@ -129,7 +139,9 @@ public class MedalHandler {
 			name = name.replace("KH II ", "KH2");
 			name = name.replace("KHII", "KH2");
 			name = name.replace("KH 3", "KH3");
-			name = name.replace("The ", "");
+			name = name.replace("KH III", "KH3");
+			name = name.replace("KHIII", "KH3");
+			name = name.replace("The ", " ");
 			name = name.replace("WORLD OF FF", "WOFF");
 			name = name.replace("Timeless River", "TR");
 			name = name.replace("Halloween", "H");
@@ -148,7 +160,7 @@ public class MedalHandler {
 							words[0] = "i";
 							String product = "";
 							for(String word : words){
-								product += word;
+								product += word + " ";
 							}
 							name = product;
 						}
@@ -169,15 +181,14 @@ public class MedalHandler {
 				String product = "";
 				boolean skip = name.split("&").length > 2;
 				for (String word : words) {
-					if (skip && word.equals("&"))
+					if (skip && word.equals("&") || word.isEmpty())
 						continue;
 					product += word.substring(0, 1);
 				}
 				name = product;
 			}
 
-			name = name.replace(" ", "");
-			toAdd.add(name);
+			if(!toAdd.contains(name)) toAdd.add(name);
 			nickList.put(original, toAdd);
 		}
 	}
@@ -270,27 +281,11 @@ public class MedalHandler {
 		while(disabled){}
 		name = name.toLowerCase();
 		if (game==GameEnum.NA) {
-			for (String test : this.medalNamesAndLink.keySet()) {
-				if (test.equalsIgnoreCase(name))
-					return test;
-			}
-			for (String realName : this.nicknames.keySet()) {
-				for(String test : this.nicknames.get(realName)){
-					if (test.equalsIgnoreCase(name.replace(" ", "")))
-						return realName;
-				}
-			}
+			String result = getInitialTestResult(name, this.medalNamesAndLink.keySet(), nicknames);
+			if(result != null) return result;
 		} else {
-			for (String test : this.jpMedalNamesAndLink.keySet()) {
-				if (test.equalsIgnoreCase(name))
-					return test;
-			}
-			for (String realName : this.jpNicknames.keySet()) {
-				for(String test : this.jpNicknames.get(realName)){
-					if (test.equalsIgnoreCase(name.replace(" ", "")))
-						return realName;
-				}
-			}
+			String result = getInitialTestResult(name, this.jpMedalNamesAndLink.keySet(), jpNicknames);
+			if(result != null) return result;
 		}
 		//Now we search with words to get a most likely candidate.
 		String[] words = name.split(" ");
@@ -301,6 +296,21 @@ public class MedalHandler {
 			this.putPercentMatchForWordsInList(name, words, percentMatch, this.jpMedalNamesAndLink.keySet());
 		}
 		return this.getBestChance(percentMatch);
+	}
+	
+	public String getInitialTestResult(String name, Set<String> realNames, HashMap<String, ArrayList<String>> nicknames){
+		String nameNoSpace = name.replaceAll("\\s", "");
+		for (String test : realNames) {
+			if (test.replaceAll("\\s", "").equalsIgnoreCase(nameNoSpace))
+				return test;
+		}
+		for (String realName : realNames) {
+			for(String test : this.nicknames.get(realName)){
+				if (test.replaceAll("\\s", "").equalsIgnoreCase(nameNoSpace))
+					return realName;
+			}
+		}
+		return null;
 	}
 	
 	public void putPercentMatchForWordsInList(String name, String[] words, HashMap<String, Float> percentMatch, Set<String> names){
