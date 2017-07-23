@@ -1,8 +1,11 @@
 package xlash.bot.khux.commands;
 
+import java.util.ArrayList;
+
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
+import xlash.bot.khux.sheduler.TimedEvent;
 
 public class TweetCommand extends CommandBase{
 	
@@ -31,7 +34,15 @@ public class TweetCommand extends CommandBase{
     		message.reply("Twitter updates have been turned off.");
     		break;
 		case "get":
-			if(!KHUxBot.twitterHandler.sendTwitterUpdate(message.getChannelReceiver())){
+			ArrayList<String> toSend = KHUxBot.twitterHandler.getNewTwitterLinks();
+			if(!toSend.isEmpty()){
+				TimedEvent update = KHUxBot.scheduler.getTimedEvent("Twitter Update");
+				if(update != null){
+					update.run();
+				}else{
+					System.err.println("Twitter Update doesn't exist");
+				}
+			}else{
 				message.getChannelReceiver().sendMessage(KHUxBot.twitterHandler.getTwitterUpdateLink(0));
 			}
 			break;
