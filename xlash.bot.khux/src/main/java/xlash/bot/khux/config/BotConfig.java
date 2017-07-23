@@ -59,8 +59,6 @@ public class BotConfig {
 	public void saveConfig(){
 		Properties p = new Properties();
 		p.setProperty("Bot_Token", botToken);
-		String toSave = "";
-		p.setProperty("Bot_Admins", toSave);
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(FILE_NAME));
