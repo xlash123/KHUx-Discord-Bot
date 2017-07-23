@@ -31,11 +31,11 @@ public class ServerConfig {
 	
 	public volatile ArrayList<String> admins;
 	
-	public ServerConfig(String serverId){
+	private ServerConfig(String serverId){
 		this.serverId = serverId;
-		this.fileName = serverId + ".properties";
+		this.fileName = DIRECTORY + serverId + ".properties";
 		init();
-		File file = new File(DIRECTORY);
+		File file = new File(DIRECTORY + serverId + ".properties");
 		if(!file.exists()){
 			try {
 				file.getParentFile().mkdirs();
@@ -45,7 +45,7 @@ public class ServerConfig {
 				e.printStackTrace();
 			}
 		}else{
-			loadConfig();
+			this.loadConfig();
 		}
 	}
 	
