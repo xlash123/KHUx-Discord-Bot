@@ -42,7 +42,7 @@ public class UnAdmin extends CommandBase{
 			unAdmins = unAdmins.substring(0, unAdmins.lastIndexOf(',')+1) + " and" + unAdmins.substring(unAdmins.lastIndexOf(',')+1);
 			if(iterations<2){
 				unAdmins = unAdmins.replaceAll(",", "");
-				unAdmins = unAdmins.substring(3);
+				unAdmins = unAdmins.substring(4);
 			}
 		}
 		if(iterations > 1) message.reply(unAdmins + " are no longer admins.");
