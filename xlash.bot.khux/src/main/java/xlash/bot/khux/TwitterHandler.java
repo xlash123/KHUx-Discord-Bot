@@ -22,22 +22,29 @@ public class TwitterHandler {
 	 * @param api The api that sends the message.
 	 * @return boolean if something was sent.
 	 */
-	public boolean sendTwitterUpdate(Channel channel){
+	public boolean sendTwitterUpdate(Channel channel, ArrayList<String> links){
 		boolean flag = false;
-		ArrayList<String> links = new ArrayList<String>();
-		String current;
-		for(int i=0; i<8; i++){
-			current = getTwitterUpdateLink(i);
-			if(!current.equalsIgnoreCase(lastTwitterUpdate)){
-				links.add(0, current);
-			}else break;
-		}
+		
 		for(String link : links){
 			flag = true;
 			if(link!=null) channel.sendMessage(link);
 		}
+		
 		if(links.size()>0) lastTwitterUpdate = links.get(links.size()-1);
 		return flag;
+	}
+	
+	public ArrayList<String> getNewTwitterLinks(){
+		ArrayList<String> ret = new ArrayList<String>();
+		String current;
+		for(int i=0; i<8; i++){
+			current = getTwitterUpdateLink(i);
+			if(!current.equalsIgnoreCase(lastTwitterUpdate)){
+				ret.add(0, current);
+			}else break;
+		}
+		
+		return ret;
 	}
 	
 	/**
