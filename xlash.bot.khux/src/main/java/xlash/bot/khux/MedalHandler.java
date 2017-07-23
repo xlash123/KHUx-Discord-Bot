@@ -3,6 +3,7 @@ package xlash.bot.khux;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -136,7 +137,7 @@ public class MedalHandler {
 				name = name.replace("\u00E8", "e");
 				toAdd.add(name);
 			}
-			name = name.replace("KH II ", "KH2");
+			name = name.replace("KH II", "KH2");
 			name = name.replace("KHII", "KH2");
 			name = name.replace("KH 3", "KH3");
 			name = name.replace("KH III", "KH3");
@@ -292,8 +293,14 @@ public class MedalHandler {
 		HashMap<String, Float> percentMatch = new HashMap<String, Float>();
 		if(game==GameEnum.NA){
 			this.putPercentMatchForWordsInList(name, words, percentMatch, this.medalNamesAndLink.keySet());
+			for(ArrayList<String> list : this.nicknames.values()){
+				this.putPercentMatchForWordsInList(name, words, percentMatch, list);
+			}
 		} else {
 			this.putPercentMatchForWordsInList(name, words, percentMatch, this.jpMedalNamesAndLink.keySet());
+			for(ArrayList<String> list : this.jpNicknames.values()){
+				this.putPercentMatchForWordsInList(name, words, percentMatch, list);
+			}
 		}
 		return this.getBestChance(percentMatch);
 	}
@@ -313,7 +320,7 @@ public class MedalHandler {
 		return null;
 	}
 	
-	public void putPercentMatchForWordsInList(String name, String[] words, HashMap<String, Float> percentMatch, Set<String> names){
+	public void putPercentMatchForWordsInList(String name, String[] words, HashMap<String, Float> percentMatch, Collection<String> names){
 		for(String test : names){
 			int matchLength = 0;
 			String compare = test.toLowerCase();
