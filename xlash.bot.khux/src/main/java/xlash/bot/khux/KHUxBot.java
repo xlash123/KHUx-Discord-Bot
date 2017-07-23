@@ -180,12 +180,14 @@ public class KHUxBot {
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update", true, 2) {
 			@Override
 			public void run() {
+				ArrayList<String> links = twitterHandler.getNewTwitterLinks();
+				if(links.isEmpty()) return;
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
 					if(!config.updateChannel.isEmpty()){
 						Channel channel = server.getChannelById(config.updateChannel);
 						if(channel != null){
-							twitterHandler.sendTwitterUpdate(channel);
+							twitterHandler.sendTwitterUpdate(channel, links);
 						}
 					}
 				}
