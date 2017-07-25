@@ -199,6 +199,12 @@ public class KHUxBot {
 				findUpdate();
 			}
 		});
+		scheduler.addEvent(new Event("Refresh", true, "08:00:00"){
+			@Override
+			public void run() {
+				medalHandler.refreshMedalList();
+			}
+		});
 		System.out.println("Initialization finished!");
 	}
 	
