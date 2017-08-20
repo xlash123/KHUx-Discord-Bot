@@ -71,7 +71,7 @@ public class TwitterHandler {
 		try {
 			Document doc = Jsoup.connect(link).get();
 			String id = doc.getElementsByClass("stream-items js-navigable-stream").get(0).getElementsByAttributeValueMatching("data-item-type", "tweet").get(recent).attr("data-item-id");
-			return "https://twitter.com/kh_ux_na/status/"+id;
+			return "https://twitter.com/" + link + "/status/"+id;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Failed to get update from Twitter, but that won't stop me!");
