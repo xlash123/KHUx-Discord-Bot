@@ -26,6 +26,7 @@ import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
 import xlash.bot.khux.commands.UnAdmin;
 import xlash.bot.khux.commands.DefaultCommand;
+import xlash.bot.khux.commands.HelpCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
 import xlash.bot.khux.commands.MedalJPCommand;
@@ -42,7 +43,7 @@ import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.4.0";
+	public static final String VERSION = "1.4.1";
 
 	public static DiscordAPI api;
 
@@ -177,17 +178,33 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addTimedEvent(new TimedEvent("Twitter Update", true, 2) {
+		scheduler.addTimedEvent(new TimedEvent("Twitter Update NA", true, 2) {
 			@Override
 			public void run() {
-				ArrayList<String> links = twitterHandler.getNewTwitterLinks();
+				ArrayList<String> links = twitterHandler.getNewTwitterLinks(GameEnum.NA);
 				if(links.isEmpty()) return;
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.updateChannel.isEmpty()){
-						Channel channel = server.getChannelById(config.updateChannel);
+					if(!config.updateChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.updateChannelNA);
 						if(channel != null){
-							twitterHandler.sendTwitterUpdate(channel, links);
+							twitterHandler.sendTwitterUpdate(channel, links, GameEnum.NA);
+						}
+					}
+				}
+			}
+		});
+		scheduler.addTimedEvent(new TimedEvent("Twitter Update JP", true, 2) {
+			@Override
+			public void run() {
+				ArrayList<String> links = twitterHandler.getNewTwitterLinks(GameEnum.JP);
+				if(links.isEmpty()) return;
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.updateChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.updateChannelJP);
+						if(channel != null){
+							twitterHandler.sendTwitterUpdate(channel, links, GameEnum.JP);
 						}
 					}
 				}
@@ -224,9 +241,11 @@ public class KHUxBot {
 	}
 	
 	public void registerCommands(){
+		commandHandler.registerCommand(new HelpCommand());
 		commandHandler.registerCommand(new MedalCommand());
 		commandHandler.registerCommand(new MedalNACommand());
 		commandHandler.registerCommand(new MedalJPCommand());
+		commandHandler.registerCommand(new MedalListCommand());
 		commandHandler.registerCommand(new LuxCommand());
 		commandHandler.registerCommand(new TweetCommand());
 		commandHandler.registerCommand(new RefreshCommand());
@@ -235,7 +254,6 @@ public class KHUxBot {
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new AdminCommand());
 		commandHandler.registerCommand(new UnAdmin());
-		commandHandler.registerCommand(new MedalListCommand());
 	}
 
 	public void connect(DiscordAPI api) {
@@ -283,6 +301,28 @@ public class KHUxBot {
 				System.out.println("Connected to " + api.getServers().size() + " servers:");
 				for(Server server : api.getServers()){
 					System.out.println(">" + server.getName());
+				}
+				if(!VERSION.equals(botConfig.version)) {
+					botConfig.version = VERSION;
+					botConfig.saveConfig();
+					for(Server server: api.getServers()) {
+						String channelId = "";
+						ServerConfig config = getServerConfig(server);
+						if(!config.updateChannelNA.isEmpty()) {
+							channelId = config.updateChannelNA;
+						}else if(!config.updateChannelJP.isEmpty()) {
+							channelId = config.updateChannelJP;
+						}else {
+							for(Channel channel : server.getChannels()) {
+								if(channel.getName().equals("general")) {
+									channelId = channel.getId();
+								}
+							}
+						}
+						if(!channelId.isEmpty()) {
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nChangelog at https://github.com/xlash123/KHUx-Discord-Bot/releases");
+						}
+					}
 				}
 			}
 
