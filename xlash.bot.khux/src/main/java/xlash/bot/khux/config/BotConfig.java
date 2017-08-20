@@ -16,6 +16,8 @@ public class BotConfig {
 	public static final String FILE_NAME = System.getProperty("user.dir") + "/khuxbot config/config.properties";
 	
 	public String botToken;
+	//Used to see if the bot was updated since last run
+	public String version;
 	
 	public BotConfig(){
 		init();
@@ -33,6 +35,7 @@ public class BotConfig {
 	
 	public void init(){
 		if(botToken == null) botToken = "";
+		if(version == null) version = "";
 	}
 	
 	/**
@@ -45,6 +48,7 @@ public class BotConfig {
 			Properties p = new Properties();
 			p.load(in);
 			this.botToken = p.getProperty("Bot_Token");
+			this.version = p.getProperty("Version");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -59,6 +63,7 @@ public class BotConfig {
 	public void saveConfig(){
 		Properties p = new Properties();
 		p.setProperty("Bot_Token", botToken);
+		p.setProperty("Version", version);
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(FILE_NAME));
