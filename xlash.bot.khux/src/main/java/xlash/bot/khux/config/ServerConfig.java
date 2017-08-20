@@ -11,13 +11,15 @@ import java.util.Properties;
 
 import de.btobastian.javacord.entities.Server;
 import xlash.bot.khux.GameEnum;
+import xlash.bot.khux.KHUxBot;
 
 public class ServerConfig {
 	
 	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/";
 	public final String fileName;
 	
-	public volatile String updateChannel;
+	public volatile String updateChannelNA;
+	public volatile String updateChannelJP;
 	public volatile String luxChannelNA;
 	public volatile String luxChannelJP;
 	public volatile GameEnum defaultGame;
@@ -54,7 +56,8 @@ public class ServerConfig {
 	}
 	
 	public void init(){
-		if(updateChannel == null) updateChannel = "";
+		if(updateChannelNA == null) updateChannelNA = "";
+		if(updateChannelJP == null) updateChannelJP = "";
 		if(luxChannelNA == null) luxChannelNA = "";
 		if(luxChannelJP == null) luxChannelJP = "";
 		if(defaultGame == null) defaultGame = GameEnum.NA;
@@ -73,7 +76,8 @@ public class ServerConfig {
 			Properties p = new Properties();
 			p.load(in);
 			this.botToken = p.getProperty("Bot_Token");
-			this.updateChannel = p.getProperty("Update_Channel");
+			this.updateChannelNA = p.getProperty("Update_Channel_NA");
+			this.updateChannelJP = p.getProperty("Update_Channel_JP");
 			this.luxChannelNA = p.getProperty("Lux_Channel_NA");
 			this.luxChannelJP = p.getProperty("Lux_Channel_JP");
 			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
@@ -95,7 +99,8 @@ public class ServerConfig {
 	public void saveConfig(){
 		init();
 		Properties p = new Properties();
-		p.setProperty("Update_Channel", updateChannel);
+		p.setProperty("Update_Channel_NA", updateChannelNA);
+		p.setProperty("Update_Channel_JP", updateChannelJP);
 		p.setProperty("Lux_Channel_NA", luxChannelNA);
 		p.setProperty("Lux_Channel_JP", luxChannelJP);
 		p.setProperty("Default_Game", defaultGame.toString());
@@ -110,7 +115,7 @@ public class ServerConfig {
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(fileName));
-			p.store(os, "This is the config file for the Discord server of ID: " + serverId);
+			p.store(os, "This is the config file for the Discord server: " + KHUxBot.api.getServerById(serverId).getName());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

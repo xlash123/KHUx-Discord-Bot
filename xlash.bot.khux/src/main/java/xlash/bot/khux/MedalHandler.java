@@ -3,6 +3,7 @@ package xlash.bot.khux;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -308,9 +309,9 @@ public class MedalHandler {
 		String[] words = name.split(" ");
 		HashMap<String, Float> percentMatch = new HashMap<String, Float>();
 		if (game == GameEnum.NA) {
-			this.putPercentMatchForWordsInList(name, words, percentMatch, this.nicknames);
+			this.putPercentMatchForWordsInList(name, words, percentMatch, this.medalNamesAndLink.keySet());
 		} else {
-			this.putPercentMatchForWordsInList(name, words, percentMatch, this.jpNicknames);
+			this.putPercentMatchForWordsInList(name, words, percentMatch, this.jpMedalNamesAndLink.keySet());
 		}
 		return this.getBestChance(percentMatch);
 	}
@@ -323,7 +324,7 @@ public class MedalHandler {
 				return test;
 		}
 		for (String realName : realNames) {
-			for (String test : this.nicknames.get(realName)) {
+			for (String test : nicknames.get(realName)) {
 				if (test.replaceAll("\\s", "").equalsIgnoreCase(nameNoSpace))
 					return realName;
 			}
@@ -332,19 +333,20 @@ public class MedalHandler {
 	}
 
 	public void putPercentMatchForWordsInList(String name, String[] words, HashMap<String, Float> percentMatch,
-			HashMap<String, ArrayList<String>> nicknames) {
-		for (String realName : nicknames.keySet()) {
-			for (String test : nicknames.get(realName)) {
+			Collection<String> names) {
+		for (String test : names) {
 				int matchLength = 0;
 				String compare = test.toLowerCase();
 				String[] testWords = compare.split(" ");
 				HashMap<String, Integer> repeats = new HashMap<String, Integer>();
 				for (String w : words) {
+					w = w.toLowerCase();
 					int numOfOcc = 0;
 					if (repeats.get(w) != null)
 						numOfOcc = repeats.get(w);
 					int initOcc = numOfOcc;
 					for (String tw : testWords) {
+						tw = tw.toLowerCase();
 						if (tw.equals(w)) {
 							numOfOcc--;
 							if (numOfOcc < 0) {
@@ -356,8 +358,7 @@ public class MedalHandler {
 					}
 				}
 				float higher = Math.max(test.length() - testWords.length, name.length() - words.length);
-				percentMatch.put(realName, matchLength / higher);
-			}
+				percentMatch.put(test, matchLength / higher);
 		}
 	}
 
@@ -372,7 +373,7 @@ public class MedalHandler {
 			if (currentPercent == 1) {
 				return currentName;
 			}
-			if (currentPercent > winnerPer && currentPercent >= .8f) {
+			if (currentPercent > winnerPer && currentPercent >= .7f) {
 				winner = currentName;
 				winnerPer = currentPercent;
 			}
