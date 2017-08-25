@@ -1,15 +1,19 @@
 package xlash.bot.khux;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
-import de.btobastian.javacord.DiscordAPI;
 import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.Server;
 
 public class TwitterHandler {
+	
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
 	
 	public String lastTwitterUpdateNA;
 	public String lastTwitterUpdateJP;
@@ -67,11 +71,34 @@ public class TwitterHandler {
 	 * @return The URL for the Tweet.
 	 */
 	public String getTwitterUpdateLink(int recent, GameEnum game){
-		String link = "https://twitter.com/" + (game==GameEnum.NA ? "kh_ux_na" : "khux_pr");
+		String gameString = (game==GameEnum.NA ? "kh_ux_na" : "khux_pr");
+		String link = "https://twitrss.me/twitter_user_to_rss/?user=" + gameString;
 		try {
 			Document doc = Jsoup.connect(link).get();
-			String id = doc.getElementsByClass("stream-items js-navigable-stream").get(0).getElementsByAttributeValueMatching("data-item-type", "tweet").get(recent).attr("data-item-id");
-			return "https://twitter.com/" + link + "/status/"+id;
+			Elements items = doc.getElementsByTag("item");
+			ArrayList<String> links = new ArrayList<String>();
+			ArrayList<Long> ids = new ArrayList<Long>();
+			for(int i=0; i<10; i++) {
+				String tweetLink = items.get(i).getElementsByTag("link").get(0).text();
+				Long tweetId = Long.parseLong(tweetLink.substring(tweetLink.lastIndexOf("/")+1));
+				if(links.size()==0) {
+					links.add(tweetLink);
+					ids.add(tweetId);
+				}else {
+					for(int j=0; j<ids.size(); j++) {
+						if(tweetId>=ids.get(j)) {
+							links.add(j, tweetLink);
+							ids.add(j, tweetId);
+							break;
+						}
+						if(j==ids.size()-1) {
+							links.add(tweetLink);
+							ids.add(tweetId);
+						}
+					}
+				}
+			}
+			return links.get(recent);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Failed to get update from Twitter, but that won't stop me!");
