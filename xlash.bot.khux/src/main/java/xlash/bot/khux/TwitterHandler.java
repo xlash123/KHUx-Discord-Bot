@@ -72,15 +72,20 @@ public class TwitterHandler {
 	 */
 	public String getTwitterUpdateLink(int recent, GameEnum game){
 		String gameString = (game==GameEnum.NA ? "kh_ux_na" : "khux_pr");
-		String link = "https://twitrss.me/twitter_user_to_rss/?user=" + gameString;
+		String link = "https://twitter.com/" + gameString + "/";
 		try {
 			Document doc = Jsoup.connect(link).get();
-			Elements items = doc.getElementsByTag("item");
 			ArrayList<String> links = new ArrayList<String>();
 			ArrayList<Long> ids = new ArrayList<Long>();
 			for(int i=0; i<10; i++) {
-				String tweetLink = items.get(i).getElementsByTag("link").get(0).text();
-				Long tweetId = Long.parseLong(tweetLink.substring(tweetLink.lastIndexOf("/")+1));
+				Long tweetId = 0L;
+				try {
+					tweetId = Long.parseLong(doc.getElementsByClass("stream-items js-navigable-stream").get(0).getElementsByAttributeValueMatching("data-item-type", "tweet").get(i).attr("data-item-id"));
+				}catch(IndexOutOfBoundsException e) {
+					//If there are less than 10 tweets, don't worry about it
+					continue;
+				}
+				String tweetLink = link + "status/" + tweetId;
 				if(links.size()==0) {
 					links.add(tweetLink);
 					ids.add(tweetId);
