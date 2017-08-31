@@ -174,7 +174,7 @@ public class MedalHandler {
 						for (String word : words) {
 							if (skip && word.equals("&"))
 								continue;
-							product += word.substring(0, 1);
+							if(!word.isEmpty()) product += word.substring(0, 1);
 						}
 						name = product;
 					}
@@ -186,7 +186,7 @@ public class MedalHandler {
 				for (String word : words) {
 					if (skip && word.equals("&") || word.isEmpty())
 						continue;
-					product += word.substring(0, 1);
+					if(!word.isEmpty()) product += word.substring(0, 1);
 				}
 				name = product;
 			}
