@@ -122,7 +122,8 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-		scheduler.addEvent(new Event("NA Lux On", true, "03:00:00", "09:00:00", "15:00:00", "21:00:00"){
+		//"03:00:00", "09:00:00", "15:00:00", "21:00:00"
+		scheduler.addEvent(new Event("NA Lux On", true, "19:00:00", "02:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -136,7 +137,8 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("NA Lux Off", true, "04:00:00", "10:00:00", "16:00:00", "22:00:00"){
+		//"04:00:00", "10:00:00", "16:00:00", "22:00:00"
+		scheduler.addEvent(new Event("NA Lux Off", true, "20:00:00", "03:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -320,7 +322,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nChangelog at https://github.com/xlash123/KHUx-Discord-Bot/releases");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "For the week of 9/4, the lux times for NA have been changed to match the daily raid event. This will be reverted on 9/11.");
 						}
 					}
 				}
