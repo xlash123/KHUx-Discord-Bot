@@ -39,7 +39,7 @@ public class CommandHandler {
 						}
 						Collection<Role> roles = user.getRoles(message.getChannelReceiver().getServer());
 						for(Role r : roles){
-							if(r.getPermissions().getState(PermissionType.ADMINISTATOR)==PermissionState.ALLOWED){
+							if(r.getPermissions().getState(PermissionType.ADMINISTRATOR)==PermissionState.ALLOWED){
 								admin = true;
 							}
 						}
