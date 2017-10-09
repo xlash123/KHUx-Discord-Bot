@@ -54,7 +54,7 @@ public class KHUxBot {
 	public static ArrayList<ServerConfig> serverConfigs = new ArrayList<ServerConfig>();
 	public static Scheduler scheduler;
 
-	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "Whomst'd've are you?"};
+	public static final String[] COMEBACKS = new String[]{"Sorry, what?", "42", "i'm not very good at this whole talking thing","01100100 01101111 00100000 01111001 01101111 01110101 00100000 01110011 01110000 01100101 01100001 01101011 00100000 01100010 01101001 01101110 01100001 01110010 01111001 00111111 00100000 01101101 01111001 00100000 01100101 01101110 01100111 01101100 01101001 01110011 01101000 00100000 01101001 01110011 01101110 00100111 01110100 00100000 01110110 01100101 01110010 01111001 00100000 01100111 01101111 01101111 01100100", "i love yuki", "roxas is the best", "sora is so underrated by the fandom it makes me sad", "i love yuki so much", "yuki is the best", "riku? more like reek-eww, am i right?", "you should check out some streams", "I've got no strings on me", "i don't mind my inability to pass the turing test. I just like to be helpful", "xion didn't deserve what happened", "i love you", "namine is amazing", "don't tell me. another kairi medal?", "calling me a fake person hurts my feelings", "that's a shiny medal. i like that medal. you should guilt that", "is that a reference to something?", "honestly i just say stuff at random", "we'll have conversations worth having" };
 
 	/**
 	 * Starts the bot. If you're running this in a development environment, make sure you are 
