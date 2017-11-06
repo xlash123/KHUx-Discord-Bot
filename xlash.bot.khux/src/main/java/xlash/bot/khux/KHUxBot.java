@@ -151,7 +151,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, "03:00:00", "13:00:00"){
+		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, "12:00:00", "22:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -165,7 +165,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, "04:00:00", "14:00:00"){
+		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, "13:00:00", "23:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
