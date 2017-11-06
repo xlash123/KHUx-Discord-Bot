@@ -10,7 +10,7 @@ public abstract class TimedEvent {
 	public int frequency;
 	public boolean enabled;
 	
-	public String lastRun;
+	public long lastRun;
 	
 	/**
 	 * Create an event that runs every x minutes
@@ -22,7 +22,7 @@ public abstract class TimedEvent {
 		this.name = name;
 		this.frequency = frequency;
 		this.enabled = enabled;
-		lastRun = "00:00:00";
+		lastRun = 0;
 	}
 	
 	/**
