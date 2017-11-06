@@ -123,7 +123,7 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-		scheduler.addEvent(new Event("NA Lux On", true, "03:00:00", "09:00:00", "15:00:00", "21:00:00"){
+		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, "02:00:00", "08:00:00", "13:00:00", "20:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -137,7 +137,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("NA Lux Off", true, "04:00:00", "10:00:00", "16:00:00", "22:00:00"){
+		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, "03:00:00", "9:00:00", "14:00:00", "21:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -151,7 +151,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux On", true, "03:00:00", "13:00:00"){
+		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, "03:00:00", "13:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -165,7 +165,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux Off", true, "04:00:00", "14:00:00"){
+		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, "04:00:00", "14:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -217,7 +217,7 @@ public class KHUxBot {
 				findUpdate();
 			}
 		});
-		scheduler.addEvent(new Event("Refresh", true, "08:00:00"){
+		scheduler.addEvent(new Event("Refresh", true, GameEnum.NA, "05:00:00"){
 			@Override
 			public void run() {
 				medalHandler.refreshMedalList();

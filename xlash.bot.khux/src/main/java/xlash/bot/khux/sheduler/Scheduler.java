@@ -1,11 +1,11 @@
 package xlash.bot.khux.sheduler;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import xlash.bot.khux.GameEnum;
 
 /**
  * Schedules things
@@ -13,7 +13,8 @@ import java.util.TimeZone;
  */
 public class Scheduler {
 	
-	public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
+	public static final SimpleDateFormat SDF_NA = new SimpleDateFormat("HH:mm:ss");
+	public static final SimpleDateFormat SDF_JP = new SimpleDateFormat("HH:mm:ss");
 	
 	public volatile ArrayList<Event> events = new ArrayList<Event>();
 	
@@ -25,7 +26,8 @@ public class Scheduler {
 	 * Initializes a scheduler.
 	 */
 	public Scheduler(){
-		SDF.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+		SDF_NA.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+		SDF_JP.setTimeZone(TimeZone.getTimeZone("Japan"));
 		schedulerThread = new Thread("Scheduler"){
 			@Override
 			public void run(){
@@ -216,11 +218,15 @@ public class Scheduler {
 	 * @param timeSec in UNIX time (milliseconds)
 	 */
 	private void executeEvents(long timeSec){
-		String currentTime = getGMTTime(timeSec);
 		Date currentDate = new Date(timeSec * 1000);
+		String currentTimeNA = SDF_NA.format(currentDate);
+		String currentTimeJP = SDF_NA.format(currentDate);
 		
 		for(Event e : events){
 			for(String time : e.getTimes()){
+				String currentTime;
+				if(e.game == GameEnum.NA) currentTime = currentTimeNA;
+				else currentTime = currentTimeJP;
 				if(e.enabled && time.equals(currentTime)){
 					System.out.println("Running " + e.getName());
 					try{
@@ -250,9 +256,5 @@ public class Scheduler {
 				}
 			}
 		}
-	}
-	
-	public static String getGMTTime(long sec){
-		return SDF.format(new Date(sec*1000));
 	}
 }

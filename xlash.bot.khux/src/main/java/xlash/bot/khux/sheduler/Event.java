@@ -1,5 +1,9 @@
 package xlash.bot.khux.sheduler;
 
+import java.util.TimeZone;
+
+import xlash.bot.khux.GameEnum;
+
 /**
  * An event that runs at a specific time
  *
@@ -9,6 +13,7 @@ public abstract class Event {
 	public final String name;
 	public String[] times;
 	public boolean enabled;
+	public GameEnum game;
 	
 	/**
 	 * Add an event to run at a specific time.
@@ -16,10 +21,11 @@ public abstract class Event {
 	 * @param enabled Determines if the event will run
 	 * @param times The times that the event runs in UTC: hh:mm:ss (must include initial '0' to fill all fields)
 	 */
-	public Event(String name, boolean enabled, String... times){
+	public Event(String name, boolean enabled, GameEnum game, String... times){
 		this.name = name;
 		this.times = times;
 		this.enabled = enabled;
+		this.game = game;
 	}
 	
 	public final String getName(){
