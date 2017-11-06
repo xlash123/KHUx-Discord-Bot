@@ -21,6 +21,7 @@ import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
+import xlash.bot.khux.TwitterHandler.Tweet;
 import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
@@ -43,7 +44,7 @@ import xlash.bot.khux.sheduler.TimedEvent;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.4.6";
+	public static final String VERSION = "1.4.7";
 
 	public static DiscordAPI api;
 
@@ -181,14 +182,14 @@ public class KHUxBot {
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update NA", true, 2) {
 			@Override
 			public void run() {
-				ArrayList<String> links = twitterHandler.getNewTwitterLinks(GameEnum.NA);
-				if(links.isEmpty()) return;
+				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.NA);
+				if(tweets.isEmpty()) return;
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
 					if(!config.updateChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.updateChannelNA);
 						if(channel != null){
-							twitterHandler.sendTwitterUpdate(channel, links, GameEnum.NA);
+							twitterHandler.sendTwitterUpdate(channel, tweets, GameEnum.NA);
 						}
 					}
 				}
@@ -197,14 +198,14 @@ public class KHUxBot {
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update JP", true, 2) {
 			@Override
 			public void run() {
-				ArrayList<String> links = twitterHandler.getNewTwitterLinks(GameEnum.JP);
-				if(links.isEmpty()) return;
+				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.JP);
+				if(tweets.isEmpty()) return;
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
 					if(!config.updateChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.updateChannelJP);
 						if(channel != null){
-							twitterHandler.sendTwitterUpdate(channel, links, GameEnum.JP);
+							twitterHandler.sendTwitterUpdate(channel, tweets, GameEnum.JP);
 						}
 					}
 				}
@@ -320,7 +321,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nUpdated for Daylight Savings.");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nUpdated for Daylight Savings.\nFixed double-posting Tweets.");
 						}
 					}
 				}
