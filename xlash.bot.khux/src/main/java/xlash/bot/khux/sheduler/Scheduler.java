@@ -3,6 +3,7 @@ package xlash.bot.khux.sheduler;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -24,7 +25,7 @@ public class Scheduler {
 	 * Initializes a scheduler.
 	 */
 	public Scheduler(){
-		SDF.setTimeZone(TimeZone.getTimeZone("GMT"));
+		SDF.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
 		schedulerThread = new Thread("Scheduler"){
 			@Override
 			public void run(){
@@ -216,7 +217,7 @@ public class Scheduler {
 	 */
 	private void executeEvents(long timeSec){
 		String currentTime = getGMTTime(timeSec);
-		Date currentDate = convert(currentTime);
+		Date currentDate = new Date(timeSec * 1000);
 		
 		for(Event e : events){
 			for(String time : e.getTimes()){
@@ -236,7 +237,7 @@ public class Scheduler {
 		
 		for(TimedEvent e : timedEvents){
 			if(e.enabled){
-				long difference = difference(convert(e.lastRun), currentDate).getTime();
+				long difference = currentDate.getTime() - e.lastRun;
 				if(difference > e.getFrequency()*60000){
 					System.out.println("Running " + e.getName());
 					try{
@@ -245,66 +246,13 @@ public class Scheduler {
 						System.err.println("Error occured while running timed event: " + e.getName());
 						e1.printStackTrace();
 					}
-					e.lastRun = String.valueOf(currentTime);
+					e.lastRun = currentDate.getTime();
 				}
 			}
 		}
 	}
 	
-	/**
-	 * Gets the GMT or UTC time.
-	 * @param format The format the time should be represented.
-	 * @return Time/Date in the GMT time zone.
-	 */
-	public static String getGMTTime(String format) {
-		final Date currentTime = new Date();
-
-		final SimpleDateFormat sdf = new SimpleDateFormat(format);
-
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return sdf.format(currentTime);
-	}
-
-	/**
-	 * Gets the time in the GMT time zone in the 00:00:00 to 23:59:59 standard.
-	 * @return Time in the 00:00:00 to 23:59:59 standard.
-	 */
-	public static String getGMTTime() {
-		return getGMTTime("HH:mm:ss");
-	}
-	
 	public static String getGMTTime(long sec){
 		return SDF.format(new Date(sec*1000));
-	}
-	
-	/**
-	 * Converts the given string into a Date object.
-	 * @param time in format HH:mm:ss
-	 * @return Date object representing the current time (ignoring actual day).
-	 */
-	public static Date convert(String time){
-		try {
-			return SDF.parse(time);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * Returns the difference in time. Should not exceed a difference of 24 hours.
-	 * @param before
-	 * @param after
-	 * @return A Date object representing the time difference.
-	 */
-	public Date difference(Date before, Date after){
-		boolean nextDay = before.after(after);
-		long timeDiff;
-		if(nextDay){
-			timeDiff = after.getTime() - before.getTime() + (24*60*60*1000);
-		}else{
-			timeDiff = after.getTime() - before.getTime();
-		}
-		return new Date(timeDiff);
 	}
 }
