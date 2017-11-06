@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.TwitterHandler.Tweet;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.sheduler.TimedEvent;
 
@@ -47,7 +48,7 @@ public class TweetCommand extends CommandBase{
     		message.reply(game.toString() + " Twitter updates have been turned off.");
     		break;
 		case "get":
-			ArrayList<String> toSend = KHUxBot.twitterHandler.getNewTwitterLinks(game);
+			ArrayList<Tweet> toSend = KHUxBot.twitterHandler.getNewTwitterLinks(game);
 			if(!toSend.isEmpty()){
 				TimedEvent update = KHUxBot.scheduler.getTimedEvent("Twitter Update " + game.toString());
 				if(update != null){
@@ -56,7 +57,7 @@ public class TweetCommand extends CommandBase{
 					System.err.println(game.toString() + " Twitter Update doesn't exist");
 				}
 			}else{
-				message.getChannelReceiver().sendMessage(KHUxBot.twitterHandler.getTwitterUpdateLink(0, game));
+				message.getChannelReceiver().sendMessage(KHUxBot.twitterHandler.getTwitterUpdateLink(0, game).getLink());
 			}
 			break;
 		case "status":
