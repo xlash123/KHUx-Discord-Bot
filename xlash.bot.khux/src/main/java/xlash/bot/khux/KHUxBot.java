@@ -137,7 +137,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, "03:00:00", "9:00:00", "14:00:00", "21:00:00"){
+		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, "03:00:00", "09:00:00", "14:00:00", "21:00:00"){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
