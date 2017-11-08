@@ -19,7 +19,7 @@ public abstract class Event {
 	 * Add an event to run at a specific time.
 	 * @param name Unique name for the event
 	 * @param enabled Determines if the event will run
-	 * @param times The times that the event runs in UTC: hh:mm:ss (must include initial '0' to fill all fields)
+	 * @param times The times that the event runs in UTC: hh:mm:ss (must include initial '0' to fill all fields), e.g. 09:00:00 instead of 9:00:00
 	 */
 	public Event(String name, boolean enabled, GameEnum game, String... times){
 		this.name = name;
