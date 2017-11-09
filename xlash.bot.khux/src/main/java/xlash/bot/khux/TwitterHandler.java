@@ -113,7 +113,7 @@ public class TwitterHandler {
 		
 		public String getLink() {
 			String gameString = (game == GameEnum.NA ? "kh_ux_na" : "khux_pr");
-			return "https://twitter.com/" + gameString + "/" + tweetId;
+			return "https://twitter.com/" + gameString + "/status/" + tweetId;
 		}
 		
 	}
