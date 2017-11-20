@@ -18,6 +18,7 @@ public class BotConfig {
 	public String botToken;
 	//Used to see if the bot was updated since last run
 	public String version;
+	public int saltCount;
 	
 	public BotConfig(){
 		init();
@@ -49,6 +50,8 @@ public class BotConfig {
 			p.load(in);
 			this.botToken = p.getProperty("Bot_Token");
 			this.version = p.getProperty("Version");
+			String saltCountString = p.getProperty("Salt_Count");
+			if(saltCountString != null) this.saltCount = Integer.parseInt(saltCountString);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -64,6 +67,7 @@ public class BotConfig {
 		Properties p = new Properties();
 		p.setProperty("Bot_Token", botToken);
 		p.setProperty("Version", version);
+		p.setProperty("Salt_Count", ""+this.saltCount);
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(FILE_NAME));
