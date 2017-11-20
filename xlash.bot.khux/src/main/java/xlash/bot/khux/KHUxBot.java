@@ -41,6 +41,7 @@ import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.sheduler.Event;
 import xlash.bot.khux.sheduler.Scheduler;
 import xlash.bot.khux.sheduler.TimedEvent;
+import xlash.bot.khux.util.LuxTimes;
 
 public class KHUxBot {
 
@@ -123,7 +124,7 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, "02:00:00", "08:00:00", "13:00:00", "20:00:00"){
+		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, LuxTimes.doubleLuxStartNA){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -137,7 +138,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, "03:00:00", "09:00:00", "14:00:00", "21:00:00"){
+		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, LuxTimes.doubleLuxStopNA){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -151,7 +152,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, "12:00:00", "22:00:00"){
+		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, LuxTimes.doubleLuxStartJP){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -165,7 +166,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, "13:00:00", "23:00:00"){
+		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, LuxTimes.doubleLuxStopJP){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -221,6 +222,30 @@ public class KHUxBot {
 			@Override
 			public void run() {
 				medalHandler.refreshMedalList();
+			}
+		});
+		scheduler.addTimedEvent(new TimedEvent("Lux Reminders", true, 1) {
+			@Override
+			public void run() {
+				int timeDifNA = LuxTimes.timeDifference(GameEnum.NA);
+				int timeDifJP = LuxTimes.timeDifference(GameEnum.JP);
+				if(timeDifNA < 30 || timeDifJP < 30) {
+					for(ServerConfig config : serverConfigs) {
+						if(config.luxRemind>0) {
+							if(!config.luxChannelNA.isEmpty()) {
+								if(config.luxRemind == timeDifNA) {
+									api.getChannelById(config.luxChannelNA).sendMessage("NA Reminder: Double lux in " + timeDifNA + " minutes!");
+								}
+							}
+						
+							if(!config.luxChannelJP.isEmpty()) {
+								if(config.luxRemind == timeDifJP) {
+									api.getChannelById(config.luxChannelNA).sendMessage("JP Reminder: Double lux in " + timeDifJP + " minutes!");
+								}
+							}
+						}
+					}
+				}
 			}
 		});
 		System.out.println("Initialization finished!");
