@@ -349,7 +349,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nUpdated for Daylight Savings.\nFixed double-posting Tweets.");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nAdded !lux remind [minutes] to remind when the next lux time is.\nAdded !lux check (na/jp) to check when the next double lux is.\nAdded !salt to keep track of how salty we are.");
 						}
 					}
 				}
