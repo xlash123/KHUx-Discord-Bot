@@ -26,6 +26,7 @@ public class ServerConfig {
 	
 	public volatile String luxOnPrompt;
 	public volatile String luxOffPrompt;
+	public volatile int luxRemind;
 	
 	public final String serverId;
 	
@@ -85,9 +86,12 @@ public class ServerConfig {
 			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
 			String adminsString = p.getProperty("Bot_Admins");
 			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
+			this.luxRemind = Integer.parseInt(p.getProperty("Lux_Remind"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
 		init();
@@ -106,6 +110,7 @@ public class ServerConfig {
 		p.setProperty("Default_Game", defaultGame.toString());
 		p.setProperty("Lux_On_Prompt", luxOnPrompt);
 		p.setProperty("Lux_Off_Prompt", luxOffPrompt);
+		p.setProperty("Lux_Remind", ""+luxRemind);
 		String toSave = "";
 		for(int i=0; i<admins.size(); i++){
 			toSave += admins.get(i);
