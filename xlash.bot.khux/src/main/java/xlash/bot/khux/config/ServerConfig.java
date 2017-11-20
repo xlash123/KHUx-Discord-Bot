@@ -86,8 +86,7 @@ public class ServerConfig {
 			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
 			String adminsString = p.getProperty("Bot_Admins");
 			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
-			String luxRemindString = p.getProperty("Lux_Remind");
-			if(luxRemindString != null) this.luxRemind = Integer.parseInt(luxRemindString);
+			this.luxRemind = Integer.parseInt(p.getProperty("Lux_Remind"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
