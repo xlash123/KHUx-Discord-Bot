@@ -35,6 +35,7 @@ import xlash.bot.khux.commands.MedalListCommand;
 import xlash.bot.khux.commands.MedalNACommand;
 import xlash.bot.khux.commands.RefreshCommand;
 import xlash.bot.khux.commands.ResetCommand;
+import xlash.bot.khux.commands.SaltCommand;
 import xlash.bot.khux.commands.TweetCommand;
 import xlash.bot.khux.config.BotConfig;
 import xlash.bot.khux.config.ServerConfig;
@@ -45,7 +46,7 @@ import xlash.bot.khux.util.LuxTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.4.7";
+	public static final String VERSION = "1.5.0";
 
 	public static DiscordAPI api;
 
@@ -56,7 +57,7 @@ public class KHUxBot {
 	public static ArrayList<ServerConfig> serverConfigs = new ArrayList<ServerConfig>();
 	public static Scheduler scheduler;
 
-	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "Whomst'd've are you?"};
+	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "https://youtu.be/dQw4w9WgXcQ", "Why would I know?", "*I am a bot, and this action was performed automatically.*", "Yes", "Ask again later", "I'm not your mom.", "Do me a favor and stop asking for favors", "KH3 will release in 2020", "Whoooaaa! Looking cool, Joker!"};
 
 	/**
 	 * Starts the bot. If you're running this in a development environment, make sure you are 
@@ -229,6 +230,7 @@ public class KHUxBot {
 			public void run() {
 				int timeDifNA = LuxTimes.timeDifference(GameEnum.NA);
 				int timeDifJP = LuxTimes.timeDifference(GameEnum.JP);
+				System.out.println("Debug times: " + timeDifNA + " " + timeDifJP);
 				if(timeDifNA < 30 || timeDifJP < 30) {
 					for(ServerConfig config : serverConfigs) {
 						if(config.luxRemind>0) {
@@ -280,6 +282,7 @@ public class KHUxBot {
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new AdminCommand());
 		commandHandler.registerCommand(new UnAdmin());
+		commandHandler.registerCommand(new SaltCommand());
 	}
 
 	public void connect(DiscordAPI api) {
