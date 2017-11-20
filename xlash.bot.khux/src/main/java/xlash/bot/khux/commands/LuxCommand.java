@@ -4,6 +4,7 @@ import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
+import xlash.bot.khux.util.LuxTimes;
 
 public class LuxCommand extends CommandBase{
 	
@@ -71,6 +72,9 @@ public class LuxCommand extends CommandBase{
 			else
 				message.reply("Double lux reminders for JP are currently turned off.");
 			return;
+		case "check":
+			message.reply("There are " + LuxTimes.timeDifference(game) + " minutes until double lux is active for " + game.name() + ".");
+			break;
 		case "remind":
 			if(args.length > 1) {
 				try {
@@ -78,8 +82,8 @@ public class LuxCommand extends CommandBase{
 					if(time > 30 || time < 0) {
 						message.reply("Out of range. Enter a number 0-30 inclusive.");
 					}else {
+						message.reply("Lux reminder set for " + time + " minutes before active time.");
 						config.luxRemind = time;
-						config.saveConfig();
 					}
 				}catch(NumberFormatException e) {
 					message.reply("I don't think that's a number... Enter a number 0-30 inclusive.");
