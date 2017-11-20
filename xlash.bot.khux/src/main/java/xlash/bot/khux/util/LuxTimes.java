@@ -15,8 +15,8 @@ public class LuxTimes {
 	public static String[] doubleLuxStopNA = new String[] {"03:00:00", "09:00:00", "15:00:00", "21:00:00"};
 	public static String[] doubleLuxStopJP = new String[] {"13:00:00", "23:00:00"};
 	
-	public static String[] dailyRaidStartNA = new String[] {};
-	public static String[] dailyRaidStopNA = new String[] {};
+	public static String[] dailyRaidStartNA = new String[] {"12:00:00", "19:00:00"};
+	public static String[] dailyRaidStopNA = new String[] {"13:00:00", "10:00:00"};
 	public static String[] dailyRaidStartJP = new String[] {};
 	public static String[] dailyRaidStopJP = new String[] {};
 	
@@ -38,14 +38,13 @@ public class LuxTimes {
 		
 		int closest = Integer.MAX_VALUE;
 		Date now = new Date();
-		Date currentDay = new Date(now.getTime());
-		currentDay.setHours(0);
-		currentDay.setMinutes(0);
-		currentDay.setSeconds(0);
 		for(String time : start) {
 			try {
-				Date luxTime = new Date(sdf.parse(time).getTime() + currentDay.getTime());
-				int difference = (int) ((luxTime.getTime() - now.getTime())/1000);
+				Date luxTime = sdf.parse(time);
+				luxTime.setYear(Calendar.getInstance().get(Calendar.YEAR)-1900);
+				luxTime.setMonth(Calendar.getInstance().get(Calendar.MONTH));
+				luxTime.setDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+				int difference = (int) ((luxTime.getTime() - now.getTime())/1000) + 60;
 				if(difference < 0) {
 					difference += 86400;
 				}
