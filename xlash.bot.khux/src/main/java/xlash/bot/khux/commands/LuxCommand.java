@@ -73,7 +73,16 @@ public class LuxCommand extends CommandBase{
 				message.reply("Double lux reminders for JP are currently turned off.");
 			return;
 		case "check":
-			message.reply("There are " + LuxTimes.timeDifference(game) + " minutes until double lux is active for " + game.name() + ".");
+			int nextTime = LuxTimes.timeDifference(game);
+			int mins = nextTime%60;
+			int hours = nextTime/60;
+			String timeS = "";
+			if(hours > 0) {
+				timeS += hours + " hours ";
+				if(mins > 0) timeS += "and ";
+			}
+			if(mins > 0) timeS += mins + " minutes ";
+			message.reply("There are " + timeS + "until double lux is active for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {
