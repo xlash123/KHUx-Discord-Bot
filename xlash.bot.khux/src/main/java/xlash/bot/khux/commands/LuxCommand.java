@@ -71,6 +71,23 @@ public class LuxCommand extends CommandBase{
 			else
 				message.reply("Double lux reminders for JP are currently turned off.");
 			return;
+		case "remind":
+			if(args.length > 1) {
+				try {
+					int time = Integer.parseInt(args[1]);
+					if(time > 30 || time < 0) {
+						message.reply("Out of range. Enter a number 0-30 inclusive.");
+					}else {
+						config.luxRemind = time;
+						config.saveConfig();
+					}
+				}catch(NumberFormatException e) {
+					message.reply("I don't think that's a number... Enter a number 0-30 inclusive.");
+				}
+			}else {
+				this.printDescriptionUsage(message);
+			}
+			break;
 			default:
 				this.printDescriptionUsage(message);
 				return;
@@ -85,7 +102,7 @@ public class LuxCommand extends CommandBase{
 
 	@Override
 	public String getUsage() {
-		return "!lux [on/off/status] (na/jp)";
+		return "!lux [on/off/status] (na/jp) or !lux remind [minutes]";
 	}
 
 	@Override
