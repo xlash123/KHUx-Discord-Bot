@@ -4,7 +4,7 @@ import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
-import xlash.bot.khux.util.LuxTimes;
+import xlash.bot.khux.util.BonusTimes;
 
 public class LuxCommand extends CommandBase{
 	
@@ -73,7 +73,7 @@ public class LuxCommand extends CommandBase{
 				message.reply("Double lux reminders for JP are currently turned off.");
 			return;
 		case "check":
-			int nextTime = LuxTimes.timeDifference(game);
+			int nextTime = BonusTimes.luxTimeDifference(game);
 			int mins = nextTime%60;
 			int hours = nextTime/60;
 			String timeS = "";
@@ -115,7 +115,7 @@ public class LuxCommand extends CommandBase{
 
 	@Override
 	public String getUsage() {
-		return "!lux [on/off/status] (na/jp) or !lux remind [minutes]";
+		return "!lux [on/off/status/check] (na/jp) or !lux remind [minutes]";
 	}
 
 	@Override

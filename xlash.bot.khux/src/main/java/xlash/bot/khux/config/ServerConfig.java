@@ -22,11 +22,17 @@ public class ServerConfig {
 	public volatile String updateChannelJP;
 	public volatile String luxChannelNA;
 	public volatile String luxChannelJP;
+	public volatile String raidChannelNA;
+	public volatile String raidChannelJP;
+	public volatile String uxChannelNA;
+	public volatile String uxChannelJP;
 	public volatile GameEnum defaultGame;
 	
 	public volatile String luxOnPrompt;
 	public volatile String luxOffPrompt;
 	public volatile int luxRemind;
+	public volatile int raidRemind;
+	public volatile int uxRemind;
 	
 	public final String serverId;
 	
