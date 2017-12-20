@@ -220,12 +220,14 @@ public class Scheduler {
 	private void executeEvents(long timeSec){
 		Date currentDate = new Date(timeSec * 1000);
 		String currentTimeNA = SDF_NA.format(currentDate);
-		String currentTimeJP = SDF_NA.format(currentDate);
+		String currentTimeJP = SDF_JP.format(currentDate);
 		
 		for(Event e : events){
 			for(String time : e.getTimes()){
 				String currentTime;
-				if(e.game == GameEnum.NA) currentTime = currentTimeNA;
+				if(e.game == GameEnum.NA) {
+					currentTime = currentTimeNA;
+				}
 				else currentTime = currentTimeJP;
 				if(e.enabled && time.equals(currentTime)){
 					System.out.println("Running " + e.getName());

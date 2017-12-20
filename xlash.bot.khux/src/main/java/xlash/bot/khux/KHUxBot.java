@@ -26,6 +26,7 @@ import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
 import xlash.bot.khux.commands.UnAdmin;
+import xlash.bot.khux.commands.UnionCrossCommand;
 import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.HelpCommand;
 import xlash.bot.khux.commands.LuxCommand;
@@ -57,7 +58,7 @@ public class KHUxBot {
 	public static ArrayList<ServerConfig> serverConfigs = new ArrayList<ServerConfig>();
 	public static Scheduler scheduler;
 
-	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "https://youtu.be/dQw4w9WgXcQ", "Why would I know?", "*I am a bot, and this action was performed automatically.*", "Yes", "Ask again later", "I'm not your mom.", "Do me a favor and stop asking for favors", "KH3 will release in 2020", "Whoooaaa! Looking cool, Joker!"};
+	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "https://youtu.be/dQw4w9WgXcQ", "Why would I know?", "*I am a bot, and this action was performed automatically.*", "Yes", "Ask again later", "I'm not your mom.", "Do me a favor and stop asking for favors", "KH3 will release in 2020", "Whoooaaa! Looking cool, Joker!", "I dare you to hack me. My IP is 127.0.0.1"};
 
 	/**
 	 * Starts the bot. If you're running this in a development environment, make sure you are 
@@ -158,7 +159,7 @@ public class KHUxBot {
 			public void run() {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.luxChannelNA.isEmpty()){
+					if(!config.luxChannelJP.isEmpty()){
 						Channel channel = server.getChannelById(config.luxChannelJP);
 						if(channel != null){
 							channel.sendMessage("JP: " + config.luxOnPrompt);
@@ -172,7 +173,7 @@ public class KHUxBot {
 			public void run() {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.luxChannelNA.isEmpty()){
+					if(!config.luxChannelJP.isEmpty()){
 						Channel channel = server.getChannelById(config.luxChannelJP);
 						if(channel != null){
 							channel.sendMessage("JP: " + config.luxOffPrompt);
@@ -302,6 +303,7 @@ public class KHUxBot {
 		commandHandler.registerCommand(new AdminCommand());
 		commandHandler.registerCommand(new UnAdmin());
 		commandHandler.registerCommand(new SaltCommand());
+		commandHandler.registerCommand(new UnionCrossCommand());
 	}
 
 	public void connect(DiscordAPI api) {
