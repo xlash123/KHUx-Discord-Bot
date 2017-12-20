@@ -42,7 +42,7 @@ import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.sheduler.Event;
 import xlash.bot.khux.sheduler.Scheduler;
 import xlash.bot.khux.sheduler.TimedEvent;
-import xlash.bot.khux.util.LuxTimes;
+import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
@@ -125,7 +125,7 @@ public class KHUxBot {
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
 		scheduler = new Scheduler();
-		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, LuxTimes.doubleLuxStartNA){
+		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, BonusTimes.doubleLuxStartNA){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -139,7 +139,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, LuxTimes.doubleLuxStopNA){
+		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, BonusTimes.doubleLuxStopNA){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -153,7 +153,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, LuxTimes.doubleLuxStartJP){
+		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, BonusTimes.doubleLuxStartJP){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -167,7 +167,7 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, LuxTimes.doubleLuxStopJP){
+		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, BonusTimes.doubleLuxStopJP){
 			@Override
 			public void run() {
 				for(Server server : api.getServers()){
@@ -225,24 +225,43 @@ public class KHUxBot {
 				medalHandler.refreshMedalList();
 			}
 		});
-		scheduler.addTimedEvent(new TimedEvent("Lux Reminders", true, 1) {
+		scheduler.addTimedEvent(new TimedEvent("Reminders", true, 1) {
 			@Override
 			public void run() {
-				int timeDifNA = LuxTimes.timeDifference(GameEnum.NA);
-				int timeDifJP = LuxTimes.timeDifference(GameEnum.JP);
-				System.out.println("Debug times: " + timeDifNA + " " + timeDifJP);
-				if(timeDifNA < 30 || timeDifJP < 30) {
+				int luxTimeDifNA = BonusTimes.luxTimeDifference(GameEnum.NA);
+				int luxTimeDifJP = BonusTimes.luxTimeDifference(GameEnum.JP);
+				if(luxTimeDifNA < 30 || luxTimeDifJP < 30) {
 					for(ServerConfig config : serverConfigs) {
 						if(config.luxRemind>0) {
 							if(!config.luxChannelNA.isEmpty()) {
-								if(config.luxRemind == timeDifNA) {
-									api.getChannelById(config.luxChannelNA).sendMessage("NA Reminder: Double lux in " + timeDifNA + " minutes!");
+								if(config.luxRemind == luxTimeDifNA) {
+									api.getChannelById(config.luxChannelNA).sendMessage("NA Reminder: Double lux in " + luxTimeDifNA + " minutes!");
 								}
 							}
 						
 							if(!config.luxChannelJP.isEmpty()) {
-								if(config.luxRemind == timeDifJP) {
-									api.getChannelById(config.luxChannelNA).sendMessage("JP Reminder: Double lux in " + timeDifJP + " minutes!");
+								if(config.luxRemind == luxTimeDifJP) {
+									api.getChannelById(config.luxChannelNA).sendMessage("JP Reminder: Double lux in " + luxTimeDifJP + " minutes!");
+								}
+							}
+						}
+					}
+				}
+				
+				int uxTimeDifNA = BonusTimes.uxTimeDifference(GameEnum.NA);
+				int uxTimeDifJP = BonusTimes.uxTimeDifference(GameEnum.JP);
+				if(uxTimeDifNA < 30 || uxTimeDifJP < 30) {
+					for(ServerConfig config : serverConfigs) {
+						if(config.uxRemind>0) {
+							if(!config.uxChannelNA.isEmpty()) {
+								if(config.uxRemind == luxTimeDifNA) {
+									api.getChannelById(config.uxChannelNA).sendMessage("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!");
+								}
+							}
+						
+							if(!config.luxChannelJP.isEmpty()) {
+								if(config.luxRemind == luxTimeDifJP) {
+									api.getChannelById(config.uxChannelNA).sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
 								}
 							}
 						}
