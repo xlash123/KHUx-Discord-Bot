@@ -13,6 +13,7 @@ public class UnionCrossCommand extends CommandBase{
 		return new String[] {"!uc", "!ux", "!unioncross"};
 	}
 
+	//I like UX, but community likes UC, so whatever
 	@Override
 	public void onCommand(String[] args, Message message) {
 		if(args.length == 0){
@@ -31,49 +32,49 @@ public class UnionCrossCommand extends CommandBase{
 		case "on":
 			if(game==GameEnum.NA){
 				if(!config.uxChannelNA.isEmpty()){
-					message.reply("NA UX reminders are already on.");
+					message.reply("NA UC reminders are already on.");
 					return;
 				}
 				config.uxChannelNA = message.getChannelReceiver().getId();
 			}else{
 				if(!config.uxChannelJP.isEmpty()){
-					message.reply("JP UX reminders are already on.");
+					message.reply("JP UC reminders are already on.");
 					return;
 				}
 				config.uxChannelJP = message.getChannelReceiver().getId();
 			}
-			message.reply("UX reminders for " + game + " have been turned on.");
+			message.reply("UC reminders for " + game + " have been turned on.");
 			break;
 		case "off":
 			if(game==GameEnum.NA){
 				if(config.uxChannelNA.isEmpty()){
-					message.reply("NA UX reminders are already off.");
+					message.reply("NA UC reminders are already off.");
 					return;
 				}
 				config.uxChannelNA = "";
 			}else{
 				if(!config.uxChannelJP.isEmpty()){
-					message.reply("JP UX reminders are already off.");
+					message.reply("JP UC reminders are already off.");
 					return;
 				}
 				config.uxChannelJP = "";
 			}
-			message.reply("UX reminders for " + game + " have been turned off.");
+			message.reply("UC reminders for " + game + " have been turned off.");
     		break;
 		case "status":
 			if (!config.uxChannelNA.isEmpty())
-				message.reply("UX reminders for NA are set for channel: #"
+				message.reply("UC reminders for NA are set for channel: #"
 						+ KHUxBot.api.getChannelById(config.uxChannelNA).getName());
 			else
-				message.reply("UX reminders for NA are currently turned off.");
+				message.reply("UC reminders for NA are currently turned off.");
 			if (!config.uxChannelJP.isEmpty())
-				message.reply("UX reminders for JP are set for channel: #"
+				message.reply("UC reminders for JP are set for channel: #"
 						+ KHUxBot.api.getChannelById(config.uxChannelJP).getName());
 			else
-				message.reply("UX reminders for JP are currently turned off.");
+				message.reply("UC reminders for JP are currently turned off.");
 			return;
 		case "check":
-			int nextTime = BonusTimes.uxTimeDifference(game);
+			int nextTime = BonusTimes.luxTimeDifference(game);
 			int mins = nextTime%60;
 			int hours = nextTime/60;
 			String timeS = "";
@@ -82,7 +83,9 @@ public class UnionCrossCommand extends CommandBase{
 				if(mins > 0) timeS += "and ";
 			}
 			if(mins > 0) timeS += mins + " minutes ";
-			message.reply("There are " + timeS + "until UX bonus time is active for " + game.name() + ".");
+			if(timeS.isEmpty()) {
+				message.reply("UC bonus time for " + game.name() + " just went active!");
+			}else message.reply("There are " + timeS + "until UC bonus time is active for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {
@@ -91,7 +94,7 @@ public class UnionCrossCommand extends CommandBase{
 					if(time > 30 || time < 0) {
 						message.reply("Out of range. Enter a number 0-30 inclusive.");
 					}else {
-						message.reply("UX reminder set for " + time + " minutes before bonus time.");
+						message.reply("UC reminder set for " + time + " minutes before bonus time.");
 						config.uxRemind = time;
 					}
 				}catch(NumberFormatException e) {
