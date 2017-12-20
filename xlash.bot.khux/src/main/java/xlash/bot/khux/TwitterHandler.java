@@ -1,18 +1,34 @@
 package xlash.bot.khux;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import de.btobastian.javacord.entities.Channel;
+import twitter4j.Paging;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterHandler {
 
 	public long lastTwitterUpdateNA;
 	public long lastTwitterUpdateJP;
+	
+	public Twitter twitter;
 
 	public TwitterHandler() {
+		ConfigurationBuilder cb = new ConfigurationBuilder();
+		cb.setOAuthConsumerKey(KHUxBot.botConfig.consumer);
+		cb.setOAuthConsumerSecret(KHUxBot.botConfig.consumerSecret);
+		cb.setOAuthAccessToken(KHUxBot.botConfig.access);
+		cb.setOAuthAccessTokenSecret(KHUxBot.botConfig.accessSecret);
+		twitter = new TwitterFactory(cb.build()).getInstance();
 		lastTwitterUpdateNA = getTwitterUpdateLink(0, GameEnum.NA).tweetId;
 		lastTwitterUpdateJP = getTwitterUpdateLink(0, GameEnum.JP).tweetId;
 	}
@@ -50,12 +66,12 @@ public class TwitterHandler {
 		for (int i = 0; i < 8; i++) {
 			current = getTwitterUpdateLink(i, game);
 			if (game == GameEnum.NA) {
-				if (current.tweetId > lastTwitterUpdateNA) {
+				if (current.created > lastTwitterUpdateNA) {
 					ret.add(current);
 				} else
 					break;
 			} else {
-				if (current.tweetId > lastTwitterUpdateJP) {
+				if (current.created > lastTwitterUpdateJP) {
 					ret.add(current);
 				} else
 					break;
@@ -73,41 +89,37 @@ public class TwitterHandler {
 	 * @return The URL for the Tweet.
 	 */
 	public Tweet getTwitterUpdateLink(int recent, GameEnum game) {
-		if (recent > 9){
-			return null;
-		}
 		String gameString = (game == GameEnum.NA ? "kh_ux_na" : "khux_pr");
-		String link = "https://twitter.com/" + gameString + "/";
+		Paging paging = new Paging(1, 15);
+		Tweet tweet = null;
 		try {
-			Document doc = Jsoup.connect(link).get();
-			ArrayList<String> links = new ArrayList<String>();
-			ArrayList<Long> ids = new ArrayList<Long>();
-			Long tweetId = 0L;
-			try {
-				tweetId = Long.parseLong(doc.getElementsByClass("stream-items js-navigable-stream").get(0)
-						.getElementsByAttributeValueMatching("data-item-type", "tweet").get(recent)
-						.attr("data-item-id"));
-			} catch (IndexOutOfBoundsException e) {
-				// If there are less than 10 tweets, worry about it
-				System.err.println("Could get tweet of index " + recent);
-				e.printStackTrace();
-				return null;
+			List<Status> statuses = twitter.getUserTimeline(gameString, paging);
+			ArrayList<Status> ordered = new ArrayList<>();
+			ordered.add(statuses.get(0));
+			for(int i=1; i<statuses.size(); i++) {
+				Status status = statuses.get(i);
+				if(status.getCreatedAt().compareTo(ordered.get(0).getCreatedAt()) > 0) {
+					ordered.add(0, status);
+				}else {
+					ordered.add(status);
+				}
 			}
-			return new Tweet(tweetId, game);
-		} catch (Exception e) {
-			System.out.println("Failed to get update from Twitter.");
+			tweet = new Tweet(ordered.get(0).getId(), ordered.get(0).getCreatedAt(), game);
+		} catch (TwitterException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return tweet;
 	}
 	
-	public class Tweet{
+public class Tweet{
 		
 		public final long tweetId;
+		public final long created;
 		private final GameEnum game;
 		
-		public Tweet(long tweetId, GameEnum game) {
+		public Tweet(long tweetId, Date created, GameEnum game) {
 			this.tweetId = tweetId;
+			this.created = created.getTime();
 			this.game = game;
 		}
 		
