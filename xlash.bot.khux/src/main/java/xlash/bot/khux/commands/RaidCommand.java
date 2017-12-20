@@ -73,7 +73,18 @@ public class RaidCommand extends CommandBase{
 				message.reply("Raid reminders for JP are currently turned off.");
 			return;
 		case "check":
-			message.reply("There are " + BonusTimes.raidTimeDifference(game) + " minutes until daily raid is active for " + game.name() + ".");
+			int nextTime = BonusTimes.luxTimeDifference(game);
+			int mins = nextTime%60;
+			int hours = nextTime/60;
+			String timeS = "";
+			if(hours > 0) {
+				timeS += hours + " hours ";
+				if(mins > 0) timeS += "and ";
+			}
+			if(mins > 0) timeS += mins + " minutes ";
+			if(timeS.isEmpty()) {
+				message.reply("The daily raid boss for " + game.name() + " just appeared!");
+			}else message.reply("There are " + timeS + "until the daily raid boss appears for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {
