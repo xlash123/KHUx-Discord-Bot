@@ -41,6 +41,11 @@ public class BonusTimes {
 		return timeDifference(game, start);
 	}
 	
+	/**
+	 * Gets the time difference in minutes for the next Union Cross bonus time.
+	 * @param game
+	 * @return time difference in minutes
+	 */
 	public static int uxTimeDifference(GameEnum game) {
 		String[] start;
 		if(game.equals(GameEnum.NA)) {
@@ -52,6 +57,11 @@ public class BonusTimes {
 		return timeDifference(game, start);
 	}
 	
+	/**
+	 * Gets the time difference in minutes for when the daily raid boss appears.
+	 * @param game
+	 * @return time difference in minutes
+	 */
 	public static int raidTimeDifference(GameEnum game) {
 		String[] start;
 		if(game.equals(GameEnum.NA)) {
