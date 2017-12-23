@@ -67,6 +67,10 @@ public class ServerConfig {
 		if(updateChannelJP == null) updateChannelJP = "";
 		if(luxChannelNA == null) luxChannelNA = "";
 		if(luxChannelJP == null) luxChannelJP = "";
+		if(uxChannelNA == null) uxChannelNA = "";
+		if(uxChannelJP == null) uxChannelJP = "";
+		if(raidChannelNA == null) raidChannelNA = "";
+		if(raidChannelJP == null) raidChannelJP = "";
 		if(defaultGame == null) defaultGame = GameEnum.NA;
 		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
 		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
