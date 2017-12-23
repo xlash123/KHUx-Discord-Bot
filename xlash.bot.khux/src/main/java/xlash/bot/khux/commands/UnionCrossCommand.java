@@ -74,7 +74,7 @@ public class UnionCrossCommand extends CommandBase{
 				message.reply("UC reminders for JP are currently turned off.");
 			return;
 		case "check":
-			int nextTime = BonusTimes.luxTimeDifference(game);
+			int nextTime = BonusTimes.uxTimeDifference(game);
 			int mins = nextTime%60;
 			int hours = nextTime/60;
 			String timeS = "";

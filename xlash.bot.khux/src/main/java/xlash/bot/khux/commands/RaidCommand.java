@@ -73,7 +73,7 @@ public class RaidCommand extends CommandBase{
 				message.reply("Raid reminders for JP are currently turned off.");
 			return;
 		case "check":
-			int nextTime = BonusTimes.luxTimeDifference(game);
+			int nextTime = BonusTimes.raidTimeDifference(game);
 			int mins = nextTime%60;
 			int hours = nextTime/60;
 			String timeS = "";
