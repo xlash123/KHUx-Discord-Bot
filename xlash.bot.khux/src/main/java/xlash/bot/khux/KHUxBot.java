@@ -47,7 +47,7 @@ import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.5.0";
+	public static final String VERSION = "1.5.1";
 
 	public static DiscordAPI api;
 
@@ -370,7 +370,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nAdded !lux remind [minutes] to remind when the next lux time is.\nAdded !lux check (na/jp) to check when the next double lux is.\nAdded !salt to keep track of how salty we are.");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nAdded !uc for Union Cross reminders.\nFixed issues with JP lux reminders.\nSwitched to using Twitter API for getting Tweets.");
 						}
 					}
 				}
