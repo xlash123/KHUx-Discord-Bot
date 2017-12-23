@@ -24,6 +24,7 @@ public class TwitterHandler {
 
 	public TwitterHandler() {
 		ConfigurationBuilder cb = new ConfigurationBuilder();
+		cb.setDebugEnabled(false);
 		cb.setOAuthConsumerKey(KHUxBot.botConfig.consumer);
 		cb.setOAuthConsumerSecret(KHUxBot.botConfig.consumerSecret);
 		cb.setOAuthAccessToken(KHUxBot.botConfig.access);
