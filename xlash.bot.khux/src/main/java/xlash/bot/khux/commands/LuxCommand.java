@@ -52,7 +52,7 @@ public class LuxCommand extends CommandBase{
 				}
 				config.luxChannelNA = "";
 			}else{
-				if(!config.luxChannelJP.isEmpty()){
+				if(config.luxChannelJP.isEmpty()){
 					message.reply("JP Lux reminders are already off.");
 					return;
 				}
