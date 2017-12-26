@@ -311,14 +311,14 @@ public class KHUxBot {
 					for(ServerConfig config : serverConfigs) {
 						if(config.uxRemind>0) {
 							if(!config.uxChannelNA.isEmpty()) {
-								if(config.uxRemind == luxTimeDifNA) {
+								if(config.uxRemind == uxTimeDifNA) {
 									api.getChannelById(config.uxChannelNA).sendMessage("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!");
 								}
 							}
 						
-							if(!config.luxChannelJP.isEmpty()) {
-								if(config.luxRemind == luxTimeDifJP) {
-									api.getChannelById(config.uxChannelNA).sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
+							if(!config.uxChannelJP.isEmpty()) {
+								if(config.uxRemind == uxTimeDifJP) {
+									api.getChannelById(config.uxChannelJP).sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
 								}
 							}
 						}
