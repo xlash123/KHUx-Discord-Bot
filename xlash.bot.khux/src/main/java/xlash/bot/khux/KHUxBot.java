@@ -182,6 +182,62 @@ public class KHUxBot {
 				}
 			}
 		});
+		scheduler.addEvent(new Event("NA UX On", true, GameEnum.NA, BonusTimes.uxBonusStartNA){
+			@Override
+			public void run() {
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.uxChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.uxChannelNA);
+						if(channel != null){
+							channel.sendMessage("NA: Union Cross bonus time active!");
+						}
+					}
+				}
+			}
+		});
+		scheduler.addEvent(new Event("NA UX Off", true, GameEnum.NA, BonusTimes.uxBonusEndNA){
+			@Override
+			public void run() {
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.uxChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.uxChannelNA);
+						if(channel != null){
+							channel.sendMessage("NA: Union Cross bonus time has finished.");
+						}
+					}
+				}
+			}
+		});
+		scheduler.addEvent(new Event("JP UX On", true, GameEnum.JP, BonusTimes.uxBonusStartJP){
+			@Override
+			public void run() {
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.uxChannelJP.isEmpty()){
+						Channel channel = server.getChannelById(config.uxChannelJP);
+						if(channel != null){
+							channel.sendMessage("JP: Union Cross bonus time is active!");
+						}
+					}
+				}
+			}
+		});
+		scheduler.addEvent(new Event("JP UX Off", true, GameEnum.JP, BonusTimes.uxBonusEndJP){
+			@Override
+			public void run() {
+				for(Server server : api.getServers()){
+					ServerConfig config = getServerConfig(server);
+					if(!config.uxChannelJP.isEmpty()){
+						Channel channel = server.getChannelById(config.uxChannelJP);
+						if(channel != null){
+							channel.sendMessage("JP: Union Cross bonus time has finished.");
+						}
+					}
+				}
+			}
+		});
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update NA", true, 2) {
 			@Override
 			public void run() {
