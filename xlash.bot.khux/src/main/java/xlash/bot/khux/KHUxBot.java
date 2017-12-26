@@ -47,7 +47,7 @@ import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.5.1";
+	public static final String VERSION = "1.5.2";
 
 	public static DiscordAPI api;
 
@@ -426,7 +426,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nAdded !uc for Union Cross reminders.\nFixed issues with JP lux reminders.\nSwitched to using Twitter API for getting Tweets.");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nFixed an issue preventing UC reminders to send.\nMerry Christmas! Now go grind for dogs all week. !salt");
 						}
 					}
 				}
