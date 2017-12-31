@@ -48,7 +48,7 @@ public class TweetCommand extends CommandBase{
     		message.reply(game.toString() + " Twitter updates have been turned off.");
     		break;
 		case "get":
-			ArrayList<Tweet> toSend = KHUxBot.twitterHandler.getNewTwitterLinks(game);
+			ArrayList<Tweet> toSend = KHUxBot.twitterHandler.getNewTwitterLinks(game, false);
 			if(!toSend.isEmpty()){
 				TimedEvent update = KHUxBot.scheduler.getTimedEvent("Twitter Update " + game.toString());
 				if(update != null){
@@ -61,15 +61,12 @@ public class TweetCommand extends CommandBase{
 			}
 			break;
 		case "status":
-			if(game==GameEnum.NA) {
-				if(!config.updateChannelNA.isEmpty()) {
-					message.reply("NA Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannelNA).getName());
-				}else message.reply("NA Twitter updates are currently turned off.");
-			}else {
-				if(!config.updateChannelJP.isEmpty()) {
-					message.reply("JP Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannelJP).getName());
-				}else message.reply("JP Twitter updates are currently turned off.");
-			}
+			if(!config.updateChannelNA.isEmpty()) {
+				message.reply("NA Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannelNA).getName());
+			}else message.reply("NA Twitter updates are currently turned off.");
+			if(!config.updateChannelJP.isEmpty()) {
+				message.reply("JP Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannelJP).getName());
+			}else message.reply("JP Twitter updates are currently turned off.");
 			return;
 			default:
 				this.printDescriptionUsage(message);
