@@ -98,6 +98,14 @@ public class ServerConfig {
 			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
 			String luxRemindString = p.getProperty("Lux_Remind");
 			if(luxRemindString != null) this.luxRemind = Integer.parseInt(luxRemindString);
+			this.uxChannelNA = p.getProperty("UX_Channel_NA");
+			this.uxChannelJP = p.getProperty("UX_Channel_JP");
+			this.raidChannelNA = p.getProperty("Raid_Channel_NA");
+			this.raidChannelJP = p.getProperty("Raid_Channel_JP");
+			String uxRemindString = p.getProperty("UX_Remind");
+			if(uxRemindString != null) this.uxRemind = Integer.parseInt(uxRemindString);
+			String raidRemindString = p.getProperty("Raid_Remind");
+			if(raidRemindString != null) this.raidRemind = Integer.parseInt(raidRemindString);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -122,6 +130,12 @@ public class ServerConfig {
 		p.setProperty("Lux_On_Prompt", luxOnPrompt);
 		p.setProperty("Lux_Off_Prompt", luxOffPrompt);
 		p.setProperty("Lux_Remind", ""+luxRemind);
+		p.setProperty("UX_Channel_NA", uxChannelNA);
+		p.setProperty("UX_Channel_JP", uxChannelJP);
+		p.setProperty("Raid_Channel_NA", raidChannelNA);
+		p.setProperty("Raid_Channel_JP", raidChannelJP);
+		p.setProperty("UX_Remind", ""+uxRemind);
+		p.setProperty("Raid_Remind", ""+raidRemind);
 		String toSave = "";
 		for(int i=0; i<admins.size(); i++){
 			toSave += admins.get(i);
