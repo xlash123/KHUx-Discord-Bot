@@ -20,9 +20,6 @@ public class BotConfig {
 	public String version;
 	public int saltCount;
 	
-	//Twitter bot stuff. Why, Twitter API, can't I just use some generic public user for just looking up Tweets?
-	public String consumer, consumerSecret, access, accessSecret;
-	
 	public BotConfig(){
 		init();
 		File file = new File(FILE_NAME);
@@ -40,10 +37,6 @@ public class BotConfig {
 	public void init(){
 		if(botToken == null) botToken = "";
 		if(version == null) version = "";
-		if(consumer == null) consumer = "";
-		if(consumerSecret == null) consumerSecret = "";
-		if(access == null) access = "";
-		if(accessSecret == null) accessSecret = "";
 	}
 	
 	/**
@@ -58,10 +51,6 @@ public class BotConfig {
 			this.botToken = p.getProperty("Bot_Token");
 			this.version = p.getProperty("Version");
 			String saltCountString = p.getProperty("Salt_Count");
-			this.consumer = p.getProperty("Consumer_Token");
-			this.consumerSecret = p.getProperty("Secret_Consumer_Token");
-			this.access = p.getProperty("Access_Token");
-			this.accessSecret = p.getProperty("Secret_Access_Token");
 			if(saltCountString != null) this.saltCount = Integer.parseInt(saltCountString);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -79,10 +68,6 @@ public class BotConfig {
 		p.setProperty("Bot_Token", botToken);
 		p.setProperty("Version", version);
 		p.setProperty("Salt_Count", ""+this.saltCount);
-		p.setProperty("Consumer_Token", consumer);
-		p.setProperty("Secret_Consumer_Token", consumerSecret);
-		p.setProperty("Access_Token", access);
-		p.setProperty("Secret_Access_Token", accessSecret);
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(FILE_NAME));
