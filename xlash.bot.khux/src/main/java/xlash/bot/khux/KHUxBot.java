@@ -47,7 +47,7 @@ import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.5.2";
+	public static final String VERSION = "1.5.3";
 
 	public static DiscordAPI api;
 
@@ -238,10 +238,10 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addTimedEvent(new TimedEvent("Twitter Update NA", true, 2) {
+		scheduler.addTimedEvent(new TimedEvent("Twitter Update NA", true, 1) {
 			@Override
 			public void run() {
-				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.NA);
+				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.NA, true);
 				if(tweets.isEmpty()) return;
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
@@ -254,10 +254,10 @@ public class KHUxBot {
 				}
 			}
 		});
-		scheduler.addTimedEvent(new TimedEvent("Twitter Update JP", true, 2) {
+		scheduler.addTimedEvent(new TimedEvent("Twitter Update JP", true, 1) {
 			@Override
 			public void run() {
-				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.JP);
+				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.JP, true);
 				if(tweets.isEmpty()) return;
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
@@ -426,7 +426,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nFixed an issue preventing UC reminders to send.\nMerry Christmas! Now go grind for dogs all week. !salt");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nRemoved Twitter API integration and improved massively on old Tweet system. Works good now :)\nSmall bug fixes\nEnjoy the new year!");
 						}
 					}
 				}
