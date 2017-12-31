@@ -84,7 +84,7 @@ public class LuxCommand extends CommandBase{
 			if(mins > 0) timeS += mins + " minutes ";
 			if(timeS.isEmpty()) {
 				message.reply("Double lux for " + game.name() + " just went active!");
-			}else message.reply("There are " + timeS + "until double lux is active for " + game.name() + ".");
+			}else message.reply("There are " + timeS + " until double lux is active for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {

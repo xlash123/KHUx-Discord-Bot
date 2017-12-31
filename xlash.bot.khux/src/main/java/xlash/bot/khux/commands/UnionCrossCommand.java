@@ -85,7 +85,7 @@ public class UnionCrossCommand extends CommandBase{
 			if(mins > 0) timeS += mins + " minutes ";
 			if(timeS.isEmpty()) {
 				message.reply("UC bonus time for " + game.name() + " just went active!");
-			}else message.reply("There are " + timeS + "until UC bonus time is active for " + game.name() + ".");
+			}else message.reply("There are " + timeS + " until UC bonus time is active for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {
