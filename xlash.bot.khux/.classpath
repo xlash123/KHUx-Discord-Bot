@@ -16,10 +16,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Noah/Documents/Java Libraries/twitter4j-core-4.0.4.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://twitter4j.org/javadoc/index.html"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
