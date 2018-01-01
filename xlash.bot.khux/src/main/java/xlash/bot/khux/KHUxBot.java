@@ -47,7 +47,7 @@ import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.5.3";
+	public static final String VERSION = "1.5.4";
 
 	public static DiscordAPI api;
 
@@ -426,7 +426,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nRemoved Twitter API integration and improved massively on old Tweet system. Works good now :)\nSmall bug fixes\nEnjoy the new year!");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nMy appologies for the update bug. I will be a good house elf from now on.");
 						}
 					}
 				}
