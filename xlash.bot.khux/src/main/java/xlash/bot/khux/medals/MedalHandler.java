@@ -13,6 +13,7 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -140,7 +141,7 @@ public class MedalHandler {
 		eb.setColor(Color.GREEN);
 		eb.setAuthor(medal.name);
 		eb.setImage(getImgLinkForMedal(medal));
-		eb.addField("Special", medal.special, true);
+		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
 		eb.addField("Strength", ""+medal.strength, true);
 		eb.addField("Guages", ""+medal.guages, true);
