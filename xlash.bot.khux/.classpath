@@ -16,5 +16,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Noah/Documents/Java Libraries/emoji-java-4.0.0.jar" sourcepath="C:/Users/Noah/Documents/Java Libraries/emoji-java-4.0.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Noah/Documents/Java Libraries/gson-2.8.2.jar" sourcepath="C:/Users/Noah/Documents/Java Libraries/gson-2.8.2-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
