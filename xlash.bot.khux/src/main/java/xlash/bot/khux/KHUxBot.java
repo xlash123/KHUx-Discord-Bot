@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,7 +19,9 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
+import de.btobastian.javacord.listener.message.ReactionAddListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
 import xlash.bot.khux.TwitterHandler.Tweet;
@@ -32,14 +35,12 @@ import xlash.bot.khux.commands.HelpCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
 import xlash.bot.khux.commands.MedalJPCommand;
-import xlash.bot.khux.commands.MedalListCommand;
 import xlash.bot.khux.commands.MedalNACommand;
-import xlash.bot.khux.commands.RefreshCommand;
-import xlash.bot.khux.commands.ResetCommand;
 import xlash.bot.khux.commands.SaltCommand;
 import xlash.bot.khux.commands.TweetCommand;
 import xlash.bot.khux.config.BotConfig;
 import xlash.bot.khux.config.ServerConfig;
+import xlash.bot.khux.medals.MedalHandler;
 import xlash.bot.khux.sheduler.Event;
 import xlash.bot.khux.sheduler.Scheduler;
 import xlash.bot.khux.sheduler.TimedEvent;
@@ -47,7 +48,7 @@ import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.5.4";
+	public static final String VERSION = "1.6.0";
 
 	public static DiscordAPI api;
 
@@ -57,6 +58,7 @@ public class KHUxBot {
 	public static BotConfig botConfig;
 	public static ArrayList<ServerConfig> serverConfigs = new ArrayList<ServerConfig>();
 	public static Scheduler scheduler;
+	public static ArrayList<ActionMessage> actionMessages = new ArrayList<>();
 
 	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "https://youtu.be/dQw4w9WgXcQ", "Why would I know?", "*I am a bot, and this action was performed automatically.*", "Yes", "Ask again later", "I'm not your mom.", "Do me a favor and stop asking for favors", "KH3 will release in 2020", "Whoooaaa! Looking cool, Joker!", "I dare you to hack me. My IP is 127.0.0.1"};
 
@@ -276,10 +278,21 @@ public class KHUxBot {
 				findUpdate();
 			}
 		});
-		scheduler.addEvent(new Event("Refresh", true, GameEnum.NA, "05:00:00"){
+		scheduler.addEvent(new Event("Daily", true, GameEnum.NA, "05:00:00"){
 			@Override
 			public void run() {
-				medalHandler.refreshMedalList();
+				for(ActionMessage am : actionMessages) {
+					if(am.isExpired()) {
+						am.message.delete();
+						am.kill();
+					}
+				}
+				actionMessages.removeIf(new Predicate<ActionMessage>() {
+					@Override
+					public boolean test(ActionMessage t) {
+						return t.dead;
+					}
+				});
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Reminders", true, 1) {
@@ -349,11 +362,8 @@ public class KHUxBot {
 		commandHandler.registerCommand(new MedalCommand());
 		commandHandler.registerCommand(new MedalNACommand());
 		commandHandler.registerCommand(new MedalJPCommand());
-		commandHandler.registerCommand(new MedalListCommand());
 		commandHandler.registerCommand(new LuxCommand());
 		commandHandler.registerCommand(new TweetCommand());
-		commandHandler.registerCommand(new RefreshCommand());
-		commandHandler.registerCommand(new ResetCommand());
 		commandHandler.registerCommand(new DefaultCommand());
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new AdminCommand());
@@ -382,6 +392,27 @@ public class KHUxBot {
 						}
 					}
 					
+				});
+				
+				api.registerListener(new ReactionAddListener() {
+					
+					@Override
+					public void onReactionAdd(DiscordAPI api, Reaction reaction, User user) {
+						if(reaction.getCount()>1) {
+							for(ActionMessage am : actionMessages){
+								if(am.isSameMessage(reaction.getMessage())) {
+									am.run(reaction);
+									am.kill();
+								}
+							}
+							actionMessages.removeIf(new Predicate<ActionMessage>() {
+								@Override
+								public boolean test(ActionMessage t) {
+									return t.dead;
+								}
+							});
+						}
+					}
 				});
 				
 				api.registerListener(new ServerJoinListener() {
@@ -426,7 +457,7 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nMy appologies for the update bug. I will be a good house elf from now on.");
+							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nCompletely overhauled the !medal command. It now suggests medals and displays the information with more pizzaz.\nMedal database now switched over to khuxtracker.com, so data is more relevant.");
 						}
 					}
 				}
