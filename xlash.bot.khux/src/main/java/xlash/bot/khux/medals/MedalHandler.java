@@ -1,393 +1,180 @@
-package xlash.bot.khux;
+package xlash.bot.khux.medals;
 
+import java.awt.Color;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.google.gson.Gson;
+
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import xlash.bot.khux.GameEnum;
+import xlash.bot.khux.KHUxBot;
+
 public class MedalHandler {
-
-	public HashMap<String, ArrayList<String>> nicknames = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, String> medalNamesAndLink = new HashMap<String, String>();
-	public HashMap<String, String> medalDescriptions = new HashMap<String, String>();
-
-	public HashMap<String, ArrayList<String>> jpNicknames = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, String> jpMedalNamesAndLink = new HashMap<String, String>();
-	public HashMap<String, String> jpMedalDescriptions = new HashMap<String, String>();
-
-	public volatile boolean disabled;
-
+	
+	public ArrayList<Medal> cachedMedalsNA = new ArrayList<>();
+	public ArrayList<Medal> cachedMedalsJP = new ArrayList<>();
+	
+	private boolean disabled;
+	
 	public MedalHandler() {
-		getMedalList();
-		System.out.println("Got medal list");
-		createNicknames();
-		System.out.println("Created nicknames");
+		
 	}
-
+	
 	/**
-	 * Deletes all medals in the database and regrabs the current list for both
-	 * games. Preserves medal descriptions.
+	 * Clears the cache of all medal databases.
 	 */
-	public void refreshMedalList() {
-		disabled = true;
-		System.out.println("Clearing nicknames");
-		nicknames.clear();
-		System.out.println("Clearing JP Nicknames");
-		jpNicknames.clear();
-		System.out.println("Clearing medal names");
-		medalNamesAndLink.clear();
-		System.out.println("Clearing JP medal names");
-		jpMedalNamesAndLink.clear();
-		System.out.println("Generating medal list");
-		getMedalList();
-		System.out.println("Generating nicknames");
-		createNicknames();
-		disabled = false;
+	public void clearDatabase() {
+		cachedMedalsNA.clear();
+		cachedMedalsNA.clear();
 	}
-
+	
 	/**
-	 * Resets the medal descriptions for both games in the off chance something
-	 * was changed.
+	 * Uses khuxtracker.com to search for the medal name given.
+	 * @param name
+	 * @param game
+	 * @return
 	 */
-	public void resetDescriptions() {
-		medalDescriptions.clear();
-		jpMedalDescriptions.clear();
-	}
-
-	private void getMedalList() {
+	public SearchQuery searchMedalByName(String name, GameEnum game) {
 		try {
-			Document doc = Jsoup.connect("http://www.khunchainedx.com/wiki/Medal").get();
-			Elements medalList = doc.getElementById("mw-content-text").getElementsByClass("collapsible collapsed")
-					.get(0).getElementsByTag("tr");
-			for (int i = 1; i < medalList.size(); i++) {
-				Elements medalLinks = medalList.get(i).getElementsByTag("a");
-				for (Element link : medalLinks) {
-					this.medalNamesAndLink.put(link.attr("title"), link.absUrl("href").replaceAll("%26", "&"));
+			int jp = 0;
+			if(game==GameEnum.JP) jp = 1;
+			name = URLEncoder.encode(name, "UTF-8");
+			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=3&jp="+jp;
+			HttpURLConnection con = (HttpURLConnection) new URL("http://khuxtracker.com/query.php").openConnection();
+			con.setDoOutput(true);
+			con.setDoInput(true);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+			try(OutputStream out = con.getOutputStream()){
+				out.write(searchQuery.getBytes());
+			}
+			InputStream in = con.getInputStream();
+			con.connect();
+			StringBuilder sb = new StringBuilder();
+			while(in.available()>0) {
+				sb.append((char) in.read());
+			}
+			con.disconnect();
+			String response = "{queries:"+sb.toString()+"}";
+			Gson gson = new Gson();
+			return gson.fromJson(response, SearchQuery.class);
+		} catch (IOException e) {
+			System.err.println("An error occured while searching for: " + name);
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Uses the mid received from the search to lookup the medal. Checks cache first, then khuxtracker.com
+	 * @param mid
+	 * @param game
+	 * @return
+	 */
+	public Medal getMedalByMid(String mid, GameEnum game) {
+
+		for(Medal m : cachedMedalsNA) {
+			if(m.mid.equals(mid)) return m;
+		}
+		for(Medal m : cachedMedalsJP) {
+			if(m.mid.equals(mid)) return m;
+		}
+		try {
+			String searchQuery = "id=" + mid + "&type=view&method=directory";
+			HttpURLConnection con = (HttpURLConnection) new URL("http://khuxtracker.com/query.php").openConnection();
+			con.setDoOutput(true);
+			con.setDoInput(true);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+			try(OutputStream out = con.getOutputStream()){
+				out.write(searchQuery.getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			InputStream in = con.getInputStream();
+			con.connect();
+			StringBuilder sb = new StringBuilder();
+			while(in.available()>0) {
+				sb.append((char) in.read());
+			}
+			con.disconnect();
+			String response = sb.toString().substring(1, sb.length()-1);
+			Gson gson = new Gson();
+			RawMedal raw = gson.fromJson(response, RawMedal.class);
+			raw.mid = mid;
+			Medal medal = raw.toMedal();
+			if(game==GameEnum.NA) {
+				if(cachedMedalsNA.contains(medal)) {
+					cachedMedalsNA.add(medal);
+				}
+			}else {
+				if(cachedMedalsNA.contains(medal) && cachedMedalsJP.contains(medal)) {
+					cachedMedalsJP.add(medal);
 				}
 			}
-			Elements jpMedalList = doc.getElementById("mw-content-text").getElementsByClass("collapsible collapsed")
-					.get(1).getElementsByTag("tr");
-			for (int i = 1; i < jpMedalList.size(); i++) {
-				Elements medalLinks = jpMedalList.get(i).getElementsByTag("a");
-				for (Element link : medalLinks) {
-					String title = link.attr("title").replace("(", "").replace(")", "");
-					if (!title.contains("page does not exist")) {
-						this.jpMedalNamesAndLink.put(link.attr("title"), link.absUrl("href").replaceAll("%26", "&"));
-					}
+			return medal;
+		} catch (IOException e) {
+			System.err.println("An error occured while searching for mid: " + mid);
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public EmbedBuilder prepareMedalMessage(Medal medal) {
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.setColor(Color.GREEN);
+		eb.setAuthor(medal.name);
+		eb.setImage(getImgLinkForMedal(medal));
+		eb.addField("Special", medal.special, true);
+		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
+		eb.addField("Strength", ""+medal.strength, true);
+		eb.addField("Guages", ""+medal.guages, true);
+		eb.addField("Tier", ""+medal.tier.tier, true);
+		DecimalFormat df = new DecimalFormat("#.##");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		String range = ""+medal.maxLow;
+		String range2 = ""+df.format(medal.maxLow*medal.tier.guiltMultiplier);
+		if(medal.maxLow != medal.maxHigh) {
+			range += " - "+medal.maxHigh;
+			range2 += " - "+df.format(medal.maxHigh*medal.tier.guiltMultiplier);
+		}
+		eb.addField("Multiplier", range, true);
+		eb.addField("Mult. w/ Max Guilt", range2, true);
+		eb.addField("Target", medal.target.name, true);
+		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of lvl 100 with max dots. See website for more specific info.");
+		return eb;
+	}
+	
+	public String getImgLinkForMedal(Medal medal) {
+		URL url;
+		try {
+			url = new URL("http://www.khunchainedx.com/wiki/File:"+medal.name.replaceAll(" ", "_").replaceAll("\\[", "(").replaceAll("\\]", ")")+"_6\u2605_KHUX.png");
+			Document doc = Jsoup.connect(url.toString()).get();
+			Elements elements = doc.getElementsByTag("img");
+			for(Element e : elements) {
+				if(e.hasAttr("alt") && e.attr("alt").startsWith("File:")) {
+					return "http://www.khunchainedx.com" + e.attr("src");
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Creates all the nicknames for each medal in both games.
-	 */
-	public void createNicknames() {
-		naNicknames();
-		jpNicknames();
-	}
-
-	private void naNicknames() {
-		this.compileNicknames(this.medalNamesAndLink.keySet(), this.nicknames);
-		addNicknameToList("Tieri", "Illustrated KH II Kairi", this.nicknames);
-		addNicknameToList("Pooglet", "Pooh & Piglet", this.nicknames);
-		addNicknameToList("BronzeDonald", "Donald A", this.nicknames);
-	}
-
-	private void jpNicknames() {
-		this.compileNicknames(this.jpMedalNamesAndLink.keySet(), jpNicknames);
-		addNicknameToList("Tieri", "Illustrated KH II Kairi", this.jpNicknames);
-		addNicknameToList("Pooglet", "Pooh & Piglet", this.jpNicknames);
-		addNicknameToList("BronzeDonald", "Donald A", this.jpNicknames);
-	}
-
-	public void compileNicknames(Set<String> realNames, HashMap<String, ArrayList<String>> nickList) {
-		for (String realName : realNames) {
-			ArrayList<String> toAdd = new ArrayList<String>() {
-				@Override
-				public boolean add(String e) {
-					e = e.replaceAll("\\s{2,}", " ").trim();
-					return super.add(e);
-				}
-			};
-			String name = new String(realName);
-			name = name.replace("Ver", "");
-			name = name.replace("(EX)", "EX");
-			if (name.contains("Art") && name.contains("EX")) {
-				name = name.replace("Art", "");
-				toAdd.add(name);
-			}
-			if (name.contains("\"")) {
-				name = name.replace("\"", "");
-				toAdd.add(name);
-			}
-			if (name.contains("\u00E9")) {
-				name = name.replace("\u00E9", "e");
-				toAdd.add(name);
-			}
-			if (name.contains("\u00E8")) {
-				name = name.replace("\u00E8", "e");
-				toAdd.add(name);
-			}
-			name = name.replace("KH II", "KH2");
-			name = name.replace("KHII", "KH2");
-			name = name.replace("KH 3", "KH3");
-			name = name.replace("KH III", "KH3");
-			name = name.replace("KHIII", "KH3");
-			name = name.replace("The ", " ");
-			name = name.replace("WORLD OF FF", "WOFF");
-			name = name.replace("Timeless River", "TR");
-			name = name.replace("Halloween", "H");
-			name = name.replace("Atlantica", "AT");
-			name = name.replace("Key Art ", "KA");
-			name = name.replace("(Medal)", "");
-			if (name.contains("Illustrated")) {
-				name = name.replace("Illustrated", "i");
-				if (name.split(" ").length > 1) {
-					String[] words = name.split(" ");
-					for (int i = 0; i < words.length; i++) {
-						if (i > 0 && words[i].equalsIgnoreCase("i")) {
-							for (int ii = i - 1; ii >= 0; ii--) {
-								words[ii + 1] = words[ii];
-							}
-							words[0] = "i";
-							String product = "";
-							for (String word : words) {
-								product += word + " ";
-							}
-							name = product;
-						}
-					}
-					if (name.contains("&")) {
-						String product = "";
-						boolean skip = name.split("&").length > 2;
-						for (String word : words) {
-							if (skip && word.equals("&"))
-								continue;
-							if(!word.isEmpty()) product += word.substring(0, 1);
-						}
-						name = product;
-					}
-				}
-			} else if (name.contains("&")) {
-				String[] words = name.split(" ");
-				String product = "";
-				boolean skip = name.split("&").length > 2;
-				for (String word : words) {
-					if (skip && word.equals("&") || word.isEmpty())
-						continue;
-					if(!word.isEmpty()) product += word.substring(0, 1);
-				}
-				name = product;
-			}
-
-			if (!toAdd.contains(name)) toAdd.add(name);
-			nickList.put(realName, toAdd);
-		}
-	}
-
-	public void addNicknameToList(String nickname, String original, HashMap<String, ArrayList<String>> nickList) {
-		ArrayList<String> list = nickList.get(original);
-		if (list != null && !list.contains(nickname)) {
-			list.add(nickname);
-		}
-	}
-
-	/**
-	 * Grabs the medal data from the wiki page.
-	 * 
-	 * @param realName
-	 *            The name of the medal as it appears in the database.
-	 * @param game
-	 *            The game to search on
-	 * @return The String meant to be published on Discord.
-	 */
-	public String getMedalInfo(String realName, GameEnum game) {
-		while (disabled) {
-		}
-		System.out.println("Getting info for game " + game.toString());
-		if (game == GameEnum.NA && this.medalDescriptions.containsKey(realName)) {
-			return this.medalDescriptions.get(realName);
-		}
-		if (game == GameEnum.JP && this.jpMedalDescriptions.containsKey(realName)) {
-			return this.jpMedalDescriptions.get(realName);
-		}
-		String website;
-		if (game == GameEnum.NA) {
-			website = this.medalNamesAndLink.get(realName);
-		} else
-			website = this.jpMedalNamesAndLink.get(realName);
-
-		if (website == null || website.isEmpty())
-			website = "http://www.khunchainedx.com/wiki/Donald_A";
-
-		Document doc;
-		try {
-			URL url = new URL(website);
-			doc = Jsoup.parse(url.openStream(), null, "");
-			// TODO Make compatible with non-6* versions
-			Elements medalMaxInfoB = doc.getElementById("mw-content-text").getElementsByTag("div");
-			Elements medalMaxInfo;
-			if (medalMaxInfoB.size() > 5) {
-				try {
-					medalMaxInfo = medalMaxInfoB.get(game.tab).getElementsByAttributeValueStarting("title", "6").get(0)
-							.getElementsByTag("td");
-				} catch (IndexOutOfBoundsException e) {
-					medalMaxInfo = medalMaxInfoB.get(1).getElementsByAttributeValueStarting("title", "6").get(0)
-							.getElementsByTag("td");
-				}
-			} else
-				medalMaxInfo = medalMaxInfoB.get(1).getElementsByAttributeValueStarting("title", "6").get(0)
-						.getElementsByTag("td");
-			Elements attributes = new Elements();
-			for (int i = 0; i < medalMaxInfo.size(); i++) {
-				if (!medalMaxInfo.get(i).hasAttr("colspan"))
-					attributes.add(medalMaxInfo.get(i));
-				if (i > 1 && medalMaxInfo.get(i).getElementsByAttributeValueMatching("colspan", "4").size() > 0)
-					attributes.add(medalMaxInfo.get(i));
-			}
-
-			String medalAttribute = attributes.get(9).text();
-			String medalStrength = attributes.get(10).text();
-			String medalDefense = attributes.get(11).text();
-			String medalAbility = attributes.get(13).text();
-			String medalTarget = attributes.get(18).text();
-			String medalTier = attributes.get(19).text();
-			String medalMultiplier = attributes.get(20).text();
-			String medalGuages = attributes.get(21).text();
-
-			String reply = "======== \n" + realName + ": \n" + "Attribute: " + medalAttribute + " \n" + "Ability: "
-					+ medalAbility + " \n" + "Str/Def + " + medalStrength + "/" + medalDefense + " \n" + "Target: "
-					+ medalTarget + " \n" + "Tier " + medalTier + " \n" + "Multiplier: " + medalMultiplier + " \n"
-					+ "Cost: " + medalGuages + " SP \n" + "========";
-			if (game == GameEnum.NA) {
-				this.medalDescriptions.put(realName, reply);
-			} else
-				this.jpMedalDescriptions.put(realName, reply);
-			return reply;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "Oh dear... something went wrong...";
-		}
-	}
-
-	/**
-	 * Attempts to get the real name of the medal. After checking the databases
-	 * for exact matches, it will then search by words and return the highest
-	 * probable medal above 70%(inclusive) match.
-	 * 
-	 * @param name
-	 *            The nickname or real name of the medal to verify.
-	 * @param game
-	 *            The game to search
-	 * @return The medal's real name, or null if none is found
-	 */
-	public String getRealNameByNickname(String name, GameEnum game) {
-		while (disabled) {
-		}
-		name = name.toLowerCase();
-		if (game == GameEnum.NA) {
-			String result = getInitialTestResult(name, this.medalNamesAndLink.keySet(), nicknames);
-			if (result != null)
-				return result;
-		} else {
-			String result = getInitialTestResult(name, this.jpMedalNamesAndLink.keySet(), jpNicknames);
-			if (result != null)
-				return result;
-		}
-		// Now we search with words to get a most likely candidate.
-		String[] words = name.split(" ");
-		HashMap<String, Float> percentMatch = new HashMap<String, Float>();
-		if (game == GameEnum.NA) {
-			this.putPercentMatchForWordsInList(name, words, percentMatch, this.medalNamesAndLink.keySet());
-		} else {
-			this.putPercentMatchForWordsInList(name, words, percentMatch, this.jpMedalNamesAndLink.keySet());
-		}
-		return this.getBestChance(percentMatch);
-	}
-
-	public String getInitialTestResult(String name, Set<String> realNames,
-			HashMap<String, ArrayList<String>> nicknames) {
-		String nameNoSpace = name.replaceAll("\\s", "");
-		for (String test : realNames) {
-			if (test.replaceAll("\\s", "").equalsIgnoreCase(nameNoSpace))
-				return test;
-		}
-		for (String realName : realNames) {
-			for (String test : nicknames.get(realName)) {
-				if (test.replaceAll("\\s", "").equalsIgnoreCase(nameNoSpace))
-					return realName;
-			}
-		}
-		return null;
-	}
-
-	public void putPercentMatchForWordsInList(String name, String[] words, HashMap<String, Float> percentMatch,
-			Collection<String> names) {
-		for (String test : names) {
-				int matchLength = 0;
-				String compare = test.toLowerCase();
-				String[] testWords = compare.split(" ");
-				HashMap<String, Integer> repeats = new HashMap<String, Integer>();
-				for (String w : words) {
-					w = w.toLowerCase();
-					int numOfOcc = 0;
-					if (repeats.get(w) != null)
-						numOfOcc = repeats.get(w);
-					int initOcc = numOfOcc;
-					for (String tw : testWords) {
-						tw = tw.toLowerCase();
-						if (tw.equals(w)) {
-							numOfOcc--;
-							if (numOfOcc < 0) {
-								matchLength += tw.length();
-								repeats.put(w, initOcc + 1);
-								break;
-							}
-						}
-					}
-				}
-				float higher = Math.max(test.length() - testWords.length, name.length() - words.length);
-				percentMatch.put(test, matchLength / higher);
-		}
-	}
-
-	public String getBestChance(HashMap<String, Float> percentMatch) {
-		Iterator<String> names = percentMatch.keySet().iterator();
-		Iterator<Float> percents = percentMatch.values().iterator();
-		String winner = null;
-		float winnerPer = 0;
-		for (int i = 0; i < percentMatch.size(); i++) {
-			String currentName = names.next();
-			float currentPercent = percents.next();
-			if (currentPercent == 1) {
-				return currentName;
-			}
-			if (currentPercent > winnerPer && currentPercent >= .7f) {
-				winner = currentName;
-				winnerPer = currentPercent;
-			}
-		}
-		return winner;
-	}
-
-	/**
-	 * Whether or not the medal handler is disabled.
-	 * 
-	 * @return True when the database is refreshing.
-	 */
-	public boolean isDisabled() {
-		return disabled;
+		return "";
 	}
 
 }
