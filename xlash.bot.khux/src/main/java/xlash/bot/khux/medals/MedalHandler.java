@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.Jsoup;
@@ -20,8 +21,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.google.gson.Gson;
+import com.vdurmont.emoji.EmojiManager;
 
+import de.btobastian.javacord.entities.Channel;
+import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 
@@ -29,8 +35,6 @@ public class MedalHandler {
 	
 	public ArrayList<Medal> cachedMedalsNA = new ArrayList<>();
 	public ArrayList<Medal> cachedMedalsJP = new ArrayList<>();
-	
-	private boolean disabled;
 	
 	public MedalHandler() {
 		
@@ -54,8 +58,10 @@ public class MedalHandler {
 		try {
 			int jp = 0;
 			if(game==GameEnum.JP) jp = 1;
+			name = name.toLowerCase();
+			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
-			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=3&jp="+jp;
+			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=5&jp="+jp;
 			HttpURLConnection con = (HttpURLConnection) new URL("http://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
@@ -88,7 +94,6 @@ public class MedalHandler {
 	 * @return
 	 */
 	public Medal getMedalByMid(String mid, GameEnum game) {
-
 		for(Medal m : cachedMedalsNA) {
 			if(m.mid.equals(mid)) return m;
 		}
@@ -118,6 +123,7 @@ public class MedalHandler {
 			Gson gson = new Gson();
 			RawMedal raw = gson.fromJson(response, RawMedal.class);
 			raw.mid = mid;
+			raw.name = raw.name.replaceAll("Namine", "Namin\u00E9");
 			Medal medal = raw.toMedal();
 			if(game==GameEnum.NA) {
 				if(cachedMedalsNA.contains(medal)) {
@@ -136,15 +142,88 @@ public class MedalHandler {
 		return null;
 	}
 	
+	public void promptQuery(SearchQuery query, Message message, GameEnum game) {
+		EmbedBuilder eb = new EmbedBuilder();
+		String one = EmojiManager.getForAlias("one").getUnicode();
+		String two = EmojiManager.getForAlias("two").getUnicode();
+		String three = EmojiManager.getForAlias("three").getUnicode();
+		String four = EmojiManager.getForAlias("four").getUnicode();
+		String five = EmojiManager.getForAlias("five").getUnicode();
+		String cancel = EmojiManager.getForAlias("x").getUnicode();
+		eb.setColor(Color.YELLOW);
+		eb.setTitle("Did you mean...");
+		eb.addField(one, query.queries.get(0).name, true);
+		eb.addField(two, query.queries.get(1).name, true);
+		if(query.size() > 2) eb.addField(three, query.queries.get(2).name, true);
+		if(query.size() > 3) eb.addField(four, query.queries.get(3).name, true);
+		if(query.size() > 4) eb.addField(five, query.queries.get(4).name, true);
+		eb.setFooter("Click or tap on the reaction that corresponds with the medal you want.");
+		try {
+			Message futureMessage = message.reply("", eb).get();
+			KHUxBot.actionMessages.add(new ActionMessage(futureMessage) {
+				@Override
+				public void run(Reaction reaction) {
+					Channel channel = futureMessage.getChannelReceiver();
+					futureMessage.delete();
+					String unicode = reaction.getUnicodeEmoji();
+					String choice = "";
+					if(unicode.equals(one)) {
+						choice += query.queries.get(0).mid;
+					}else if(unicode.equals(two)){
+						choice += query.queries.get(1).mid;
+					}else if(unicode.equals(three)){
+						choice += query.queries.get(2).mid;
+					}else if(unicode.equals(four)){
+						choice += query.queries.get(3).mid;
+					}else if(unicode.equals(five)){
+						choice += query.queries.get(4).mid;
+					}else if(unicode.equals(cancel)){
+						return;
+					}
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					Medal medal = KHUxBot.medalHandler.getMedalByMid(choice, game);
+					channel.sendMessage("", KHUxBot.medalHandler.prepareMedalMessage(medal));
+				}
+			});
+			futureMessage.addUnicodeReaction(one);
+			//It needs to wait for the reaction to actually be added. I've tried using Future.isDone(), but that doesn't seem to work.
+			//Could potentially break if speed is slow
+			Thread.sleep(350);
+			futureMessage.addUnicodeReaction(two);
+			if(query.size()>2) {
+				Thread.sleep(350);
+				futureMessage.addUnicodeReaction(three);
+				if(query.size()>3) {
+					Thread.sleep(350);
+					futureMessage.addUnicodeReaction(four);
+					if(query.size()>4) {
+						Thread.sleep(350);
+						futureMessage.addUnicodeReaction(five);
+					}
+				}
+			}
+			Thread.sleep(350);
+			futureMessage.addUnicodeReaction(cancel);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public EmbedBuilder prepareMedalMessage(Medal medal) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
 		eb.setAuthor(medal.name);
-		eb.setImage(getImgLinkForMedal(medal));
+		String imgLink = getImgLinkForMedal(medal);
+		System.out.println(imgLink);
+		eb.setImage(imgLink);
 		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
 		eb.addField("Strength", ""+medal.strength, true);
-		eb.addField("Guages", ""+medal.guages, true);
+		eb.addField("Gauges", ""+medal.gauges, true);
 		eb.addField("Tier", ""+medal.tier.tier, true);
 		DecimalFormat df = new DecimalFormat("#.##");
 		df.setRoundingMode(RoundingMode.HALF_UP);
@@ -164,15 +243,24 @@ public class MedalHandler {
 	public String getImgLinkForMedal(Medal medal) {
 		URL url;
 		try {
-			url = new URL("http://www.khunchainedx.com/wiki/File:"+medal.name.replaceAll(" ", "_").replaceAll("\\[", "(").replaceAll("\\]", ")")+"_6\u2605_KHUX.png");
-			Document doc = Jsoup.connect(url.toString()).get();
-			Elements elements = doc.getElementsByTag("img");
+			String encodedName = URLEncoder.encode(medal.name+" 6\u2605", "UTF-8");
+			encodedName = encodedName.replaceAll("Limited", "LM").replaceAll("Nightmare", "NM");
+			url = new URL("http://www.khunchainedx.com/w/index.php?title=Special:Search&profile=images&fulltext=1&search=" + encodedName);;
+			Document doc = Jsoup.parse(url.openStream(), null, "");
+			Elements elms = doc.getElementsByTag("tr");
+			String link = elms.get(0).getElementsByTag("a").get(0).attr("href");
+			if(link.contains("(Old)")) {
+				link = elms.get(1).getElementsByTag("a").get(0).attr("href");
+			}
+			URL url2 = new URL("http://www.khunchainedx.com" + link);
+			Document doc2 = Jsoup.parse(url2.openStream(), null, "");
+			Elements elements = doc2.getElementsByTag("img");
 			for(Element e : elements) {
 				if(e.hasAttr("alt") && e.attr("alt").startsWith("File:")) {
 					return "http://www.khunchainedx.com" + e.attr("src");
 				}
 			}
-		} catch (IOException e) {
+		} catch (IOException | IndexOutOfBoundsException e) {
 			e.printStackTrace();
 		}
 		return "";
