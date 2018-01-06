@@ -7,10 +7,10 @@ public class Medal {
 	public Attribute attribute;
 	public Tier tier;
 	public float baseLow, baseHigh, maxLow, maxHigh;
-	public int strength, guages;
+	public int strength, gauges;
 	public Target target;
 	
-	public Medal(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int guages, int target) {
+	public Medal(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int target) {
 		this.mid = mid;
 		this.name = name;
 		this.special = special;
@@ -22,7 +22,7 @@ public class Medal {
 		this.maxLow = maxLow;
 		this.maxHigh = maxHigh;
 		this.strength = strength;
-		this.guages = guages;
+		this.gauges = gauges;
 		this.target = Target.getFromId(target);
 	}
 	
