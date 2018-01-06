@@ -1,6 +1,6 @@
 # KHUx Info Bot
 
-This is a bot I created to make it easier to retrieve medal info, remind your server about lux or Union Cross times, and posting updates from Twitter for either the NA or JP version of KHUx. This was made using the libraries [Javacord](https://github.com/BtoBastian/Javacord/) by BtoBastian and [JSoup](https://jsoup.org/).
+This is a bot I created to make it easier to retrieve medal info, remind your server about lux or Union Cross times, and posting updates from Twitter for either the NA or JP version of KHUx. This was made using the libraries [Javacord](https://github.com/BtoBastian/Javacord/) by BtoBastian, [JSoup](https://jsoup.org/), [Emoji-Java](https://github.com/vdurmont/emoji-java) by vdurmont, and [Gson](https://github.com/google/gson) by Google, with extreme thanks to Rosie for her amazing website [khuxtracker.com](http://khuxtracker.com/) which I use for the searching algorithm and database.
 
 ## How to use
 
