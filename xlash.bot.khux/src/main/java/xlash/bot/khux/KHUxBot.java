@@ -1,5 +1,6 @@
 package xlash.bot.khux;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,6 +21,7 @@ import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.Reaction;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.message.ReactionAddListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
@@ -48,7 +50,7 @@ import xlash.bot.khux.util.BonusTimes;
 
 public class KHUxBot {
 
-	public static final String VERSION = "1.6.0";
+	public static final String VERSION = "1.6.1";
 
 	public static DiscordAPI api;
 
@@ -457,7 +459,11 @@ public class KHUxBot {
 							}
 						}
 						if(!channelId.isEmpty()) {
-							server.getChannelById(channelId).sendMessage("Bot Update: " + VERSION + "\nCompletely overhauled the !medal command. It now suggests medals and displays the information with more pizzaz.\nMedal database now switched over to khuxtracker.com, so data is more relevant.");
+							EmbedBuilder eb = new EmbedBuilder();
+							eb.setColor(Color.BLUE);
+							eb.setAuthor("Bot Update: " + VERSION);
+							eb.setDescription("Sorry for the bugs! I've fixed almost all cases of the image not showing.\nFixed a bug where !medal only worked for NA.\n'and' can be used instead of '&'\nIncreased !medal suggestions up to 5.");
+							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
 				}
