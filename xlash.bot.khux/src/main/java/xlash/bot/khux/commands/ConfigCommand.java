@@ -1,9 +1,12 @@
 package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
-import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 
+/**
+ * Loads the config file
+ *
+ */
 public class ConfigCommand extends CommandBase{
 
 	@Override

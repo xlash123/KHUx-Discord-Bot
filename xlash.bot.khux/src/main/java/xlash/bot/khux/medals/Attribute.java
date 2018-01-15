@@ -1,5 +1,9 @@
 package xlash.bot.khux.medals;
 
+/**
+ * The attribute of a medal: power, speed, or magic
+ *
+ */
 public enum Attribute {
 	
 	POWER("Power", 1),
@@ -7,6 +11,9 @@ public enum Attribute {
 	MAGIC("Magic", 3);
 	
 	public String name;
+	/**
+	 * The id as it appears on khuxtracker
+	 */
 	public final int id;
 	
 	private Attribute(String name, int id) {

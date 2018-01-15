@@ -1,5 +1,9 @@
 package xlash.bot.khux.medals;
 
+/**
+ * An intermediate class to convert the JSON from khuxtracker to the Medal class
+ *
+ */
 public class RawMedal {
 	
 	public String mid, name, special;

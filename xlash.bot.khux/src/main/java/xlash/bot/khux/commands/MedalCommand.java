@@ -10,6 +10,10 @@ import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.medals.Medal;
 import xlash.bot.khux.medals.SearchQuery;
 
+/**
+ * Gets the info on a medal of the default game
+ *
+ */
 public class MedalCommand extends CommandBase{
 	
 	@Override

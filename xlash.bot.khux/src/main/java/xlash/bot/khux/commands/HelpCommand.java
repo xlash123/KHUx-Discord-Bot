@@ -1,8 +1,15 @@
 package xlash.bot.khux.commands;
 
+import java.awt.Color;
+
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import xlash.bot.khux.KHUxBot;
 
+/**
+ * Sends the user the list of commands with usage
+ *
+ */
 public class HelpCommand extends CommandBase{
 
 	@Override
@@ -12,19 +19,13 @@ public class HelpCommand extends CommandBase{
 
 	@Override
 	public void onCommand(String[] args, Message message) {
-		String toSend = "```";
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.setColor(Color.CYAN);
 		for(CommandBase com : KHUxBot.commandHandler.commands) {
-			toSend += com.getAliases()[0] + ": " + com.getDescription() + "\n Usage: " + com.getUsage() + "\n";
-			if(com.getAliases().length > 1) {
-				toSend += " Aliases:";
-				for(int i=1; i<com.getAliases().length; i++) {
-					toSend += " " + com.getAliases()[i];
-				}
-				toSend += "\n";
-			}
+			eb.setTitle("List of all commands:");
+			eb.addField(com.getAliases()[0], "**Description:** " + com.getDescription() + "\n**Aliases:** " + com.getAliasesTogether() + "\n**Usage:** " + com.getUsage(), false);
 		}
-		toSend += "```";
-		message.getAuthor().sendMessage(toSend);
+		message.getAuthor().sendMessage("", eb);
 	}
 
 	@Override

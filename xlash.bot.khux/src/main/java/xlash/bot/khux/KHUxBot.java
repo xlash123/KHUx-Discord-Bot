@@ -48,25 +48,39 @@ import xlash.bot.khux.sheduler.Scheduler;
 import xlash.bot.khux.sheduler.TimedEvent;
 import xlash.bot.khux.util.BonusTimes;
 
+/**
+ * The instance of the KHUx Bot
+ * @author xlash123
+ *
+ */
 public class KHUxBot {
 
-	public static final String VERSION = "1.6.1";
+	public static final String VERSION = "1.6.2";
 
+	/** Instance of the Discord API*/
 	public static DiscordAPI api;
 
+	/** Instance of the medal handler*/
 	public static MedalHandler medalHandler;
+	/** Instance of the twitter handler*/
 	public static TwitterHandler twitterHandler;
+	/** Instance of the command handler*/
 	public static CommandHandler commandHandler;
+	/** Instance of the bot config*/
 	public static BotConfig botConfig;
+	/** The list of config files of connected servers*/
 	public static ArrayList<ServerConfig> serverConfigs = new ArrayList<ServerConfig>();
+	/** Instance of the scheduler*/
 	public static Scheduler scheduler;
+	/** The list of all pending action messages*/
 	public static ArrayList<ActionMessage> actionMessages = new ArrayList<>();
 
+	/** Fun comebacks that the bot responds with when you @mention it*/
 	public static final String[] COMEBACKS = new String[]{"Don't at me, bro.", "42", "no", "https://youtu.be/dQw4w9WgXcQ", "Why would I know?", "*I am a bot, and this action was performed automatically.*", "Yes", "Ask again later", "I'm not your mom.", "Do me a favor and stop asking for favors", "KH3 will release in 2020", "Whoooaaa! Looking cool, Joker!", "I dare you to hack me. My IP is 127.0.0.1"};
 
 	/**
 	 * Starts the bot. If you're running this in a development environment, make sure you are 
-	 * running it with parameter "run", else nothing will happen.
+	 * running it with parameter "run", or else nothing will happen.
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -116,6 +130,10 @@ public class KHUxBot {
 		System.out.println("Bot setup complete! Connecting to servers...");
 	}
 	
+	/**
+	 * Runs whenever a server connects.
+	 * @param newServer the server that connected
+	 */
 	public void initializeServer(Server newServer){
 		ServerConfig config = getServerConfig(newServer);
 		if(config==null){
@@ -125,6 +143,9 @@ public class KHUxBot {
 		}
 	}
 
+	/**
+	 * Initializes various components of the bot
+	 */
 	public void initialize() {
 		System.out.println("Initializing...");
 		medalHandler = new MedalHandler();
@@ -285,7 +306,7 @@ public class KHUxBot {
 			public void run() {
 				for(ActionMessage am : actionMessages) {
 					if(am.isExpired()) {
-						am.message.delete();
+						am.messageStored.delete();
 						am.kill();
 					}
 				}
@@ -359,6 +380,9 @@ public class KHUxBot {
 		return null;
 	}
 	
+	/**
+	 * Registers all the commands
+	 */
 	public void registerCommands(){
 		commandHandler.registerCommand(new HelpCommand());
 		commandHandler.registerCommand(new MedalCommand());
@@ -437,10 +461,11 @@ public class KHUxBot {
 				});
 				
 				scheduler.startThread();
-				System.out.println("Connected to " + api.getServers().size() + " servers:");
+				System.out.println("Connected to servers:");
 				for(Server server : api.getServers()){
 					System.out.println(">" + server.getName());
 				}
+				System.out.println("Total of " + api.getServers().size() + " servers connected.");
 				if(!VERSION.equals(botConfig.version)) {
 					botConfig.version = VERSION;
 					botConfig.saveConfig();
@@ -461,8 +486,8 @@ public class KHUxBot {
 						if(!channelId.isEmpty()) {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
-							eb.setAuthor("Bot Update: " + VERSION);
-							eb.setDescription("Sorry for the bugs! I've fixed almost all cases of the image not showing.\nFixed a bug where !medal only worked for NA.\n'and' can be used instead of '&'\nIncreased !medal suggestions up to 5.");
+							eb.setTitle("Bot Update: " + VERSION);
+							eb.setDescription("You can now DM with the bot for simple things, like !medal.\nImproved look of !help command");
 							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
@@ -475,6 +500,9 @@ public class KHUxBot {
 		});
 	}
 
+	/**
+	 * Searches my GitHub releases page to determine if there is an update available.
+	 */
 	public static void findUpdate() {
 		try {
 			Document doc = Jsoup.connect("https://github.com/xlash123/KHUx-Discord-Bot/releases").get();

@@ -8,6 +8,10 @@ import java.util.Date;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.sheduler.Scheduler;
 
+/**
+ * A list of all the bonus times, plus methods for various time calculations
+ *
+ */
 public class BonusTimes {
 	
 	public static String[] doubleLuxStartNA = new String[] {"02:00:00", "08:00:00", "14:00:00", "20:00:00"};

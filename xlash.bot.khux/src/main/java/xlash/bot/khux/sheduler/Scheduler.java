@@ -8,7 +8,7 @@ import java.util.TimeZone;
 import xlash.bot.khux.GameEnum;
 
 /**
- * Schedules things
+ * Schedules things, like how often Tweets should be grabbed
  *
  */
 public class Scheduler {

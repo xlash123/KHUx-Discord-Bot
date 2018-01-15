@@ -5,12 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Properties;
 
-import xlash.bot.khux.GameEnum;
-
+/**
+ * Handles the configuration for the bot as a whole.
+ *
+ */
 public class BotConfig {
 	
 	public static final String FILE_NAME = System.getProperty("user.dir") + "/khuxbot config/config.properties";
@@ -34,6 +34,9 @@ public class BotConfig {
 		}
 	}
 	
+	/**
+	 * Ensures that no variables are null
+	 */
 	public void init(){
 		if(botToken == null) botToken = "";
 		if(version == null) version = "";

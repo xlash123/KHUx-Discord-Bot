@@ -6,6 +6,10 @@ import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.UserUtil;
 
+/**
+ * A command for managing people who use admin commands
+ *
+ */
 public class AdminCommand extends CommandBase{
 
 	@Override

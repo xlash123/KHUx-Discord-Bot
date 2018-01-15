@@ -11,18 +11,34 @@ import de.btobastian.javacord.entities.permissions.Role;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 
+/**
+ * Handles message execution and storage
+ *
+ */
 public class CommandHandler {
 	
+	/**
+	 * List of commands
+	 */
 	public ArrayList<CommandBase> commands = new ArrayList<CommandBase>();
 	
 	public CommandHandler(){}
 	
+	/**
+	 * Registers a command so it can be called by a user
+	 * @param command instance of a command to register
+	 */
 	public void registerCommand(CommandBase command){
 		commands.add(command);
 	}
 	
+	/**
+	 * Attempts to execute a command from the user's message
+	 * @param message user message
+	 */
 	public void executeCommand(Message message){
 		String content = message.getContent();
+		if(!content.startsWith("!")) return;
 		String[] parts = content.split(" ");
 		for(CommandBase com : commands){
 			for(String alias : com.getAliases()){

@@ -1,15 +1,13 @@
 package xlash.bot.khux;
 
+/**
+ * The type of game: North America (NA) or Japan (JP)
+ *
+ */
 public enum GameEnum {
 	
-	NA(1),
-	JP(5);
-	
-	public int tab;
-	
-	private GameEnum(int tab){
-		this.tab = tab;
-	}
+	NA,
+	JP;
 	
 	/**
 	 * Takes a string and converts it into the GameState

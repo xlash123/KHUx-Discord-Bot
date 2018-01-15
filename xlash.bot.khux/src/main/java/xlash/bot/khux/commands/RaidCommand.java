@@ -6,6 +6,10 @@ import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.BonusTimes;
 
+/**
+ * Reminds the server of when a daily raid boss is able to be attacked. Currently this isn't implemented because it hasn't come back yet.
+ *
+ */
 public class RaidCommand extends CommandBase{
 
 	@Override

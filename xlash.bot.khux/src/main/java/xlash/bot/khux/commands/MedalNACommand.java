@@ -9,6 +9,10 @@ import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.medals.Medal;
 import xlash.bot.khux.medals.SearchQuery;
 
+/**
+ * Gets the info on a medal from the NA version
+ *
+ */
 public class MedalNACommand extends CommandBase{
 	
 	@Override

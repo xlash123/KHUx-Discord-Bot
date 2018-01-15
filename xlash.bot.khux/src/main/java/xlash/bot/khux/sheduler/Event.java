@@ -1,7 +1,5 @@
 package xlash.bot.khux.sheduler;
 
-import java.util.TimeZone;
-
 import xlash.bot.khux.GameEnum;
 
 /**

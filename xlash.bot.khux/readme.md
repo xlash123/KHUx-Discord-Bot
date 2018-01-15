@@ -60,6 +60,9 @@ A good explaination of how to get the Discord App ID is explained [here](https:/
 <br>
 If you're still lost, here's a helpful [Reddit thread](https://www.reddit.com/r/KingdomHearts/comments/65puab/khux_easy_guide_to_run_xlash123s_khux_bot_in_your/), thanks to /u/MaxialstarOA, although it is now slightly outdated.
 
+## Running in a Dev Environment
+For whatever IDE you use, configure the launch to include "run" as a parameter, otherwise nothing will happen.
+
 ## Questions?
 
 Any bugs, suggestions, or questions can be posted as an issue. I'll respond to anything I get.

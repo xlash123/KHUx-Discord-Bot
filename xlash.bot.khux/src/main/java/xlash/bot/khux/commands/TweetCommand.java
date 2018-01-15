@@ -9,6 +9,10 @@ import xlash.bot.khux.TwitterHandler.Tweet;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.sheduler.TimedEvent;
 
+/**
+ * Automatically posts Tweets to a given channel
+ *
+ */
 public class TweetCommand extends CommandBase{
 	
 	@Override

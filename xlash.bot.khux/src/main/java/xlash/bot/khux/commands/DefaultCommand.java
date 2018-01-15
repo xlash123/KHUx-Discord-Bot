@@ -2,9 +2,12 @@ package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.GameEnum;
-import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 
+/**
+ * Changes the default game. Affects !medal, !lux, and !uc
+ *
+ */
 public class DefaultCommand extends CommandBase{
 	
 	@Override
@@ -29,7 +32,7 @@ public class DefaultCommand extends CommandBase{
 
 	@Override
 	public String getDescription() {
-		return "Changes the default game. Affects !medal and !lux";
+		return "Changes the default game. Affects !medal, !lux, and !uc";
 	}
 
 	@Override

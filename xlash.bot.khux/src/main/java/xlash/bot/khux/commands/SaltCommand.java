@@ -3,6 +3,10 @@ package xlash.bot.khux.commands;
 import de.btobastian.javacord.entities.message.Message;
 import xlash.bot.khux.KHUxBot;
 
+/**
+ * Adds to a global counter of the amount of saltiness in the community
+ *
+ */
 public class SaltCommand extends CommandBase{
 
 	@Override

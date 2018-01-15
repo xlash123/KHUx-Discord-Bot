@@ -1,5 +1,9 @@
 package xlash.bot.khux.medals;
 
+/**
+ * A collection of all of a medal's stats
+ *
+ */
 public class Medal {
 	
 	public String mid, name, special;

@@ -13,6 +13,10 @@ import de.btobastian.javacord.entities.Server;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 
+/**
+ * Handles the configuration for each individual connected server
+ *
+ */
 public class ServerConfig {
 	
 	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/";
@@ -58,6 +62,19 @@ public class ServerConfig {
 		}
 	}
 	
+	/**
+	 * Creates a blank instance used for handling DMs
+	 */
+	private ServerConfig() {
+		fileName = "";
+		serverId = "";
+		init();
+	}
+	
+	/**
+	 * Initializes a ServerConfig for the server of specified id
+	 * @param serverId id of the server
+	 */
 	public ServerConfig(Server server){
 		this(server.getId());
 	}
@@ -75,6 +92,10 @@ public class ServerConfig {
 		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
 		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
 		if(admins == null) admins = new ArrayList<String>();
+	}
+	
+	public static ServerConfig getBlank() {
+		return new ServerConfig();
 	}
 	
 	/**

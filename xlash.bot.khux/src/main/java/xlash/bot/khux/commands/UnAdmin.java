@@ -2,10 +2,13 @@ package xlash.bot.khux.commands;
 
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
-import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.UserUtil;
 
+/**
+ * Removes permissions to be able to use admin commands
+ *
+ */
 public class UnAdmin extends CommandBase{
 
 	@Override

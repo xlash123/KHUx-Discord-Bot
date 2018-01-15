@@ -6,6 +6,10 @@ import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.BonusTimes;
 
+/**
+ * Alerts when double lux time is active to a given channel
+ *
+ */
 public class LuxCommand extends CommandBase{
 	
 	@Override

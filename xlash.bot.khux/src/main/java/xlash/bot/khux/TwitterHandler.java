@@ -8,14 +8,18 @@ import org.jsoup.select.Elements;
 
 import de.btobastian.javacord.entities.Channel;
 
+/**
+ * Manages all the Twitter functionality. No, I'm not going to use their API.
+ *
+ */
 public class TwitterHandler {
 	
 	/**
-	 * Stores the last 10 Tweets
+	 * Stores the last 10 Tweets for NA
 	 */
 	public ArrayList<Tweet> latestTweetsNA = new ArrayList<>();
 	/**
-	 * Stores the last 10 Tweets
+	 * Stores the last 10 Tweets for JP
 	 */
 	public ArrayList<Tweet> latestTweetsJP = new ArrayList<>();
 
@@ -129,6 +133,10 @@ public class TwitterHandler {
 		return null;
 	}
 	
+	/**
+	 * A class for storing some info about a tweet
+	 *
+	 */
 	public class Tweet{
 		
 		public final long tweetId;

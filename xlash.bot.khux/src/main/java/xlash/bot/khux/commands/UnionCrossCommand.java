@@ -6,6 +6,10 @@ import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.BonusTimes;
 
+/**
+ * Reminds the server when the Union Cross bonus times are active
+ *
+ */
 public class UnionCrossCommand extends CommandBase{
 
 	@Override
