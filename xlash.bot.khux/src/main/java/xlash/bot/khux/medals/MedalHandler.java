@@ -4,17 +4,15 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,6 +29,10 @@ import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 
+/**
+ * Manages all the medals
+ *
+ */
 public class MedalHandler {
 	
 	public ArrayList<Medal> cachedMedalsNA = new ArrayList<>();
@@ -123,7 +125,7 @@ public class MedalHandler {
 			Gson gson = new Gson();
 			RawMedal raw = gson.fromJson(response, RawMedal.class);
 			raw.mid = mid;
-			raw.name = raw.name.replaceAll("Namine", "Namin\u00E9");
+			raw.name = raw.name.replaceAll("Namine", "Namin\u00E9").replaceAll("Lumiere", "Lumi\u00E8re");
 			Medal medal = raw.toMedal();
 			if(game==GameEnum.NA) {
 				if(cachedMedalsNA.contains(medal)) {
@@ -142,6 +144,12 @@ public class MedalHandler {
 		return null;
 	}
 	
+	/**
+	 * Promps the user with the query of which medal they would like to see
+	 * @param query the list of medals to query
+	 * @param message the message the user send
+	 * @param game game context
+	 */
 	public void promptQuery(SearchQuery query, Message message, GameEnum game) {
 		EmbedBuilder eb = new EmbedBuilder();
 		String one = EmojiManager.getForAlias("one").getUnicode();
@@ -164,7 +172,6 @@ public class MedalHandler {
 				@Override
 				public void run(Reaction reaction) {
 					Channel channel = futureMessage.getChannelReceiver();
-					futureMessage.delete();
 					String unicode = reaction.getUnicodeEmoji();
 					String choice = "";
 					if(unicode.equals(one)) {
@@ -178,15 +185,22 @@ public class MedalHandler {
 					}else if(unicode.equals(five)){
 						choice += query.queries.get(4).mid;
 					}else if(unicode.equals(cancel)){
+						futureMessage.delete();
 						return;
-					}
+					}else return;
+					futureMessage.delete();
 					try {
 						Thread.sleep(300);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					Medal medal = KHUxBot.medalHandler.getMedalByMid(choice, game);
-					channel.sendMessage("", KHUxBot.medalHandler.prepareMedalMessage(medal));
+					EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal);
+					if(channel != null) {
+						channel.sendMessage("", build);
+					} else {
+						message.getAuthor().sendMessage("", build);
+					}
 				}
 			});
 			futureMessage.addUnicodeReaction(one);
@@ -213,12 +227,16 @@ public class MedalHandler {
 		}
 	}
 	
+	/**
+	 * Prepares the message to send to the user
+	 * @param medal the selected medal
+	 * @return An embeded message for the user to receive
+	 */
 	public EmbedBuilder prepareMedalMessage(Medal medal) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
-		eb.setAuthor(medal.name);
+		eb.setTitle(medal.name);
 		String imgLink = getImgLinkForMedal(medal);
-		System.out.println(imgLink);
 		eb.setImage(imgLink);
 		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
