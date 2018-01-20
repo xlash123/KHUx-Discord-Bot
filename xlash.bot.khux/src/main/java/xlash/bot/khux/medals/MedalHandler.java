@@ -64,7 +64,7 @@ public class MedalHandler {
 			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
 			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=5&jp="+jp;
-			HttpURLConnection con = (HttpURLConnection) new URL("http://khuxtracker.com/query.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
@@ -80,6 +80,7 @@ public class MedalHandler {
 			}
 			con.disconnect();
 			String response = "{queries:"+sb.toString()+"}";
+			System.out.println(response);
 			Gson gson = new Gson();
 			return gson.fromJson(response, SearchQuery.class);
 		} catch (IOException e) {
@@ -104,7 +105,7 @@ public class MedalHandler {
 		}
 		try {
 			String searchQuery = "id=" + mid + "&type=view&method=directory";
-			HttpURLConnection con = (HttpURLConnection) new URL("http://khuxtracker.com/query.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
