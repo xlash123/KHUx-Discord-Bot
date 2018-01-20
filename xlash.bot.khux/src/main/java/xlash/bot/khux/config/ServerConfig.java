@@ -159,9 +159,9 @@ public class ServerConfig {
 		p.setProperty("Raid_Remind", ""+raidRemind);
 		String toSave = "";
 		for(int i=0; i<admins.size(); i++){
-			toSave += admins.get(i);
-			if(i+1<admins.size()) toSave += ",";
+			toSave += admins.get(i)+",";
 		}
+		if(toSave.length()>0) toSave = toSave.substring(0, toSave.length()-1);
 		p.setProperty("Bot_Admins", toSave);
 		FileOutputStream os;
 		try {
