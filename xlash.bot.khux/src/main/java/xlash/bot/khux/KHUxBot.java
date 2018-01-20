@@ -491,7 +491,7 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("You can now DM with the bot for simple things, like !medal.\nImproved look of !help command");
+							eb.setDescription("Issues with the !medal commands not working have been fixed.");
 							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
