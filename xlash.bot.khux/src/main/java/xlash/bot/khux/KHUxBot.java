@@ -55,7 +55,7 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.6.2";
+	public static final String VERSION = "1.6.3";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -328,13 +328,15 @@ public class KHUxBot {
 						if(config.luxRemind>0) {
 							if(!config.luxChannelNA.isEmpty()) {
 								if(config.luxRemind == luxTimeDifNA) {
-									api.getChannelById(config.luxChannelNA).sendMessage("NA Reminder: Double lux in " + luxTimeDifNA + " minutes!");
+									Channel channel = api.getChannelById(config.luxChannelNA);
+									if(channel != null) channel.sendMessage("NA Reminder: Double lux in " + luxTimeDifNA + " minutes!");
 								}
 							}
 						
 							if(!config.luxChannelJP.isEmpty()) {
 								if(config.luxRemind == luxTimeDifJP) {
-									api.getChannelById(config.luxChannelNA).sendMessage("JP Reminder: Double lux in " + luxTimeDifJP + " minutes!");
+									Channel channel = api.getChannelById(config.luxChannelJP);
+									if(channel != null) channel.sendMessage("JP Reminder: Double lux in " + luxTimeDifJP + " minutes!");
 								}
 							}
 						}
@@ -348,13 +350,15 @@ public class KHUxBot {
 						if(config.uxRemind>0) {
 							if(!config.uxChannelNA.isEmpty()) {
 								if(config.uxRemind == uxTimeDifNA) {
-									api.getChannelById(config.uxChannelNA).sendMessage("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!");
+									Channel channel = api.getChannelById(config.uxChannelNA);
+									if(channel != null) channel.sendMessage("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!");
 								}
 							}
 						
 							if(!config.uxChannelJP.isEmpty()) {
 								if(config.uxRemind == uxTimeDifJP) {
-									api.getChannelById(config.uxChannelJP).sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
+									Channel channel = api.getChannelById(config.uxChannelJP);
+									if(channel != null) channel.sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
 								}
 							}
 						}
