@@ -6,7 +6,7 @@ package xlash.bot.khux.medals;
  */
 public class Medal {
 	
-	public String mid, name, special;
+	public String mid, name, special, img;
 	public Type type;
 	public Attribute attribute;
 	public Tier tier;
@@ -14,7 +14,7 @@ public class Medal {
 	public int strength, gauges;
 	public Target target;
 	
-	public Medal(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int target) {
+	public Medal(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int target, String img) {
 		this.mid = mid;
 		this.name = name;
 		this.special = special;
@@ -28,6 +28,7 @@ public class Medal {
 		this.strength = strength;
 		this.gauges = gauges;
 		this.target = Target.getFromId(target);
+		this.img = img;
 	}
 	
 	public boolean equals(Object o) {

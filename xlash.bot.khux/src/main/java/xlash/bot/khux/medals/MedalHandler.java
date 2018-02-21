@@ -13,10 +13,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.google.gson.Gson;
 import com.vdurmont.emoji.EmojiManager;
@@ -237,7 +233,7 @@ public class MedalHandler {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
 		eb.setTitle(medal.name);
-		String imgLink = getImgLinkForMedal(medal);
+		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setImage(imgLink);
 		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
@@ -259,30 +255,4 @@ public class MedalHandler {
 		return eb;
 	}
 	
-	public String getImgLinkForMedal(Medal medal) {
-		URL url;
-		try {
-			String encodedName = URLEncoder.encode(medal.name+" 6\u2605", "UTF-8");
-			encodedName = encodedName.replaceAll("Limited", "LM").replaceAll("Nightmare", "NM");
-			url = new URL("http://www.khunchainedx.com/w/index.php?title=Special:Search&profile=images&fulltext=1&search=" + encodedName);;
-			Document doc = Jsoup.parse(url.openStream(), null, "");
-			Elements elms = doc.getElementsByTag("tr");
-			String link = elms.get(0).getElementsByTag("a").get(0).attr("href");
-			if(link.contains("(Old)")) {
-				link = elms.get(1).getElementsByTag("a").get(0).attr("href");
-			}
-			URL url2 = new URL("http://www.khunchainedx.com" + link);
-			Document doc2 = Jsoup.parse(url2.openStream(), null, "");
-			Elements elements = doc2.getElementsByTag("img");
-			for(Element e : elements) {
-				if(e.hasAttr("alt") && e.attr("alt").startsWith("File:")) {
-					return "http://www.khunchainedx.com" + e.attr("src");
-				}
-			}
-		} catch (IOException | IndexOutOfBoundsException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-
 }
