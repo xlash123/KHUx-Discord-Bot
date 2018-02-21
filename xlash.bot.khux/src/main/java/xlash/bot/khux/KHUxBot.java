@@ -55,7 +55,7 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.6.3";
+	public static final String VERSION = "1.6.4";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -491,7 +491,7 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Issues with the !medal commands not working have been fixed.");
+							eb.setDescription("Medal images are now pulled from the database, so all medal images should work.");
 							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
