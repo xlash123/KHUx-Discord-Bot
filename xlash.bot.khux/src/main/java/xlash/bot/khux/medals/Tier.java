@@ -6,7 +6,8 @@ package xlash.bot.khux.medals;
  */
 public enum Tier {
 	
-	TIER1(1, 1.25f), TIER2(2, 1.5f), TIER3(3, 2f), TIER4(4, 2.3f), TIER5(5, 2.5f), TIER6(6, 2.8f), TIER7(7, 3f);
+	TIER1(1, 1.25f), TIER2(2, 1.5f), TIER3(3, 2f), TIER4(4, 2.3f), TIER5(5, 2.5f), TIER6(6, 2.8f), TIER7(7, 3f), TIER8(8, 3.3f), TIER9(9, 3.5f), TIER10(10, 3.8f);
+	//Later tiers are just approximations based on what earlier tiers have done.
 	
 	public final int tier;
 	public final float guiltMultiplier;
