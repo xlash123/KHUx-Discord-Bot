@@ -23,7 +23,7 @@ public class HelpCommand extends CommandBase{
 		eb.setColor(Color.CYAN);
 		for(CommandBase com : KHUxBot.commandHandler.commands) {
 			eb.setTitle("List of all commands:");
-			eb.addField(com.getAliases()[0], "**Description:** " + com.getDescription() + "\n**Aliases:** " + com.getAliasesTogether() + "\n**Usage:** " + com.getUsage(), false);
+			eb.addField("`"+com.getAliases()[0]+"`", "**Description:** " + com.getDescription() + "\n**Aliases:** " + com.getAliasesTogether() + "\n**Usage:** " + com.getUsage(), false);
 		}
 		message.getAuthor().sendMessage("", eb);
 	}
