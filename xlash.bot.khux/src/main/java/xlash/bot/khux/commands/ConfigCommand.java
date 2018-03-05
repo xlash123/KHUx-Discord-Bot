@@ -16,33 +16,56 @@ public class ConfigCommand extends CommandBase{
 
 	@Override
 	public void onCommand(String[] args, Message message) {
-		if(args.length==0){
+		if(args.length<3){
 			this.printDescriptionUsage(message);
 		}else{
 			ServerConfig config = this.getServerConfig(message);
+			String property = "";
 			switch(args[0].toLowerCase()){
-			case "load":
-				config.loadConfig();
-				message.reply("Configuration file reloaded.");
+			case "lux":
+				property += "Lux";
 				break;
-			case "save":
-				config.saveConfig();
-				message.reply("Configuration file saved.");
+			case "uc":
+				property += "UC";
+				break;
+			case "get":
+				message.reply("Lux On: " + config.luxOnPrompt + "\nLux Off: " + config.luxOffPrompt + "\nUC On: " + config.ucOnPrompt + "\nUC Off: " + config.ucOffPrompt);
+				return;
+				default:
+					this.printDescriptionUsage(message);
+					return;
+			}
+			property += "_";
+			switch(args[1].toLowerCase()) {
+			case "on":
+				property += "On";
+				break;
+			case "off":
+				property += "Off";
 				break;
 				default:
 					this.printDescriptionUsage(message);
+					return;
 			}
+			property += "_Prompt";
+			String mes = "";
+			for (int i = 2; i < args.length; i++) {
+				mes += args[i] + " ";
+			}
+			mes = mes.substring(0, mes.length()-1);
+			config.putConfig(property, mes);
+			message.reply("Config change saved!");
 		}
 	}
 
 	@Override
 	public String getDescription() {
-		return "Loads the config file.";
+		return "Makes changes to your server's configuration.";
 	}
 
 	@Override
 	public String getUsage() {
-		return "!config [save/load]";
+		return "!config [lux/uc/get] [on/off] [message]";
 	}
 	
 	@Override
