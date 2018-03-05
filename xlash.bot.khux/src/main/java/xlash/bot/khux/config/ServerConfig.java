@@ -28,15 +28,17 @@ public class ServerConfig {
 	public volatile String luxChannelJP;
 	public volatile String raidChannelNA;
 	public volatile String raidChannelJP;
-	public volatile String uxChannelNA;
-	public volatile String uxChannelJP;
+	public volatile String ucChannelNA;
+	public volatile String ucChannelJP;
 	public volatile GameEnum defaultGame;
 	
 	public volatile String luxOnPrompt;
 	public volatile String luxOffPrompt;
+	public volatile String ucOnPrompt;
+	public volatile String ucOffPrompt;
 	public volatile int luxRemind;
 	public volatile int raidRemind;
-	public volatile int uxRemind;
+	public volatile int ucRemind;
 	
 	public final String serverId;
 	
@@ -84,13 +86,15 @@ public class ServerConfig {
 		if(updateChannelJP == null) updateChannelJP = "";
 		if(luxChannelNA == null) luxChannelNA = "";
 		if(luxChannelJP == null) luxChannelJP = "";
-		if(uxChannelNA == null) uxChannelNA = "";
-		if(uxChannelJP == null) uxChannelJP = "";
+		if(ucChannelNA == null) ucChannelNA = "";
+		if(ucChannelJP == null) ucChannelJP = "";
 		if(raidChannelNA == null) raidChannelNA = "";
 		if(raidChannelJP == null) raidChannelJP = "";
 		if(defaultGame == null) defaultGame = GameEnum.NA;
 		if(luxOnPrompt == null) luxOnPrompt = "Double lux active!";
 		if(luxOffPrompt == null) luxOffPrompt = "Double lux has faded...";
+		if(ucOnPrompt == null) ucOnPrompt = "Union Cross bonus time active!";
+		if(ucOffPrompt == null) ucOffPrompt = "Union Cross bonus time has finished.";
 		if(admins == null) admins = new ArrayList<String>();
 	}
 	
@@ -115,16 +119,18 @@ public class ServerConfig {
 			this.defaultGame = GameEnum.parseString(p.getProperty("Default_Game"));
 			this.luxOnPrompt = p.getProperty("Lux_On_Prompt");
 			this.luxOffPrompt = p.getProperty("Lux_Off_Prompt");
+			this.ucOnPrompt = p.getProperty("UC_On_Prompt");
+			this.ucOffPrompt = p.getProperty("UC_Off_Prompt");
 			String adminsString = p.getProperty("Bot_Admins");
 			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
 			String luxRemindString = p.getProperty("Lux_Remind");
 			if(luxRemindString != null) this.luxRemind = Integer.parseInt(luxRemindString);
-			this.uxChannelNA = p.getProperty("UX_Channel_NA");
-			this.uxChannelJP = p.getProperty("UX_Channel_JP");
+			this.ucChannelNA = p.getProperty("UC_Channel_NA");
+			this.ucChannelJP = p.getProperty("UC_Channel_JP");
 			this.raidChannelNA = p.getProperty("Raid_Channel_NA");
 			this.raidChannelJP = p.getProperty("Raid_Channel_JP");
-			String uxRemindString = p.getProperty("UX_Remind");
-			if(uxRemindString != null) this.uxRemind = Integer.parseInt(uxRemindString);
+			String ucRemindString = p.getProperty("UC_Remind");
+			if(ucRemindString != null) this.ucRemind = Integer.parseInt(ucRemindString);
 			String raidRemindString = p.getProperty("Raid_Remind");
 			if(raidRemindString != null) this.raidRemind = Integer.parseInt(raidRemindString);
 		} catch (FileNotFoundException e) {
@@ -135,6 +141,21 @@ public class ServerConfig {
 			e.printStackTrace();
 		}
 		init();
+	}
+	
+	public String getConfig(String prop) { 
+		FileInputStream in;
+		try {
+			in = new FileInputStream(new File(fileName));
+			Properties p = new Properties();
+			p.load(in);
+			return p.getProperty(prop, "null");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "null";
 	}
 	
 	/**
@@ -150,12 +171,14 @@ public class ServerConfig {
 		p.setProperty("Default_Game", defaultGame.toString());
 		p.setProperty("Lux_On_Prompt", luxOnPrompt);
 		p.setProperty("Lux_Off_Prompt", luxOffPrompt);
+		p.setProperty("UC_On_Prompt", ucOnPrompt);
+		p.setProperty("UC_Off_Prompt", ucOffPrompt);
 		p.setProperty("Lux_Remind", ""+luxRemind);
-		p.setProperty("UX_Channel_NA", uxChannelNA);
-		p.setProperty("UX_Channel_JP", uxChannelJP);
+		p.setProperty("UC_Channel_NA", ucChannelNA);
+		p.setProperty("UC_Channel_JP", ucChannelJP);
 		p.setProperty("Raid_Channel_NA", raidChannelNA);
 		p.setProperty("Raid_Channel_JP", raidChannelJP);
-		p.setProperty("UX_Remind", ""+uxRemind);
+		p.setProperty("UC_Remind", ""+ucRemind);
 		p.setProperty("Raid_Remind", ""+raidRemind);
 		String toSave = "";
 		for(int i=0; i<admins.size(); i++){
@@ -167,6 +190,21 @@ public class ServerConfig {
 		try {
 			os = new FileOutputStream(new File(fileName));
 			p.store(os, "This is the config file for the Discord server: " + KHUxBot.api.getServerById(serverId).getName());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void putConfig(String prop, String value) {
+		FileInputStream in;
+		try {
+			in = new FileInputStream(new File(fileName));
+			Properties p = new Properties();
+			p.load(in);
+			p.setProperty(prop, value);
+			p.store(new FileOutputStream(fileName), "This is the config file for the Discord server: " + KHUxBot.api.getServerById(serverId).getName());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
