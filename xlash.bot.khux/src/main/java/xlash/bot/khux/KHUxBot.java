@@ -212,10 +212,10 @@ public class KHUxBot {
 			public void run() {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.uxChannelNA.isEmpty()){
-						Channel channel = server.getChannelById(config.uxChannelNA);
+					if(!config.ucChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.ucChannelNA);
 						if(channel != null){
-							channel.sendMessage("NA: Union Cross bonus time active!");
+							channel.sendMessage("NA: " + config.ucOnPrompt);
 						}
 					}
 				}
@@ -226,10 +226,10 @@ public class KHUxBot {
 			public void run() {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.uxChannelNA.isEmpty()){
-						Channel channel = server.getChannelById(config.uxChannelNA);
+					if(!config.ucChannelNA.isEmpty()){
+						Channel channel = server.getChannelById(config.ucChannelNA);
 						if(channel != null){
-							channel.sendMessage("NA: Union Cross bonus time has finished.");
+							channel.sendMessage("NA: " + config.ucOffPrompt);
 						}
 					}
 				}
@@ -240,10 +240,10 @@ public class KHUxBot {
 			public void run() {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.uxChannelJP.isEmpty()){
-						Channel channel = server.getChannelById(config.uxChannelJP);
+					if(!config.ucChannelJP.isEmpty()){
+						Channel channel = server.getChannelById(config.ucChannelJP);
 						if(channel != null){
-							channel.sendMessage("JP: Union Cross bonus time is active!");
+							channel.sendMessage("JP: " + config.ucOnPrompt);
 						}
 					}
 				}
@@ -254,10 +254,10 @@ public class KHUxBot {
 			public void run() {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.uxChannelJP.isEmpty()){
-						Channel channel = server.getChannelById(config.uxChannelJP);
+					if(!config.ucChannelJP.isEmpty()){
+						Channel channel = server.getChannelById(config.ucChannelJP);
 						if(channel != null){
-							channel.sendMessage("JP: Union Cross bonus time has finished.");
+							channel.sendMessage("JP: " + config.ucOffPrompt);
 						}
 					}
 				}
@@ -347,17 +347,17 @@ public class KHUxBot {
 				int uxTimeDifJP = BonusTimes.uxTimeDifference(GameEnum.JP);
 				if(uxTimeDifNA < 30 || uxTimeDifJP < 30) {
 					for(ServerConfig config : serverConfigs) {
-						if(config.uxRemind>0) {
-							if(!config.uxChannelNA.isEmpty()) {
-								if(config.uxRemind == uxTimeDifNA) {
-									Channel channel = api.getChannelById(config.uxChannelNA);
+						if(config.ucRemind>0) {
+							if(!config.ucChannelNA.isEmpty()) {
+								if(config.ucRemind == uxTimeDifNA) {
+									Channel channel = api.getChannelById(config.ucChannelNA);
 									if(channel != null) channel.sendMessage("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!");
 								}
 							}
 						
-							if(!config.uxChannelJP.isEmpty()) {
-								if(config.uxRemind == uxTimeDifJP) {
-									Channel channel = api.getChannelById(config.uxChannelJP);
+							if(!config.ucChannelJP.isEmpty()) {
+								if(config.ucRemind == uxTimeDifJP) {
+									Channel channel = api.getChannelById(config.ucChannelJP);
 									if(channel != null) channel.sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
 								}
 							}
@@ -388,17 +388,18 @@ public class KHUxBot {
 	 * Registers all the commands
 	 */
 	public void registerCommands(){
+		//Keep alphabetized in terms of command usage
+		commandHandler.registerCommand(new AdminCommand());
+		commandHandler.registerCommand(new ConfigCommand());
+		commandHandler.registerCommand(new DefaultCommand());
 		commandHandler.registerCommand(new HelpCommand());
+		commandHandler.registerCommand(new LuxCommand());
 		commandHandler.registerCommand(new MedalCommand());
 		commandHandler.registerCommand(new MedalNACommand());
 		commandHandler.registerCommand(new MedalJPCommand());
-		commandHandler.registerCommand(new LuxCommand());
-		commandHandler.registerCommand(new TweetCommand());
-		commandHandler.registerCommand(new DefaultCommand());
-		commandHandler.registerCommand(new ConfigCommand());
-		commandHandler.registerCommand(new AdminCommand());
-		commandHandler.registerCommand(new UnAdmin());
 		commandHandler.registerCommand(new SaltCommand());
+		commandHandler.registerCommand(new TweetCommand());
+		commandHandler.registerCommand(new UnAdmin());
 		commandHandler.registerCommand(new UnionCrossCommand());
 	}
 
