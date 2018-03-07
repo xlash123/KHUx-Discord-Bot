@@ -42,6 +42,7 @@ import xlash.bot.khux.commands.SaltCommand;
 import xlash.bot.khux.commands.TweetCommand;
 import xlash.bot.khux.config.BotConfig;
 import xlash.bot.khux.config.ServerConfig;
+import xlash.bot.khux.keyblades.KeybladeHandler;
 import xlash.bot.khux.medals.MedalHandler;
 import xlash.bot.khux.sheduler.Event;
 import xlash.bot.khux.sheduler.Scheduler;
@@ -66,6 +67,8 @@ public class KHUxBot {
 	public static TwitterHandler twitterHandler;
 	/** Instance of the command handler*/
 	public static CommandHandler commandHandler;
+	/** Instance of the keyblade handler*/
+	public static KeybladeHandler keybladeHandler;
 	/** Instance of the bot config*/
 	public static BotConfig botConfig;
 	/** The list of config files of connected servers*/
@@ -150,6 +153,7 @@ public class KHUxBot {
 		System.out.println("Initializing...");
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
+		keybladeHandler = new KeybladeHandler();
 		scheduler = new Scheduler();
 		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, BonusTimes.doubleLuxStartNA){
 			@Override
