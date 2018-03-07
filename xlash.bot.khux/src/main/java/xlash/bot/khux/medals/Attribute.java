@@ -29,5 +29,14 @@ public enum Attribute {
 		}
 		return null;
 	}
+	
+	public static Attribute getFromName(String name) {
+		for(Attribute a : Attribute.class.getEnumConstants()) {
+			if(a.name.equalsIgnoreCase(name)) {
+				return a;
+			}
+		}
+		return null;
+	}
 
 }
