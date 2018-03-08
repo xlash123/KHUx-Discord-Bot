@@ -60,11 +60,9 @@ public class KeybladeDeserilizer implements JsonDeserializer<Keyblade>{
 			}
 		}else {
 			JsonObject levels = o.getAsJsonObject("level");
-			Set<Entry<String, JsonElement>> entrySet = levels.entrySet();
-			Iterator<Entry<String, JsonElement>> entryIt = entrySet.iterator();
-			while(entryIt.hasNext()) {
-				Entry<String, JsonElement> entry = entryIt.next();
-				multipliers.add(entry.getValue().getAsFloat());
+			//Just making sure I read all levels.
+			for (int i = 0; i < 100; i++) {
+				if(levels.has(""+i)) multipliers.add(levels.get(""+i).getAsFloat());
 			}
 		}
 	}
