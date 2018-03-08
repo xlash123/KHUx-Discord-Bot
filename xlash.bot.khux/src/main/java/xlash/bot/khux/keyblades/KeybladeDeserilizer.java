@@ -2,9 +2,6 @@ package xlash.bot.khux.keyblades;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -32,6 +29,7 @@ public class KeybladeDeserilizer implements JsonDeserializer<Keyblade>{
 			ArrayList<Float> attrMultipliers = new ArrayList<>();
 			int typeActive = 0;
 			ArrayList<Float> typeMultipliers = new ArrayList<>();
+			int slotActive = slot.get("active").getAsInt();
 			
 			JsonObject friend = slot.getAsJsonObject("friend");
 			if(friend!=null) {
@@ -47,7 +45,7 @@ public class KeybladeDeserilizer implements JsonDeserializer<Keyblade>{
 				slotType = xlash.bot.khux.medals.Type.getFromName(type.get("name").getAsString());
 				parseForLevel(type, typeMultipliers);
 			}
-			slots[s-1] = new Slot(slotAttribute, slotType, attrActive, typeActive, attrMultipliers, typeMultipliers);
+			slots[s-1] = new Slot(slotAttribute, slotType, attrActive, typeActive, slotActive, attrMultipliers, typeMultipliers);
 		}
 		return new Keyblade(name, slots);
 	}
