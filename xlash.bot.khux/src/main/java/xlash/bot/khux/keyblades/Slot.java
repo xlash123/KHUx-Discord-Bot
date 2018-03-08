@@ -11,14 +11,16 @@ public class Slot {
 	public final Attribute attr;
 	public final Type type;
 	public final int attrActive, typeActive;
+	public final int slotActive;
 	
 	public final ArrayList<Float> attrMultipliers, typeMultipliers;
 
-	public Slot(Attribute attr, Type type, int attrActive, int typeActive, ArrayList<Float> attrMultipliers, ArrayList<Float> typeMultipliers) {
+	public Slot(Attribute attr, Type type, int attrActive, int typeActive, int slotActive, ArrayList<Float> attrMultipliers, ArrayList<Float> typeMultipliers) {
 		this.attr = attr;
 		this.type = type;
 		this.attrActive = attrActive;
 		this.typeActive = typeActive;
+		this.slotActive = slotActive;
 		this.attrMultipliers = attrMultipliers;
 		this.typeMultipliers = typeMultipliers;
 	}
@@ -26,7 +28,7 @@ public class Slot {
 	public float getSlotMultiplier(Attribute attr, Type type, int slotNumber, int level) {
 		if(this.attr == attr) {
 			if(this.type == type) {
-				return getTypeMultipler(level);
+				return getTypeMultiplier(level);
 			}
 			else return getAttrMultiplier(level);
 		}else return 1;
@@ -38,7 +40,7 @@ public class Slot {
 		} else return 1;
 	}
 	
-	public float getTypeMultipler(int level) {
+	public float getTypeMultiplier(int level) {
 		if(level>=typeActive) {
 			return typeMultipliers.get(level-typeActive);
 		} else return 1;
