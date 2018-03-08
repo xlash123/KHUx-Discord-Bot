@@ -23,7 +23,7 @@ public class Slot {
 		this.typeMultipliers = typeMultipliers;
 	}
 	
-	public double getSlotMultiplier(Attribute attr, Type type, int slotNumber, int level) {
+	public float getSlotMultiplier(Attribute attr, Type type, int slotNumber, int level) {
 		if(this.attr == attr) {
 			if(this.type == type) {
 				return getTypeMultipler(level);
@@ -32,19 +32,19 @@ public class Slot {
 		}else return 1;
 	}
 	
-	private double getAttrMultiplier(int level) {
+	public float getAttrMultiplier(int level) {
 		if(level>=attrActive) {
 			return attrMultipliers.get(level-attrActive);
 		} else return 1;
 	}
 	
-	private double getTypeMultipler(int level) {
+	public float getTypeMultipler(int level) {
 		if(level>=typeActive) {
 			return typeMultipliers.get(level-typeActive);
 		} else return 1;
 	}
 	
-	public double getSlotMultipler(Medal medal, int slotNumber, int level) {
+	public float getSlotMultipler(Medal medal, int slotNumber, int level) {
 		return getSlotMultiplier(medal.attribute, medal.type, slotNumber, level);
 	}
 	
