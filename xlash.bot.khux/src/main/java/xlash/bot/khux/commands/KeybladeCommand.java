@@ -1,5 +1,7 @@
 package xlash.bot.khux.commands;
 
+import java.awt.Color;
+
 import de.btobastian.javacord.entities.message.Message;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import xlash.bot.khux.KHUxBot;
@@ -15,16 +17,34 @@ public class KeybladeCommand extends CommandBase {
 
 	@Override
 	public void onCommand(String[] args, Message message) {
-		if(args.length < 2) {
+		if(args.length < 1) {
 			this.printDescriptionUsage(message);
 			return;
 		}
 		String keybladeName = "";
-		for(int i=0; i<args.length-1; i++) {
-			keybladeName += args[i] + " ";
+		Keyblade keyblade;
+		if(args.length>1) {
+			for(int i=0; i<args.length-1; i++) {
+				keybladeName += args[i] + " ";
+			}
+			keybladeName = keybladeName.substring(0, keybladeName.length()-1);
+			keyblade = KHUxBot.keybladeHandler.getKeyblade(keybladeName);
+			if(keyblade == null) {
+				keybladeName = "";
+				for(int i=0; i<args.length; i++) {
+					keybladeName += args[i] + " ";
+				}
+				keybladeName = keybladeName.substring(0, keybladeName.length()-1);
+				keyblade = KHUxBot.keybladeHandler.getKeyblade(keybladeName);
+			}
+		}else {
+			for(int i=0; i<args.length; i++) {
+				keybladeName += args[i] + " ";
+			}
+			keybladeName = keybladeName.substring(0, keybladeName.length()-1);
+			keyblade = KHUxBot.keybladeHandler.getKeyblade(keybladeName);
 		}
-		keybladeName = keybladeName.substring(0, keybladeName.length()-1);
-		Keyblade keyblade = KHUxBot.keybladeHandler.getKeyblade(keybladeName);
+		EmbedBuilder eb = new EmbedBuilder();
 		if(keyblade != null) {
 			int level = keyblade.getMaxLevel();
 			try {
@@ -32,7 +52,6 @@ public class KeybladeCommand extends CommandBase {
 			}catch (NumberFormatException e) {
 				System.out.println("Error when parsing level. Using max level.");
 			}
-			EmbedBuilder eb = new EmbedBuilder();
 			eb.setTitle(keyblade.name + " +" + KHUxBot.keybladeHandler.getAliasLevel(level));
 			for(int i=0; i<keyblade.slots.length-1; i++) {
 				Slot slot = keyblade.slots[i];
@@ -41,6 +60,11 @@ public class KeybladeCommand extends CommandBase {
 			Slot friend = keyblade.slots[keyblade.slots.length-1];
 			eb.addField("Friend Slot", ""+friend.getTypeMultipler(level), true);
 			eb.setFooter("All Keyblade information received from khuxtracker.com. Visit the website for more specific information.");
+			eb.setColor(Color.green);
+			message.reply("", eb);
+		}else {
+			eb.setColor(Color.red);
+			eb.setDescription("I could not find that Keyblade.");
 			message.reply("", eb);
 		}
 	}
