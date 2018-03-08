@@ -55,10 +55,22 @@ public class KeybladeCommand extends CommandBase {
 			eb.setTitle(keyblade.name + " +" + KHUxBot.keybladeHandler.getAliasLevel(level));
 			for(int i=0; i<keyblade.slots.length-1; i++) {
 				Slot slot = keyblade.slots[i];
-				eb.addField("Slot " + (i+1), slot.attr.name+"/"+slot.type.name+": " + slot.getAttrMultiplier(level) + "/" + slot.getTypeMultipler(level), true);
+				String value = "";
+				if(slot.slotActive > level) {
+					value = "**Locked**";
+				}else {
+					float attrMult = slot.getAttrMultiplier(level);
+					float typeMult = slot.getTypeMultiplier(level);
+					if(attrMult > 1) {
+						if(typeMult > 1) {
+							value = "**"+slot.type.name+"**/*"+slot.attr.name+"*: **" + typeMult + "**/*" + attrMult + "*";
+						}else value = "*"+slot.attr.name+"*: *"+attrMult+"*";
+					}else value = "*No boost*";
+				}
+				eb.addField("Slot " + (i+1), value, true);
 			}
 			Slot friend = keyblade.slots[keyblade.slots.length-1];
-			eb.addField("Friend Slot", ""+friend.getTypeMultipler(level), true);
+			eb.addField("Friend Slot", ""+friend.getTypeMultiplier(level), true);
 			eb.setFooter("All Keyblade information received from khuxtracker.com. Visit the website for more specific information.");
 			eb.setColor(Color.green);
 			message.reply("", eb);
