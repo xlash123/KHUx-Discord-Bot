@@ -34,6 +34,7 @@ import xlash.bot.khux.commands.UnAdmin;
 import xlash.bot.khux.commands.UnionCrossCommand;
 import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.HelpCommand;
+import xlash.bot.khux.commands.KeybladeCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
 import xlash.bot.khux.commands.MedalJPCommand;
@@ -56,7 +57,7 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.6.5";
+	public static final String VERSION = "1.7.0";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -397,6 +398,7 @@ public class KHUxBot {
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new DefaultCommand());
 		commandHandler.registerCommand(new HelpCommand());
+		commandHandler.registerCommand(new KeybladeCommand());
 		commandHandler.registerCommand(new LuxCommand());
 		commandHandler.registerCommand(new MedalCommand());
 		commandHandler.registerCommand(new MedalNACommand());
@@ -496,7 +498,7 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Fixed Tier 8 medals not loading.");
+							eb.setDescription("Added !keyblade command for getting Keyblade slot multipliers.\nSome minor improvements.");
 							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
