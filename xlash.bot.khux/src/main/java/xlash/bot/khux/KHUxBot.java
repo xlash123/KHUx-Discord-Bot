@@ -129,7 +129,6 @@ public class KHUxBot {
 		api.setAutoReconnect(false);
 		commandHandler = new CommandHandler();
 		registerCommands();
-		
 		connect(api);
 		System.out.println("Bot setup complete! Connecting to servers...");
 	}
@@ -503,6 +502,7 @@ public class KHUxBot {
 						}
 					}
 				}
+				api.setGame("!help for commands");
 			}
 
 			public void onFailure(Throwable t) {
