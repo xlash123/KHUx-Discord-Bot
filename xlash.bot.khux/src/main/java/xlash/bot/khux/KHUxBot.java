@@ -320,6 +320,7 @@ public class KHUxBot {
 						return t.dead;
 					}
 				});
+				keybladeHandler.updateKeybladeData();
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Reminders", true, 1) {
@@ -502,7 +503,7 @@ public class KHUxBot {
 						}
 					}
 				}
-				api.setGame("!help for commands");
+				api.setGame("Type !help for commands");
 			}
 
 			public void onFailure(Throwable t) {
