@@ -27,7 +27,7 @@ public class KeybladeHandler {
 	/**
 	 * Updates all the Keyblade settings from khuxtracker
 	 */
-	public void updateKeybladeData() {
+	public synchronized void updateKeybladeData() {
 		try {
 			HttpsURLConnection site = (HttpsURLConnection) new URL("https://khuxtracker.com/js/static.js").openConnection();
 			StringBuilder sb = new StringBuilder();
@@ -79,6 +79,7 @@ public class KeybladeHandler {
 			}
 			String levelAliasesString = allTheData.substring(index-1, endIndex+1);
 			JsonArray levelAliasesArray = parser.parse(levelAliasesString).getAsJsonObject().get("level").getAsJsonArray();
+			this.levelAliases.clear();
 			for(int i=0; i<levelAliasesArray.size(); i++) {
 				this.levelAliases.add(levelAliasesArray.get(i).getAsFloat());
 			}
