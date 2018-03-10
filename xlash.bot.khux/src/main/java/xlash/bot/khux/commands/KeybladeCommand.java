@@ -52,6 +52,9 @@ public class KeybladeCommand extends CommandBase {
 			}catch (NumberFormatException e) {
 				System.out.println("Error when parsing level. Using max level.");
 			}
+			if(level > keyblade.getMaxLevel()) {
+				level = keyblade.getMaxLevel();
+			}else if(level < 0) level = 0;
 			eb.setTitle(keyblade.name + " +" + KHUxBot.keybladeHandler.getAliasLevel(level));
 			for(int i=0; i<keyblade.slots.length-1; i++) {
 				Slot slot = keyblade.slots[i];
