@@ -22,6 +22,8 @@ public abstract class CommandBase{
 		for(String s : this.getAliases()) {
 			aliases += s + ", ";
 		}
+		aliases = aliases.substring(0, aliases.length()-2);
+		System.out.println(aliases);
 		return aliases;
 	}
 	
