@@ -34,6 +34,7 @@ import xlash.bot.khux.commands.UnAdmin;
 import xlash.bot.khux.commands.UnionCrossCommand;
 import xlash.bot.khux.commands.DefaultCommand;
 import xlash.bot.khux.commands.HelpCommand;
+import xlash.bot.khux.commands.KeybladeCommand;
 import xlash.bot.khux.commands.LuxCommand;
 import xlash.bot.khux.commands.MedalCommand;
 import xlash.bot.khux.commands.MedalJPCommand;
@@ -42,6 +43,7 @@ import xlash.bot.khux.commands.SaltCommand;
 import xlash.bot.khux.commands.TweetCommand;
 import xlash.bot.khux.config.BotConfig;
 import xlash.bot.khux.config.ServerConfig;
+import xlash.bot.khux.keyblades.KeybladeHandler;
 import xlash.bot.khux.medals.MedalHandler;
 import xlash.bot.khux.sheduler.Event;
 import xlash.bot.khux.sheduler.Scheduler;
@@ -55,7 +57,7 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.6.5";
+	public static final String VERSION = "1.7.0";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -66,6 +68,8 @@ public class KHUxBot {
 	public static TwitterHandler twitterHandler;
 	/** Instance of the command handler*/
 	public static CommandHandler commandHandler;
+	/** Instance of the keyblade handler*/
+	public static KeybladeHandler keybladeHandler;
 	/** Instance of the bot config*/
 	public static BotConfig botConfig;
 	/** The list of config files of connected servers*/
@@ -125,7 +129,6 @@ public class KHUxBot {
 		api.setAutoReconnect(false);
 		commandHandler = new CommandHandler();
 		registerCommands();
-		
 		connect(api);
 		System.out.println("Bot setup complete! Connecting to servers...");
 	}
@@ -150,6 +153,7 @@ public class KHUxBot {
 		System.out.println("Initializing...");
 		medalHandler = new MedalHandler();
 		twitterHandler = new TwitterHandler();
+		keybladeHandler = new KeybladeHandler();
 		scheduler = new Scheduler();
 		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, BonusTimes.doubleLuxStartNA){
 			@Override
@@ -316,6 +320,7 @@ public class KHUxBot {
 						return t.dead;
 					}
 				});
+				keybladeHandler.updateKeybladeData();
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Reminders", true, 1) {
@@ -393,6 +398,7 @@ public class KHUxBot {
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new DefaultCommand());
 		commandHandler.registerCommand(new HelpCommand());
+		commandHandler.registerCommand(new KeybladeCommand());
 		commandHandler.registerCommand(new LuxCommand());
 		commandHandler.registerCommand(new MedalCommand());
 		commandHandler.registerCommand(new MedalNACommand());
@@ -492,11 +498,12 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Fixed Tier 8 medals not loading.");
+							eb.setDescription("Added !keyblade command for getting Keyblade slot multipliers.\nChanged !config to be able to change !lux and !ux reminder messages.\nMinor improvements to !help.");
 							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
 				}
+				api.setGame("Type !help for commands");
 			}
 
 			public void onFailure(Throwable t) {

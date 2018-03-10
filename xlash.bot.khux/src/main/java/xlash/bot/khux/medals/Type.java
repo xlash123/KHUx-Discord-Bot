@@ -7,7 +7,7 @@ package xlash.bot.khux.medals;
 public enum Type {
 	
 	UPRIGHT("Upright", 0),
-	REVERSED("Revered", 1);
+	REVERSED("Reverse", 1);
 	
 	public String name;
 	/**
@@ -23,6 +23,15 @@ public enum Type {
 	public static Type getFromId(int id) {
 		for(Type t : Type.class.getEnumConstants()) {
 			if(t.id == id) {
+				return t;
+			}
+		}
+		return null;
+	}
+	
+	public static Type getFromName(String name) {
+		for(Type t : Type.class.getEnumConstants()) {
+			if(t.name.equalsIgnoreCase(name)) {
 				return t;
 			}
 		}
