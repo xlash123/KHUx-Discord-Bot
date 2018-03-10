@@ -498,7 +498,7 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Added !keyblade command for getting Keyblade slot multipliers.\nSome minor improvements.");
+							eb.setDescription("Added !keyblade command for getting Keyblade slot multipliers.\nChanged !config to be able to change !lux and !ux reminder messages.\nMinor improvements to !help.");
 							server.getChannelById(channelId).sendMessage("", eb);
 						}
 					}
