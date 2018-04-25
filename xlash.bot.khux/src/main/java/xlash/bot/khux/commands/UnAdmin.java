@@ -72,4 +72,9 @@ public class UnAdmin extends CommandBase{
 		return "!unadmin @[user] @[another user]...";
 	}
 	
+	@Override
+	public boolean isServerOnly() {
+		return true;
+	}
+	
 }

@@ -68,7 +68,9 @@ public class CommandHandler {
 					if(argsString.equals(content)) argsString = "";
 					String[] argsArray = argsString.split(" ");
 					if(argsArray[0].isEmpty()) argsArray = new String[0];
-					com.onCommand(argsArray, message);
+					if(com.isServerOnly() && message.isPrivateMessage()) {
+						message.reply("Sorry, this command is for servers only.");
+					}else com.onCommand(argsArray, message);
 				}
 			}
 		}

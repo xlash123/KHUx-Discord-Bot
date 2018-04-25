@@ -68,5 +68,10 @@ public class AdminCommand extends CommandBase{
 	public String getUsage() {
 		return "!admin @[user] @[another user]...";
 	}
+	
+	@Override
+	public boolean isServerOnly() {
+		return true;
+	}
 
 }

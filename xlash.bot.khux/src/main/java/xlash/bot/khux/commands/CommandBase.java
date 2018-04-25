@@ -55,6 +55,14 @@ public abstract class CommandBase{
 	}
 	
 	/**
+	 * Returns if this command should only be used for servers and not DMs
+	 * @return true if the command should only be used for server
+	 */
+	public boolean isServerOnly() {
+		return false;
+	}
+	
+	/**
 	 * Returns the server config of the server from which the message was sent
 	 * @param message the user's message
 	 * @return server config
