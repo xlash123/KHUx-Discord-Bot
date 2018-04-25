@@ -91,7 +91,7 @@ public class KeybladeCommand extends CommandBase {
 
 	@Override
 	public String getUsage() {
-		return "!keyblade [keyblade name] [level]";
+		return "!keyblade [keyblade name] (level)";
 	}
 
 }
