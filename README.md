@@ -75,8 +75,18 @@ Let's face it. This game is pretty salty. Simply run `!salt` to let all servers 
 ### !config
 To reload the config data, use !config. This is helpful for loading the lux reminder message when edited.
 
+### !keyblade
+Use this to view the stats of any Keyblade at any level! It'll display all the slots available for that Keyblade, including its attribute, type, and each multiplier.
+
+`!keyblade [keyblade name] (level)`
+
+Omiting level will simply display the max level stats.
+
+### !help
+You can also view all of the commands and their usage by running !help.
 
 ## How to install
+If you choose not to let [my host](https://discordapp.com/oauth2/authorize?client_id=300117950457708560&scope=bot&permissions=0) join your server, you can run your own instance by doing the following:
 
 Download the [latest build](https://github.com/xlash123/KHUx-Discord-Bot/releases/) or build from the source (using Maven). Then either double click on the file (only for Windows) or run the following in terminal/cmd.
 `java -jar "[filepath]" run`
