@@ -60,7 +60,7 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.7.0";
+	public static final String VERSION = "1.7.1";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -532,8 +532,8 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Added !keyblade command for getting Keyblade slot multipliers.\nChanged !config to be able to change !lux and !ux reminder messages.\nMinor improvements to !help.");
-							server.getChannelById(channelId).sendMessage("", eb);
+							eb.setDescription("Potentially fixed issues with some servers not receiving timed notifications.");
+							sendMassive("", eb, server.getChannelById(channelId));
 						}
 					}
 				}
