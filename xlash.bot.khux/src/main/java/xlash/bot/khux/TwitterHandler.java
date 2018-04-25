@@ -29,22 +29,6 @@ public class TwitterHandler {
 	}
 
 	/**
-	 * Posts the newest Tweets to the channel specified in config.
-	 * 
-	 * @param api
-	 *            The api that sends the message.
-	 * @return boolean if something was sent.
-	 */
-	public boolean sendTwitterUpdate(Channel channel, ArrayList<Tweet> tweets, GameEnum game) {
-		for (Tweet tweet : tweets) {
-			if (tweet != null)
-				channel.sendMessage(tweet.getLink());
-		}
-
-		return tweets.size() > 0;
-	}
-
-	/**
 	 * Gets the new Tweets detected
 	 * 
 	 * @param game
