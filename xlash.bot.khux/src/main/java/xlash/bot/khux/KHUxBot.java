@@ -7,7 +7,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.function.Predicate;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,12 +21,14 @@ import de.btobastian.javacord.entities.Channel;
 import de.btobastian.javacord.entities.Server;
 import de.btobastian.javacord.entities.User;
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.MessageReceiver;
 import de.btobastian.javacord.entities.message.Reaction;
 import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import de.btobastian.javacord.listener.message.MessageCreateListener;
 import de.btobastian.javacord.listener.message.ReactionAddListener;
 import de.btobastian.javacord.listener.server.ServerJoinListener;
 import de.btobastian.javacord.listener.server.ServerLeaveListener;
+import de.btobastian.javacord.utils.ratelimits.RateLimitType;
 import xlash.bot.khux.TwitterHandler.Tweet;
 import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
@@ -145,6 +148,39 @@ public class KHUxBot {
 			serverConfigs.add(config);
 		}
 	}
+	
+	/**
+	 * Meant for sending many messages to many servers, checking rate limits along the way
+	 */
+	public static void sendMassive(String content, EmbedBuilder eb, MessageReceiver receiver) {
+		Future<Message> mesF = receiver.sendMessage(content, eb);
+		try {
+			//Getting will halt the thread until the message is sent. Also, if I hit a rate limit, it'll throw, and I'll wait and send again.
+			mesF.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			long rateLimit = 0;
+			if(receiver instanceof Channel) {
+				rateLimit = api.getRateLimitManager().getRateLimit(RateLimitType.SERVER_MESSAGE, null, (Channel) receiver);
+			}else if(receiver instanceof User) {
+				rateLimit = api.getRateLimitManager().getRateLimit(RateLimitType.PRIVATE_MESSAGE);
+			}else System.err.println("Like what the heck are you doing?");
+			if(rateLimit > 0) {
+				System.out.println("Hit rate limit on \"" +content + "\". Waiting " + rateLimit + "ms.");
+				try {
+					Thread.sleep(rateLimit);
+				} catch (InterruptedException ee) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				receiver.sendMessage(content, eb).get();
+			} catch (InterruptedException | ExecutionException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
 
 	/**
 	 * Initializes various components of the bot
@@ -163,7 +199,7 @@ public class KHUxBot {
 					if(!config.luxChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.luxChannelNA);
 						if(channel != null){
-							channel.sendMessage("NA: " + config.luxOnPrompt);
+							sendMassive("NA: " + config.luxOnPrompt, null, channel);
 						}
 					}
 				}
@@ -177,7 +213,7 @@ public class KHUxBot {
 					if(!config.luxChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.luxChannelNA);
 						if(channel != null){
-							channel.sendMessage("NA: " + config.luxOffPrompt);
+							sendMassive("NA: " + config.luxOffPrompt, null, channel);
 						}
 					}
 				}
@@ -191,7 +227,7 @@ public class KHUxBot {
 					if(!config.luxChannelJP.isEmpty()){
 						Channel channel = server.getChannelById(config.luxChannelJP);
 						if(channel != null){
-							channel.sendMessage("JP: " + config.luxOnPrompt);
+							sendMassive("JP: " + config.luxOnPrompt, null, channel);
 						}
 					}
 				}
@@ -205,7 +241,7 @@ public class KHUxBot {
 					if(!config.luxChannelJP.isEmpty()){
 						Channel channel = server.getChannelById(config.luxChannelJP);
 						if(channel != null){
-							channel.sendMessage("JP: " + config.luxOffPrompt);
+							sendMassive("JP: " + config.luxOffPrompt, null, channel);
 						}
 					}
 				}
@@ -219,7 +255,7 @@ public class KHUxBot {
 					if(!config.ucChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.ucChannelNA);
 						if(channel != null){
-							channel.sendMessage("NA: " + config.ucOnPrompt);
+							sendMassive("NA: " + config.ucOnPrompt, null, channel);
 						}
 					}
 				}
@@ -233,7 +269,7 @@ public class KHUxBot {
 					if(!config.ucChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.ucChannelNA);
 						if(channel != null){
-							channel.sendMessage("NA: " + config.ucOffPrompt);
+							sendMassive("NA: " + config.ucOffPrompt, null, channel);
 						}
 					}
 				}
@@ -247,7 +283,7 @@ public class KHUxBot {
 					if(!config.ucChannelJP.isEmpty()){
 						Channel channel = server.getChannelById(config.ucChannelJP);
 						if(channel != null){
-							channel.sendMessage("JP: " + config.ucOnPrompt);
+							sendMassive("JP: " + config.ucOnPrompt, null, channel);
 						}
 					}
 				}
@@ -261,7 +297,7 @@ public class KHUxBot {
 					if(!config.ucChannelJP.isEmpty()){
 						Channel channel = server.getChannelById(config.ucChannelJP);
 						if(channel != null){
-							channel.sendMessage("JP: " + config.ucOffPrompt);
+							sendMassive("JP: " + config.ucOffPrompt, null, channel);
 						}
 					}
 				}
@@ -277,7 +313,10 @@ public class KHUxBot {
 					if(!config.updateChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.updateChannelNA);
 						if(channel != null){
-							twitterHandler.sendTwitterUpdate(channel, tweets, GameEnum.NA);
+							for (Tweet tweet : tweets) {
+								if (tweet != null)
+									sendMassive(tweet.getLink(), null, channel);
+							}
 						}
 					}
 				}
@@ -293,7 +332,10 @@ public class KHUxBot {
 					if(!config.updateChannelNA.isEmpty()){
 						Channel channel = server.getChannelById(config.updateChannelJP);
 						if(channel != null){
-							twitterHandler.sendTwitterUpdate(channel, tweets, GameEnum.JP);
+							for (Tweet tweet : tweets) {
+								if (tweet != null)
+									sendMassive(tweet.getLink(), null, channel);
+							}
 						}
 					}
 				}
@@ -308,18 +350,7 @@ public class KHUxBot {
 		scheduler.addEvent(new Event("Daily", true, GameEnum.NA, "05:00:00"){
 			@Override
 			public void run() {
-				for(ActionMessage am : actionMessages) {
-					if(am.isExpired()) {
-						am.messageStored.delete();
-						am.kill();
-					}
-				}
-				actionMessages.removeIf(new Predicate<ActionMessage>() {
-					@Override
-					public boolean test(ActionMessage t) {
-						return t.dead;
-					}
-				});
+				actionMessages.removeIf(a -> a.isExpired());
 				keybladeHandler.updateKeybladeData();
 			}
 		});
@@ -334,14 +365,18 @@ public class KHUxBot {
 							if(!config.luxChannelNA.isEmpty()) {
 								if(config.luxRemind == luxTimeDifNA) {
 									Channel channel = api.getChannelById(config.luxChannelNA);
-									if(channel != null) channel.sendMessage("NA Reminder: Double lux in " + luxTimeDifNA + " minutes!");
+									if(channel != null) {
+										sendMassive("NA Reminder: Double lux in " + luxTimeDifNA + " minutes!", null, channel);
+									}
 								}
 							}
 						
 							if(!config.luxChannelJP.isEmpty()) {
 								if(config.luxRemind == luxTimeDifJP) {
 									Channel channel = api.getChannelById(config.luxChannelJP);
-									if(channel != null) channel.sendMessage("JP Reminder: Double lux in " + luxTimeDifJP + " minutes!");
+									if(channel != null) {
+										sendMassive("JP Reminder: Double lux in " + luxTimeDifJP + " minutes!", null, channel);
+									}
 								}
 							}
 						}
@@ -356,14 +391,18 @@ public class KHUxBot {
 							if(!config.ucChannelNA.isEmpty()) {
 								if(config.ucRemind == uxTimeDifNA) {
 									Channel channel = api.getChannelById(config.ucChannelNA);
-									if(channel != null) channel.sendMessage("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!");
+									if(channel != null) {
+										sendMassive("NA Reminder: Union Cross in " + uxTimeDifNA + " minutes!", null, channel);
+									}
 								}
 							}
 						
 							if(!config.ucChannelJP.isEmpty()) {
 								if(config.ucRemind == uxTimeDifJP) {
 									Channel channel = api.getChannelById(config.ucChannelJP);
-									if(channel != null) channel.sendMessage("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!");
+									if(channel != null) {
+										sendMassive("JP Reminder: Union Cross in " + uxTimeDifJP + " minutes!", null, channel);
+									}
 								}
 							}
 						}
@@ -442,12 +481,7 @@ public class KHUxBot {
 									am.kill();
 								}
 							}
-							actionMessages.removeIf(new Predicate<ActionMessage>() {
-								@Override
-								public boolean test(ActionMessage t) {
-									return t.dead;
-								}
-							});
+							actionMessages.removeIf(a -> a.dead);
 						}
 					}
 				});
