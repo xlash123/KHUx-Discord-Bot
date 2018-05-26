@@ -15,9 +15,18 @@ import com.google.gson.JsonParser;
 
 public class KeybladeHandler {
 	
+	/**
+	 * A list of all the Keyblades in the game
+	 */
 	public ArrayList<Keyblade> keyblades;
+	/**
+	 * A list used to convert the integer level into the decimal level.
+	 */
 	public ArrayList<Float> levelAliases;
 	
+	/**
+	 * Handles anything and everything to do with Keyblade data
+	 */
 	public KeybladeHandler() {
 		this.keyblades = new ArrayList<>();
 		this.levelAliases = new ArrayList<>();
@@ -88,6 +97,11 @@ public class KeybladeHandler {
 		}
 	}
 	
+	/**
+	 * Gets the Keyblade with the specified name
+	 * @param name
+	 * @return The Keyblade, or null if not found
+	 */
 	public Keyblade getKeyblade(String name) {
 		for(Keyblade keyblade : keyblades) {
 			if(keyblade.name.equalsIgnoreCase(name)) {
@@ -97,10 +111,20 @@ public class KeybladeHandler {
 		return null;
 	}
 	
+	/**
+	 * Gets the Keyblade of specified id, e.g. 0 -> Starlight
+	 * @param id
+	 * @return
+	 */
 	public Keyblade getKeyblade(int id) {
 		return this.keyblades.get(id);
 	}
 	
+	/**
+	 * Returns the integer level given the user visible level
+	 * @param level
+	 * @return The integer level
+	 */
 	public int getRealLevel(float level) {
 		for(int i=0; i<levelAliases.size(); i++) {
 			if(levelAliases.get(i)==level) {
@@ -110,6 +134,11 @@ public class KeybladeHandler {
 		return levelAliases.size()-1;
 	}
 	
+	/**
+	 * Returns the user visible level given its integer level
+	 * @param level
+	 * @return The user visible level
+	 */
 	public float getAliasLevel(int level) {
 		if(level >= 0 && level < levelAliases.size()) {
 			return levelAliases.get(level);

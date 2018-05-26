@@ -14,6 +14,23 @@ public class Medal {
 	public int strength, gauges;
 	public Target target;
 	
+	/**
+	 * An object representing a medal of specified data
+	 * @param mid
+	 * @param name
+	 * @param special
+	 * @param type
+	 * @param attribute
+	 * @param tier
+	 * @param baseLow
+	 * @param baseHigh
+	 * @param maxLow
+	 * @param maxHigh
+	 * @param strength
+	 * @param gauges
+	 * @param target
+	 * @param img
+	 */
 	public Medal(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int target, String img) {
 		this.mid = mid;
 		this.name = name;

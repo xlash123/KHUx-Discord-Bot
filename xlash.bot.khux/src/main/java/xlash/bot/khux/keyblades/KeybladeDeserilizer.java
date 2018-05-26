@@ -15,6 +15,9 @@ import xlash.bot.khux.medals.Attribute;
 public class KeybladeDeserilizer implements JsonDeserializer<Keyblade>{
 
 	@Override
+	/**
+	 * Converts Json into a Java Keyblade object
+	 */
 	public Keyblade deserialize(JsonElement json, Type typeAsT, JsonDeserializationContext context) throws JsonParseException {
 		String name;
 		Slot[] slots = new Slot[6];
@@ -50,6 +53,11 @@ public class KeybladeDeserilizer implements JsonDeserializer<Keyblade>{
 		return new Keyblade(name, slots);
 	}
 	
+	/**
+	 * Reads through the given object as an object or an array as necessary to determine multipliers at each level.
+	 * @param o
+	 * @param multipliers
+	 */
 	private void parseForLevel(JsonObject o, ArrayList<Float> multipliers) {
 		if(o.get("level").isJsonArray()) {
 			JsonArray levels = o.getAsJsonArray("level");

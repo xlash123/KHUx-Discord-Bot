@@ -15,11 +15,22 @@ public class BotConfig {
 	
 	public static final String FILE_NAME = System.getProperty("user.dir") + "/khuxbot config/config.properties";
 	
+	/**
+	 * A unique and secret token id used for impersonating this program as a bot user.
+	 */
 	public String botToken;
-	//Used to see if the bot was updated since last run
+	/**
+	 * Used to determine if this bot instance is out of date.
+	 */
 	public String version;
+	/**
+	 * A global counter of how salty we all are
+	 */
 	public int saltCount;
 	
+	/**
+	 * Stores information pertaining to the entire bot.
+	 */
 	public BotConfig(){
 		init();
 		File file = new File(FILE_NAME);

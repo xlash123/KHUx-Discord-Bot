@@ -10,7 +10,7 @@ import de.btobastian.javacord.entities.User;
 public class UserUtil {
 	
 	/**
-	 * Gets the nickname of a user
+	 * Gets the on-screen name of a user, typically the nickname
 	 * @param u the user
 	 * @param s the user's server
 	 * @return the user's nickname

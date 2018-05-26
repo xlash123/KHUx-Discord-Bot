@@ -232,7 +232,7 @@ public class Scheduler {
 				if(e.enabled && time.equals(currentTime)){
 					System.out.println("Running " + e.getName());
 					try{
-						e.run();
+						e.run(currentTime);
 						System.out.println("Passed " + e.getName());
 					}catch(Exception e1){
 						System.err.println("Error occured while running event: " + e.getName());
