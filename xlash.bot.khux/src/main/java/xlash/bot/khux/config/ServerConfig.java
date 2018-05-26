@@ -22,20 +22,16 @@ public class ServerConfig {
 	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/";
 	public final String fileName;
 	
-	public volatile String updateChannelNA;
-	public volatile String updateChannelJP;
-	public volatile String luxChannelNA;
-	public volatile String luxChannelJP;
-	public volatile String raidChannelNA;
-	public volatile String raidChannelJP;
-	public volatile String ucChannelNA;
-	public volatile String ucChannelJP;
+	public volatile String updateChannelNA, updateChannelJP;
+	public volatile String luxChannelNA, luxChannelJP;
+	public volatile String raidChannelNA, raidChannelJP;
+	public volatile String ucChannelNA, ucChannelJP;
 	public volatile GameEnum defaultGame;
+	public volatile int luxSelectionsNA, luxSelectionsJP;
+	public volatile int ucSelectionsNA, ucSelectionsJP;
 	
-	public volatile String luxOnPrompt;
-	public volatile String luxOffPrompt;
-	public volatile String ucOnPrompt;
-	public volatile String ucOffPrompt;
+	public volatile String luxOnPrompt, luxOffPrompt;
+	public volatile String ucOnPrompt, ucOffPrompt;
 	public volatile int luxRemind;
 	public volatile int raidRemind;
 	public volatile int ucRemind;
@@ -81,6 +77,9 @@ public class ServerConfig {
 		this(server.getId());
 	}
 	
+	/**
+	 * Ensures that no variable is null
+	 */
 	public void init(){
 		if(updateChannelNA == null) updateChannelNA = "";
 		if(updateChannelJP == null) updateChannelJP = "";
@@ -98,6 +97,10 @@ public class ServerConfig {
 		if(admins == null) admins = new ArrayList<String>();
 	}
 	
+	/**
+	 * Used for when dealing with DMs
+	 * @return
+	 */
 	public static ServerConfig getBlank() {
 		return new ServerConfig();
 	}
@@ -123,16 +126,17 @@ public class ServerConfig {
 			this.ucOffPrompt = p.getProperty("UC_Off_Prompt");
 			String adminsString = p.getProperty("Bot_Admins");
 			if(adminsString != null) this.admins.addAll(Arrays.asList(adminsString.split(",")));
-			String luxRemindString = p.getProperty("Lux_Remind");
-			if(luxRemindString != null) this.luxRemind = Integer.parseInt(luxRemindString);
+			this.luxRemind = stringToInt(p.getProperty("Lux_Remind"));
 			this.ucChannelNA = p.getProperty("UC_Channel_NA");
 			this.ucChannelJP = p.getProperty("UC_Channel_JP");
 			this.raidChannelNA = p.getProperty("Raid_Channel_NA");
 			this.raidChannelJP = p.getProperty("Raid_Channel_JP");
-			String ucRemindString = p.getProperty("UC_Remind");
-			if(ucRemindString != null) this.ucRemind = Integer.parseInt(ucRemindString);
-			String raidRemindString = p.getProperty("Raid_Remind");
-			if(raidRemindString != null) this.raidRemind = Integer.parseInt(raidRemindString);
+			this.ucRemind = stringToInt(p.getProperty("UC_Remind"));
+			this.raidRemind = stringToInt(p.getProperty("Raid_Remind"));
+			this.luxSelectionsNA = stringToInt(p.getProperty("Lux_Selections_NA"));
+			this.luxSelectionsJP = stringToInt(p.getProperty("Lux_Selections_JP"));
+			this.ucSelectionsNA = stringToInt(p.getProperty("UC_Selections_NA"));
+			this.ucSelectionsJP = stringToInt(p.getProperty("UC_Selections_JP"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -143,6 +147,26 @@ public class ServerConfig {
 		init();
 	}
 	
+	/**
+	 * Easy way to safely convert Strings to integers
+	 * @param field
+	 * @return Integer.parseInt() or 0 if null or on exception
+	 */
+	public int stringToInt(String field) {
+		try {
+			if(field != null) {
+				return Integer.parseInt(field);
+			}
+		}catch (NumberFormatException e) {
+		}
+		return 0;
+	}
+	
+	/**
+	 * Gets the data stored in the specified field on the written copy of the config.
+	 * @param prop
+	 * @return
+	 */
 	public String getConfig(String prop) { 
 		FileInputStream in;
 		try {
@@ -180,12 +204,19 @@ public class ServerConfig {
 		p.setProperty("Raid_Channel_JP", raidChannelJP);
 		p.setProperty("UC_Remind", ""+ucRemind);
 		p.setProperty("Raid_Remind", ""+raidRemind);
+		//Admins saved in comma separated list
 		String toSave = "";
 		for(int i=0; i<admins.size(); i++){
 			toSave += admins.get(i)+",";
 		}
 		if(toSave.length()>0) toSave = toSave.substring(0, toSave.length()-1);
 		p.setProperty("Bot_Admins", toSave);
+		//End of admin saving
+		p.setProperty("Lux_Selections_NA", ""+luxSelectionsNA);
+		p.setProperty("Lux_Selections_JP", ""+luxSelectionsJP);
+		p.setProperty("UC_Selections_NA", ""+ucSelectionsNA);
+		p.setProperty("UC_Selections_JP", ""+ucSelectionsJP);
+		
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(fileName));
@@ -197,6 +228,11 @@ public class ServerConfig {
 		}
 	}
 	
+	/**
+	 * Puts the specified value into the specified field and saves it to the written copy of the config
+	 * @param prop
+	 * @param value
+	 */
 	public void putConfig(String prop, String value) {
 		FileInputStream in;
 		try {
