@@ -22,23 +22,25 @@ public class UnAdmin extends CommandBase{
 			this.printDescriptionUsage(message);
 			return;
 		}
-		if(args[0].equalsIgnoreCase("@everyone")){
-			message.reply("No");
-			return;
+		for(String arg : args) {
+			if(arg.equalsIgnoreCase("@everyone")) {
+				message.reply("That's a bad idea.");
+				return;
+			}
 		}
 		ServerConfig config = this.getServerConfig(message);
 		String unAdmins = "";
 		int iterations = 0;
 		for(User u : message.getMentions()){
-			if(!config.admins.contains(u.getId())){
+			if(config.admins.contains(u.getId())){
 				if(config.admins.size()<=1){
 					message.reply("You must have at least one admin. " + UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + " will remain admin.");
 					return;
 				}
-				config.admins.add(u.getId());
+				config.admins.remove(u.getId());
+				unAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
+				iterations++;
 			}
-			unAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
-			iterations++;
 		}
 		if(!unAdmins.isEmpty()){
 			unAdmins = unAdmins.substring(0, unAdmins.length()-2);
@@ -47,14 +49,13 @@ public class UnAdmin extends CommandBase{
 				unAdmins = unAdmins.replaceAll(",", "");
 				unAdmins = unAdmins.substring(4);
 			}
-		}
-		if(iterations > 1) message.reply(unAdmins + " are no longer admins.");
-		else message.reply(unAdmins + " is no longer an admin.");
-		if(iterations > 0){
-			config.saveConfig();
-			return;
-		}
-		message.reply("Unknown user(s). You must @mention real users on this server.");
+			if(iterations > 1) message.reply(unAdmins + " are no longer admins.");
+			else message.reply(unAdmins + " is no longer an admin.");
+			if(iterations > 0){
+				config.saveConfig();
+				return;
+			}
+		}else message.reply("No people have lost admin privileges.");
 	}
 
 	@Override
