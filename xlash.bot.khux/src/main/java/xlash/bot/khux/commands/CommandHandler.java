@@ -10,6 +10,7 @@ import de.btobastian.javacord.entities.permissions.PermissionType;
 import de.btobastian.javacord.entities.permissions.Role;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
+import xlash.bot.khux.util.PermissionsUtil;
 
 /**
  * Handles message execution and storage
@@ -43,6 +44,11 @@ public class CommandHandler {
 		for(CommandBase com : commands){
 			for(String alias : com.getAliases()){
 				if(alias.equalsIgnoreCase(parts[0])){
+					//Currently hasPermission doesn't work
+//					if(PermissionsUtil.hasPermission(PermissionType.SEND_MESSAGES, message.getChannelReceiver().getServer(), message.getChannelReceiver(), KHUxBot.api.getYourself())) {
+//						message.getAuthor().sendMessage("I do not have permission to send messages in #"+message.getChannelReceiver().getName()+". Please get your server admin to enable this.");
+//						return;
+//					}
 					if(com.isAdmin()){
 						User user = message.getAuthor();
 						boolean admin = false;
@@ -53,10 +59,13 @@ public class CommandHandler {
 								break;
 							}
 						}
-						Collection<Role> roles = user.getRoles(message.getChannelReceiver().getServer());
-						for(Role r : roles){
-							if(r.getPermissions().getState(PermissionType.ADMINISTRATOR)==PermissionState.ALLOWED){
-								admin = true;
+						if(!admin) {
+							Collection<Role> roles = user.getRoles(message.getChannelReceiver().getServer());
+							for(Role r : roles){
+								//This works, so if anyone tries to say otherwise, they're high
+								if(r.getPermissions().getState(PermissionType.ADMINISTRATOR)==PermissionState.ALLOWED){
+									admin = true;
+								}
 							}
 						}
 						if(!admin){
