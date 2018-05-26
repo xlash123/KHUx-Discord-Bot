@@ -1,6 +1,13 @@
 package xlash.bot.khux.commands;
 
+import java.util.concurrent.ExecutionException;
+
+import com.vdurmont.emoji.EmojiManager;
+
 import de.btobastian.javacord.entities.message.Message;
+import de.btobastian.javacord.entities.message.Reaction;
+import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
@@ -33,51 +40,44 @@ public class LuxCommand extends CommandBase{
 		}
 		switch(args[0]){
 		case "on":
-			if(game==GameEnum.NA){
-				if(!config.luxChannelNA.isEmpty()){
-					message.reply("NA Lux reminders are already on.");
-					return;
-				}
-				config.luxChannelNA = message.getChannelReceiver().getId();
-			}else{
-				if(!config.luxChannelJP.isEmpty()){
-					message.reply("JP Lux reminders are already on.");
-					return;
-				}
-				config.luxChannelJP = message.getChannelReceiver().getId();
-			}
-			message.reply("Double lux reminders for " + game + " have been turned on.");
+			createTimesPrompt(message, config, game);
 			break;
 		case "off":
-			if(game==GameEnum.NA){
-				if(config.luxChannelNA.isEmpty()){
-					message.reply("NA Lux reminders are already off.");
-					return;
-				}
-				config.luxChannelNA = "";
-			}else{
-				if(config.luxChannelJP.isEmpty()){
-					message.reply("JP Lux reminders are already off.");
-					return;
-				}
-				config.luxChannelJP = "";
-			}
-			message.reply("Double lux reminders for " + game + " have been turned off.");
+			setTimes(message, config, game, false, false, false, false);
     		break;
 		case "status":
-			if (!config.luxChannelNA.isEmpty())
+			boolean[] timesNA = getTimes(config, GameEnum.NA);
+			boolean[] timesJP = getTimes(config, GameEnum.JP);
+			String strTimesNA = "";
+			String strTimesJP = "";
+			for(int i=0; i<4; i++) {
+				if(timesNA[i]) strTimesNA += BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartNA[i]) + ", ";
+			}
+			for(int i=0; i<2; i++) {
+				if(timesJP[i]) strTimesJP += BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartJP[i]) + ", ";
+			}
+			if (!config.luxChannelNA.isEmpty()) {
+				strTimesNA = strTimesNA.substring(0, strTimesNA.length()-2);
 				message.reply("Double lux reminders for NA are set for channel: #"
-						+ KHUxBot.api.getChannelById(config.luxChannelNA).getName());
+						+ KHUxBot.api.getChannelById(config.luxChannelNA).getName()+"\n"+
+						"The registered times for NA are " + strTimesNA + ".");
+			}
 			else
 				message.reply("Double lux reminders for NA are currently turned off.");
-			if (!config.luxChannelJP.isEmpty())
+			if (!config.luxChannelJP.isEmpty()) {
+				strTimesJP = strTimesJP.substring(0, strTimesJP.length()-2);
 				message.reply("Double lux reminders for JP are set for channel: #"
-						+ KHUxBot.api.getChannelById(config.luxChannelJP).getName());
+						+ KHUxBot.api.getChannelById(config.luxChannelJP).getName()+"\n"+
+						"The registered times for JP are " + strTimesJP + ".");
+			}
 			else
 				message.reply("Double lux reminders for JP are currently turned off.");
 			return;
 		case "check":
-			int nextTime = BonusTimes.luxTimeDifference(game);
+			int nextTime;
+			if(isEnabled(config, game)) {
+				nextTime = BonusTimes.luxTimeDifference(game, getTimes(config, game));
+			}else nextTime = BonusTimes.luxTimeDifference(game);
 			int mins = nextTime%60;
 			int hours = nextTime/60;
 			String timeS = "";
@@ -88,7 +88,7 @@ public class LuxCommand extends CommandBase{
 			if(mins > 0) timeS += mins + " minutes ";
 			if(timeS.isEmpty()) {
 				message.reply("Double lux for " + game.name() + " just went active!");
-			}else message.reply("There are " + timeS + " until double lux is active for " + game.name() + ".");
+			}else message.reply("There are " + timeS + "until double lux is active for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {
@@ -112,6 +112,100 @@ public class LuxCommand extends CommandBase{
 				return;
 		}
 		config.saveConfig();
+	}
+	
+	public void setTimes(Message message, ServerConfig config, GameEnum game, boolean time0, boolean time1, boolean time2, boolean time3) {
+		boolean[] times = new boolean[] {time0, time1, time2, time3};
+		//Store all of these booleans as a single integer
+		int selections = (time0 ? 1 : 0) | (time1 ? 1<<1 : 0) | (time2 ? 1<<2 : 0) | (time3 ? 1<<3 : 0);
+		if(game==GameEnum.NA) {
+			config.luxSelectionsNA = selections;
+			config.luxChannelNA = config.luxSelectionsNA > 0 ? message.getChannelReceiver().getId() : "";
+		}else {
+			config.luxSelectionsJP = selections;
+			config.luxChannelJP = config.luxSelectionsJP > 0 ? message.getChannelReceiver().getId() : "";
+		}
+		if(selections>0) {
+			String strTimes = "";
+			if(game==GameEnum.NA) {
+				for(int i=0; i<4; i++) {
+					if(times[i]) strTimes += BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartNA[i]) + ", ";
+				}
+			}else {
+				for(int i=0; i<2; i++) {
+					if(times[i]) strTimes += BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartJP[i]) + ", ";
+				}
+			}
+			strTimes = strTimes.substring(0, strTimes.length()-2);
+			message.reply("The registered Lux times for " + game + " are: " + strTimes + ".");
+		}else message.reply("Lux reminders for " + game + " have been turned off.");
+		config.saveConfig();
+	}
+	
+	public static boolean[] getTimes(ServerConfig config, GameEnum game) {
+		int selections = 0;
+		if(game==GameEnum.NA) {
+			selections = config.luxSelectionsNA;
+		}else {
+			selections = config.luxSelectionsJP;
+		}
+		//Reverting the stored booleans from the binary of the integer
+		return new boolean[] {(selections & 1) > 0, (selections & (1<<1)) > 0, (selections & (1<<2)) > 0, (selections & (1<<3)) > 0};
+	}
+	
+	public void createTimesPrompt(Message message, ServerConfig config, GameEnum game) {
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.setTitle("Set Times for Raids");
+		String[] emojis = new String[] {EmojiManager.getForAlias("one").getUnicode(), EmojiManager.getForAlias("two").getUnicode(), EmojiManager.getForAlias("three").getUnicode(), EmojiManager.getForAlias("four").getUnicode()};
+		String check = EmojiManager.getForAlias("white_check_mark").getUnicode();
+		if(game==GameEnum.NA) {
+			eb.setDescription("Select which times you want (Pacific Time), then click " + check);
+			for(int i=0; i<4; i++) {
+				eb.addField(emojis[i], BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartNA[i]), true);
+			}
+		}else {
+			eb.setDescription("Select which times you want (Japan Time), then click " + check);
+			for(int i=0; i<2; i++) {
+				eb.addField(emojis[i], BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartJP[i]), true);
+			}
+		}
+		try {
+			Message futureMessage = message.reply("", eb).get();
+			int iterations = game==GameEnum.NA ? 4 : 2;
+			for(int i=0; i<iterations; i++) {
+				futureMessage.addUnicodeReaction(emojis[i]);
+				Thread.sleep(350);
+			}
+			futureMessage.addUnicodeReaction(check);
+			Thread.sleep(350);
+			KHUxBot.actionMessages.add(new ActionMessage(futureMessage) {
+				@Override
+				public void run(Reaction reaction) {
+					Message messageStored = KHUxBot.api.getMessageById(this.messageId);
+					int size = messageStored.getReactions().size()-1;
+					int[] counts = new int[4];
+					for(int i=0; i<size; i++) {
+						counts[i] = messageStored.getReactions().get(i).getCount()-1;
+					}
+					futureMessage.delete();
+					setTimes(message, config, game, counts[0]>0, counts[1]>0, counts[2]>0, counts[3]>0);
+				}
+				@Override
+				public boolean test() {
+					Message messageStored = KHUxBot.api.getMessageById(this.messageId);
+					int size = messageStored.getReactions().size();
+					return messageStored.getReactions().get(size-1).getCount()>1;
+				}
+			});
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isEnabled(ServerConfig config, GameEnum game) {
+		if(game==GameEnum.NA) {
+			return !config.luxChannelNA.isEmpty();
+		}else return !config.luxChannelJP.isEmpty();
 	}
 
 	@Override
