@@ -11,11 +11,18 @@ import de.btobastian.javacord.entities.message.Reaction;
  */
 public abstract class ActionMessage {
 	
-	public Message messageStored;
+	/**
+	 * The id of the message to which this pertains. Call using the api.
+	 */
+	public String messageId;
 	public boolean dead;
 	
+	/**
+	 * Runs the run method on the specified message when any reaction emoji surpasses 1 and the optional test method returns true.
+	 * @param message
+	 */
 	public ActionMessage(Message message) {
-		this.messageStored = message;
+		this.messageId = message.getId();
 	}
 
 	/**
@@ -29,7 +36,7 @@ public abstract class ActionMessage {
 	 * @return if the message is expired
 	 */
 	public boolean isExpired() {
-		return new Date().getTime()-messageStored.getCreationDate().getTimeInMillis()>=3600000;
+		return new Date().getTime()-KHUxBot.api.getMessageById(messageId).getCreationDate().getTimeInMillis()>=3600000;
 	}
 	
 	/**
@@ -38,7 +45,15 @@ public abstract class ActionMessage {
 	 * @return if the messages are the same
 	 */
 	public boolean isSameMessage(Message message) {
-		return this.messageStored.getId().equals(message.getId());
+		return this.messageId.equals(message.getId());
+	}
+	
+	/**
+	 * Override to conditionally run this action
+	 * @return should the action run
+	 */
+	public boolean test() {
+		return true;
 	}
 	
 	/**
