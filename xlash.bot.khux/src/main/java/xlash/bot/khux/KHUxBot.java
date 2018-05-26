@@ -61,6 +61,7 @@ import xlash.bot.khux.util.BonusTimes;
 public class KHUxBot {
 
 	public static final String VERSION = "1.8.0";
+	public static final String CHANGELOG = "Lux and UC reminders are now selectable, so you can set at which time they go off. Simply use !lux on or !uc on and you will be prompted with a selection menu.\nFixed issue with saving bot admin config.\nAdded !admin list to view current registered bot admins.";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -562,7 +563,7 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Lux and UC reminders are now selectable, so you can set at which time they go off.\nFixed issue with saving bot admin config.\nAdded !admin list to view current registered bot admins.");
+							eb.setDescription(CHANGELOG);
 							sendMassive("", eb, server.getChannelById(channelId));
 						}
 					}
