@@ -60,8 +60,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.8.0";
-	public static final String CHANGELOG = "Lux and UC reminders are now selectable, so you can set at which time they go off. Simply use !lux on or !uc on and you will be prompted with a selection menu.\nFixed issue with saving bot admin config.\nAdded !admin list to view current registered bot admins.";
+	public static final String VERSION = "1.8.1";
+	public static final String CHANGELOG = "Fixed issue with the 5th UC time going off when the 4th time is selected. You'll need to reconfigure !uc on to fix this.";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
