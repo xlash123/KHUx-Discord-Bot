@@ -56,7 +56,7 @@ public class UnionCrossCommand extends CommandBase{
 			for(int i=0; i<2; i++) {
 				if(timesJP[i]) strTimesJP += BonusTimes.getTimeLocalized(BonusTimes.uxBonusStartJP[i]) + ", ";
 			}
-			if (!config.ucChannelNA.isEmpty()) {
+			if (!config.ucChannelNA.isEmpty() && !strTimesNA.isEmpty()) {
 				strTimesNA = strTimesNA.substring(0, strTimesNA.length()-2);
 				message.reply("UC reminders for NA are set for channel: #"
 						+ KHUxBot.api.getChannelById(config.ucChannelNA).getName()+"\n"+
@@ -64,7 +64,7 @@ public class UnionCrossCommand extends CommandBase{
 			}
 			else
 				message.reply("UC reminders for NA are currently turned off.");
-			if (!config.ucChannelJP.isEmpty()) {
+			if (!config.ucChannelJP.isEmpty() && strTimesJP.isEmpty()) {
 				strTimesJP = strTimesJP.substring(0, strTimesJP.length()-2);
 				message.reply("UC reminders for JP are set for channel: #"
 						+ KHUxBot.api.getChannelById(config.ucChannelJP).getName()+"\n"+
@@ -202,9 +202,16 @@ public class UnionCrossCommand extends CommandBase{
 	}
 	
 	public boolean isEnabled(ServerConfig config, GameEnum game) {
+		boolean hasTimes = false;
+		for(boolean b : getTimes(config, game)) {
+			if(b) {
+				hasTimes = true;
+				break;
+			}
+		}
 		if(game==GameEnum.NA) {
-			return !config.ucChannelNA.isEmpty();
-		}else return !config.ucChannelJP.isEmpty();
+			return !config.ucChannelNA.isEmpty() && hasTimes;
+		}else return !config.ucChannelJP.isEmpty() && hasTimes;
 	}
 
 	@Override

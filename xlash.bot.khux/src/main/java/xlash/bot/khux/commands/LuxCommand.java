@@ -56,7 +56,7 @@ public class LuxCommand extends CommandBase{
 			for(int i=0; i<2; i++) {
 				if(timesJP[i]) strTimesJP += BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartJP[i]) + ", ";
 			}
-			if (!config.luxChannelNA.isEmpty()) {
+			if (!config.luxChannelNA.isEmpty() && !strTimesNA.isEmpty()) {
 				strTimesNA = strTimesNA.substring(0, strTimesNA.length()-2);
 				message.reply("Double lux reminders for NA are set for channel: #"
 						+ KHUxBot.api.getChannelById(config.luxChannelNA).getName()+"\n"+
@@ -64,7 +64,7 @@ public class LuxCommand extends CommandBase{
 			}
 			else
 				message.reply("Double lux reminders for NA are currently turned off.");
-			if (!config.luxChannelJP.isEmpty()) {
+			if (!config.luxChannelJP.isEmpty() && !strTimesJP.isEmpty()) {
 				strTimesJP = strTimesJP.substring(0, strTimesJP.length()-2);
 				message.reply("Double lux reminders for JP are set for channel: #"
 						+ KHUxBot.api.getChannelById(config.luxChannelJP).getName()+"\n"+
@@ -203,9 +203,16 @@ public class LuxCommand extends CommandBase{
 	}
 	
 	public boolean isEnabled(ServerConfig config, GameEnum game) {
+		boolean hasTimes = false;
+		for(boolean b : getTimes(config, game)) {
+			if(b) {
+				hasTimes = true;
+				break;
+			}
+		}
 		if(game==GameEnum.NA) {
-			return !config.luxChannelNA.isEmpty();
-		}else return !config.luxChannelJP.isEmpty();
+			return !config.luxChannelNA.isEmpty() && hasTimes;
+		}else return !config.luxChannelJP.isEmpty() && hasTimes;
 	}
 
 	@Override
