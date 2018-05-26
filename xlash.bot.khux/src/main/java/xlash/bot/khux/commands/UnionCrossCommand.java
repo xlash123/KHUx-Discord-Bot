@@ -50,10 +50,10 @@ public class UnionCrossCommand extends CommandBase{
 			boolean[] timesJP = getTimes(config, GameEnum.JP);
 			String strTimesNA = "";
 			String strTimesJP = "";
-			for(int i=0; i<5; i++) {
+			for(int i=0; i<timesNA.length; i++) {
 				if(timesNA[i]) strTimesNA += BonusTimes.getTimeLocalized(BonusTimes.uxBonusStartNA[i]) + ", ";
 			}
-			for(int i=0; i<2; i++) {
+			for(int i=0; i<timesJP.length; i++) {
 				if(timesJP[i]) strTimesJP += BonusTimes.getTimeLocalized(BonusTimes.uxBonusStartJP[i]) + ", ";
 			}
 			if (!config.ucChannelNA.isEmpty() && !strTimesNA.isEmpty()) {
@@ -117,7 +117,7 @@ public class UnionCrossCommand extends CommandBase{
 	public void setTimes(Message message, ServerConfig config, GameEnum game, boolean time0, boolean time1, boolean time2, boolean time3, boolean time4) {
 		boolean[] times = new boolean[] {time0, time1, time2, time3, time4};
 		//Store all of these booleans as a single integer
-		int selections = (time0 ? 1 : 0) | (time1 ? 1<<1 : 0) | (time2 ? 1<<2 : 0) | (time3 ? 1<<3 : 0) | (time3 ? 1<<4 : 0);
+		int selections = (time0 ? 1 : 0) | (time1 ? 1<<1 : 0) | (time2 ? 1<<2 : 0) | (time3 ? 1<<3 : 0) | (time4 ? 1<<4 : 0);
 		if(game==GameEnum.NA) {
 			config.ucSelectionsNA = selections;
 			config.ucChannelNA = config.ucSelectionsNA > 0 ? message.getChannelReceiver().getId() : "";
