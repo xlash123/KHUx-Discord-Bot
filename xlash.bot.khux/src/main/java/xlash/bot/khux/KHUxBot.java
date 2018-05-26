@@ -60,7 +60,7 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.7.1";
+	public static final String VERSION = "1.8.0";
 
 	/** Instance of the Discord API*/
 	public static DiscordAPI api;
@@ -126,6 +126,9 @@ public class KHUxBot {
 		}
 	}
 
+	/**
+	 * Creates a new object of only the greatest KHUx Discord Bot known to mankind. Please only create one instance.
+	 */
 	public KHUxBot() {
 		this.initialize();
 		api = Javacord.getApi(botConfig.botToken, true);
@@ -191,15 +194,18 @@ public class KHUxBot {
 		twitterHandler = new TwitterHandler();
 		keybladeHandler = new KeybladeHandler();
 		scheduler = new Scheduler();
+		//I apologize in advance for the following code dealing with events. 3 many anonymous classes 5 me
 		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, BonusTimes.doubleLuxStartNA){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.luxChannelNA.isEmpty()){
-						Channel channel = server.getChannelById(config.luxChannelNA);
-						if(channel != null){
-							sendMassive("NA: " + config.luxOnPrompt, null, channel);
+					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.NA), BonusTimes.doubleLuxStartNA).contains(currentTime)) {
+						if(!config.luxChannelNA.isEmpty()){
+							Channel channel = server.getChannelById(config.luxChannelNA);
+							if(channel != null){
+								sendMassive("NA: " + config.luxOnPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -207,13 +213,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, BonusTimes.doubleLuxStopNA){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.luxChannelNA.isEmpty()){
-						Channel channel = server.getChannelById(config.luxChannelNA);
-						if(channel != null){
-							sendMassive("NA: " + config.luxOffPrompt, null, channel);
+					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.NA), BonusTimes.doubleLuxStopNA).contains(currentTime)) {
+						if(!config.luxChannelNA.isEmpty()){
+							Channel channel = server.getChannelById(config.luxChannelNA);
+							if(channel != null){
+								sendMassive("NA: " + config.luxOffPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -221,13 +229,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, BonusTimes.doubleLuxStartJP){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.luxChannelJP.isEmpty()){
-						Channel channel = server.getChannelById(config.luxChannelJP);
-						if(channel != null){
-							sendMassive("JP: " + config.luxOnPrompt, null, channel);
+					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.JP), BonusTimes.doubleLuxStartJP).contains(currentTime)) {
+						if(!config.luxChannelJP.isEmpty()){
+							Channel channel = server.getChannelById(config.luxChannelJP);
+							if(channel != null){
+								sendMassive("JP: " + config.luxOnPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -235,13 +245,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, BonusTimes.doubleLuxStopJP){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.luxChannelJP.isEmpty()){
-						Channel channel = server.getChannelById(config.luxChannelJP);
-						if(channel != null){
-							sendMassive("JP: " + config.luxOffPrompt, null, channel);
+					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.JP), BonusTimes.doubleLuxStopJP).contains(currentTime)) {
+						if(!config.luxChannelJP.isEmpty()){
+							Channel channel = server.getChannelById(config.luxChannelJP);
+							if(channel != null){
+								sendMassive("JP: " + config.luxOffPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -249,13 +261,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("NA UX On", true, GameEnum.NA, BonusTimes.uxBonusStartNA){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.ucChannelNA.isEmpty()){
-						Channel channel = server.getChannelById(config.ucChannelNA);
-						if(channel != null){
-							sendMassive("NA: " + config.ucOnPrompt, null, channel);
+					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.NA), BonusTimes.uxBonusStartNA).contains(currentTime)) {
+						if(!config.ucChannelNA.isEmpty()){
+							Channel channel = server.getChannelById(config.ucChannelNA);
+							if(channel != null){
+								sendMassive("NA: " + config.ucOnPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -263,13 +277,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("NA UX Off", true, GameEnum.NA, BonusTimes.uxBonusEndNA){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.ucChannelNA.isEmpty()){
-						Channel channel = server.getChannelById(config.ucChannelNA);
-						if(channel != null){
-							sendMassive("NA: " + config.ucOffPrompt, null, channel);
+					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.NA), BonusTimes.uxBonusEndNA).contains(currentTime)) {
+						if(!config.ucChannelNA.isEmpty()){
+							Channel channel = server.getChannelById(config.ucChannelNA);
+							if(channel != null){
+								sendMassive("NA: " + config.ucOffPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -277,13 +293,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("JP UX On", true, GameEnum.JP, BonusTimes.uxBonusStartJP){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.ucChannelJP.isEmpty()){
-						Channel channel = server.getChannelById(config.ucChannelJP);
-						if(channel != null){
-							sendMassive("JP: " + config.ucOnPrompt, null, channel);
+					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.JP), BonusTimes.uxBonusStartJP).contains(currentTime)) {
+						if(!config.ucChannelJP.isEmpty()){
+							Channel channel = server.getChannelById(config.ucChannelJP);
+							if(channel != null){
+								sendMassive("JP: " + config.ucOnPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -291,13 +309,15 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("JP UX Off", true, GameEnum.JP, BonusTimes.uxBonusEndJP){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				for(Server server : api.getServers()){
 					ServerConfig config = getServerConfig(server);
-					if(!config.ucChannelJP.isEmpty()){
-						Channel channel = server.getChannelById(config.ucChannelJP);
-						if(channel != null){
-							sendMassive("JP: " + config.ucOffPrompt, null, channel);
+					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.JP), BonusTimes.uxBonusEndJP).contains(currentTime)) {
+						if(!config.ucChannelJP.isEmpty()){
+							Channel channel = server.getChannelById(config.ucChannelJP);
+							if(channel != null){
+								sendMassive("JP: " + config.ucOffPrompt, null, channel);
+							}
 						}
 					}
 				}
@@ -349,7 +369,7 @@ public class KHUxBot {
 		});
 		scheduler.addEvent(new Event("Daily", true, GameEnum.NA, "05:00:00"){
 			@Override
-			public void run() {
+			public void run(String currentTime) {
 				actionMessages.removeIf(a -> a.isExpired());
 				keybladeHandler.updateKeybladeData();
 			}
@@ -357,12 +377,13 @@ public class KHUxBot {
 		scheduler.addTimedEvent(new TimedEvent("Reminders", true, 1) {
 			@Override
 			public void run() {
-				int luxTimeDifNA = BonusTimes.luxTimeDifference(GameEnum.NA);
-				int luxTimeDifJP = BonusTimes.luxTimeDifference(GameEnum.JP);
-				if(luxTimeDifNA < 30 || luxTimeDifJP < 30) {
+				int difNA = BonusTimes.luxTimeDifference(GameEnum.NA);
+				int difJP = BonusTimes.luxTimeDifference(GameEnum.JP);
+				if(difNA < 30 || difJP < 30) {
 					for(ServerConfig config : serverConfigs) {
 						if(config.luxRemind>0) {
 							if(!config.luxChannelNA.isEmpty()) {
+								int luxTimeDifNA = BonusTimes.luxTimeDifference(GameEnum.NA, LuxCommand.getTimes(config, GameEnum.NA));
 								if(config.luxRemind == luxTimeDifNA) {
 									Channel channel = api.getChannelById(config.luxChannelNA);
 									if(channel != null) {
@@ -372,6 +393,7 @@ public class KHUxBot {
 							}
 						
 							if(!config.luxChannelJP.isEmpty()) {
+								int luxTimeDifJP = BonusTimes.luxTimeDifference(GameEnum.JP, LuxCommand.getTimes(config, GameEnum.JP));
 								if(config.luxRemind == luxTimeDifJP) {
 									Channel channel = api.getChannelById(config.luxChannelJP);
 									if(channel != null) {
@@ -383,12 +405,13 @@ public class KHUxBot {
 					}
 				}
 				
-				int uxTimeDifNA = BonusTimes.uxTimeDifference(GameEnum.NA);
-				int uxTimeDifJP = BonusTimes.uxTimeDifference(GameEnum.JP);
-				if(uxTimeDifNA < 30 || uxTimeDifJP < 30) {
+				difNA = BonusTimes.uxTimeDifference(GameEnum.NA);
+				difJP = BonusTimes.uxTimeDifference(GameEnum.JP);
+				if(difNA < 30 || difJP < 30) {
 					for(ServerConfig config : serverConfigs) {
 						if(config.ucRemind>0) {
 							if(!config.ucChannelNA.isEmpty()) {
+								int uxTimeDifNA = BonusTimes.uxTimeDifference(GameEnum.NA, UnionCrossCommand.getTimes(config, GameEnum.NA));
 								if(config.ucRemind == uxTimeDifNA) {
 									Channel channel = api.getChannelById(config.ucChannelNA);
 									if(channel != null) {
@@ -398,6 +421,7 @@ public class KHUxBot {
 							}
 						
 							if(!config.ucChannelJP.isEmpty()) {
+								int uxTimeDifJP = BonusTimes.uxTimeDifference(GameEnum.JP, UnionCrossCommand.getTimes(config, GameEnum.JP));
 								if(config.ucRemind == uxTimeDifJP) {
 									Channel channel = api.getChannelById(config.ucChannelJP);
 									if(channel != null) {
@@ -432,7 +456,7 @@ public class KHUxBot {
 	 * Registers all the commands
 	 */
 	public void registerCommands(){
-		//Keep alphabetized in terms of command usage
+		//Keep alphabetized in terms of first command alias. Because I'm too lazy to sort dynamically
 		commandHandler.registerCommand(new AdminCommand());
 		commandHandler.registerCommand(new ConfigCommand());
 		commandHandler.registerCommand(new DefaultCommand());
@@ -448,6 +472,10 @@ public class KHUxBot {
 		commandHandler.registerCommand(new UnionCrossCommand());
 	}
 
+	/**
+	 * Connects the client with the Discord servers, sets up listeners, and runs actions right after the servers connect.
+	 * @param api
+	 */
 	public void connect(DiscordAPI api) {
 		api.connect(new FutureCallback<DiscordAPI>() {
 			public void onSuccess(DiscordAPI api) {
@@ -474,9 +502,10 @@ public class KHUxBot {
 					
 					@Override
 					public void onReactionAdd(DiscordAPI api, Reaction reaction, User user) {
+						//Used for action messages, which are used for this like !medal and !lux
 						if(reaction.getCount()>1) {
 							for(ActionMessage am : actionMessages){
-								if(am.isSameMessage(reaction.getMessage())) {
+								if(am.isSameMessage(reaction.getMessage()) && am.test()) {
 									am.run(reaction);
 									am.kill();
 								}
@@ -500,6 +529,7 @@ public class KHUxBot {
 					public void onServerLeave(DiscordAPI api, Server server) {
 						synchronized(serverConfigs){
 							System.out.println("Removing " + server.getName());
+							//Config is removed from RAM, but still stored in case they come back :)
 							serverConfigs.remove(getServerConfig(server));
 						}
 					}
@@ -532,7 +562,7 @@ public class KHUxBot {
 							EmbedBuilder eb = new EmbedBuilder();
 							eb.setColor(Color.BLUE);
 							eb.setTitle("Bot Update: " + VERSION);
-							eb.setDescription("Potentially fixed issues with some servers not receiving timed notifications.");
+							eb.setDescription("Lux and UC reminders are now selectable, so you can set at which time they go off.\nFixed issue with saving bot admin config.\nAdded !admin list to view current registered bot admins.");
 							sendMassive("", eb, server.getChannelById(channelId));
 						}
 					}
@@ -550,6 +580,7 @@ public class KHUxBot {
 	 * Searches my GitHub releases page to determine if there is an update available.
 	 */
 	public static void findUpdate() {
+		//Yes, I know there's probably a much better, less hacky solution to this. But do I care? Only slightly.
 		try {
 			Document doc = Jsoup.connect("https://github.com/xlash123/KHUx-Discord-Bot/releases").get();
 			String newVersion = doc.getElementsByClass("css-truncate-target").get(0).text();
