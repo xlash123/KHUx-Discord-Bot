@@ -2,8 +2,9 @@ package xlash.bot.khux;
 
 import java.util.Date;
 
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.Reaction;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.Reaction;
 
 /**
  * A message that has an action attached to it. Used for responding to reaction emoji messages.
@@ -15,6 +16,8 @@ public abstract class ActionMessage {
 	 * The id of the message to which this pertains. Call using the api.
 	 */
 	public String messageId;
+	public TextChannel channel;
+	public boolean killable;
 	public boolean dead;
 	
 	/**
@@ -22,21 +25,27 @@ public abstract class ActionMessage {
 	 * @param message
 	 */
 	public ActionMessage(Message message) {
-		this.messageId = message.getId();
+		this(message, true);
+	}
+	
+	public ActionMessage(Message message, boolean killable) {
+		this.messageId = message.getIdAsString();
+		channel = message.getChannel();
+		this.killable = killable;
 	}
 
 	/**
 	 * Runs when the action message is called
 	 * @param reaction
 	 */
-	public abstract void run(Reaction reaction);
+	public abstract void run(Reaction reaction, Type type);
 	
 	/**
 	 * Determines if the message is expired and should be deleted (1 hour)
 	 * @return if the message is expired
 	 */
 	public boolean isExpired() {
-		return new Date().getTime()-KHUxBot.api.getMessageById(messageId).getCreationDate().getTimeInMillis()>=3600000;
+		return new Date().getTime()-KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli()>=3600000;
 	}
 	
 	/**
@@ -45,15 +54,15 @@ public abstract class ActionMessage {
 	 * @return if the messages are the same
 	 */
 	public boolean isSameMessage(Message message) {
-		return this.messageId.equals(message.getId());
+		return this.messageId.equals(message.getIdAsString());
 	}
 	
 	/**
-	 * Override to conditionally run this action
+	 * Override to conditionally run this action. By default, this will return true when a reaction is added.
 	 * @return should the action run
 	 */
-	public boolean test() {
-		return true;
+	public boolean test(Type type) {
+		return type==Type.ADD;
 	}
 	
 	/**
@@ -61,6 +70,12 @@ public abstract class ActionMessage {
 	 */
 	public void kill() {
 		this.dead = true;
+	}
+	
+	public enum Type {
+		
+		ADD, REMOVE
+		
 	}
 	
 }
