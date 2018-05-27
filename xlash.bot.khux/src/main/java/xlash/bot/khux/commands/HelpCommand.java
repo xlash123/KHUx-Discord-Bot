@@ -2,8 +2,9 @@ package xlash.bot.khux.commands;
 
 import java.awt.Color;
 
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+
 import xlash.bot.khux.KHUxBot;
 
 /**
@@ -25,7 +26,9 @@ public class HelpCommand extends CommandBase{
 			eb.setTitle("List of all commands:");
 			eb.addField("`"+com.getAliases()[0]+"`", "**Description:** " + com.getDescription() + "\n**Aliases:** " + com.getAliasesTogether() + "\n**Usage:** " + com.getUsage(), false);
 		}
-		message.getAuthor().sendMessage("", eb);
+		message.getUserAuthor().ifPresent(user -> {
+			user.sendMessage(eb);
+		});
 	}
 
 	@Override

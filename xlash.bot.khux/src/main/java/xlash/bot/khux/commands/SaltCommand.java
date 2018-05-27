@@ -1,6 +1,7 @@
 package xlash.bot.khux.commands;
 
-import de.btobastian.javacord.entities.message.Message;
+import org.javacord.api.entity.message.Message;
+
 import xlash.bot.khux.KHUxBot;
 
 /**
@@ -16,7 +17,7 @@ public class SaltCommand extends CommandBase{
 
 	@Override
 	public void onCommand(String[] args, Message message) {
-		message.reply("Salt levels have increased to " + (++KHUxBot.botConfig.saltCount) + ".");
+		message.getChannel().sendMessage("Salt levels have increased to " + (++KHUxBot.botConfig.saltCount) + ".");
 		KHUxBot.botConfig.saveConfig();
 	}
 

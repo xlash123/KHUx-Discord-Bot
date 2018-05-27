@@ -1,6 +1,7 @@
 package xlash.bot.khux.commands;
 
-import de.btobastian.javacord.entities.message.Message;
+import org.javacord.api.entity.message.Message;
+
 import xlash.bot.khux.config.ServerConfig;
 
 /**
@@ -29,7 +30,7 @@ public class ConfigCommand extends CommandBase{
 				property += "UC";
 				break;
 			case "get":
-				message.reply("Lux On: " + config.luxOnPrompt + "\nLux Off: " + config.luxOffPrompt + "\nUC On: " + config.ucOnPrompt + "\nUC Off: " + config.ucOffPrompt);
+				message.getChannel().sendMessage("Lux On: " + config.luxOnPrompt + "\nLux Off: " + config.luxOffPrompt + "\nUC On: " + config.ucOnPrompt + "\nUC Off: " + config.ucOffPrompt);
 				return;
 				default:
 					this.printDescriptionUsage(message);
@@ -54,7 +55,7 @@ public class ConfigCommand extends CommandBase{
 			}
 			mes = mes.substring(0, mes.length()-1);
 			config.putConfig(property, mes);
-			message.reply("Config change saved!");
+			message.getChannel().sendMessage("Config change saved!");
 		}
 	}
 

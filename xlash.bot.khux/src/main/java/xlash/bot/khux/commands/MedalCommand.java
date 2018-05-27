@@ -2,8 +2,9 @@ package xlash.bot.khux.commands;
 
 import java.awt.Color;
 
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
@@ -38,10 +39,10 @@ public class MedalCommand extends CommandBase{
 		if(query.queries.size()==0) {
 			eb.setColor(Color.RED);
 			eb.setDescription("I could not find any medals with that name.");
-			message.reply("", eb);
+			message.getChannel().sendMessage("", eb);
 		}else if(query.queries.size()==1) {
 			Medal medal = KHUxBot.medalHandler.getMedalByMid(query.queries.get(0).mid, game);
-			message.reply("", KHUxBot.medalHandler.prepareMedalMessage(medal));
+			message.getChannel().sendMessage("", KHUxBot.medalHandler.prepareMedalMessage(medal, false));
 		}else {
 			KHUxBot.medalHandler.promptQuery(query, message, game);
 		}

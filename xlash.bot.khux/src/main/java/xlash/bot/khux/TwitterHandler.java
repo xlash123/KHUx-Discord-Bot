@@ -6,8 +6,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import de.btobastian.javacord.entities.Channel;
-
 /**
  * Manages all the Twitter functionality. No, I'm not going to use their API.
  *

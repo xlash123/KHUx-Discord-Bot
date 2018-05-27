@@ -10,17 +10,19 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
+
+import javax.sound.midi.Synthesizer;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.Messageable;
+import org.javacord.api.entity.message.Reaction;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import com.google.gson.Gson;
 import com.vdurmont.emoji.EmojiManager;
 
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.Reaction;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
@@ -154,6 +156,7 @@ public class MedalHandler {
 		String three = EmojiManager.getForAlias("three").getUnicode();
 		String four = EmojiManager.getForAlias("four").getUnicode();
 		String five = EmojiManager.getForAlias("five").getUnicode();
+		String seven = EmojiManager.getForAlias("seven").getUnicode();
 		String cancel = EmojiManager.getForAlias("x").getUnicode();
 		eb.setColor(Color.YELLOW);
 		eb.setTitle("Did you mean...");
@@ -163,13 +166,12 @@ public class MedalHandler {
 		if(query.size() > 3) eb.addField(four, query.queries.get(3).name, true);
 		if(query.size() > 4) eb.addField(five, query.queries.get(4).name, true);
 		eb.setFooter("Click or tap on the reaction that corresponds with the medal you want.");
-		try {
-			Message futureMessage = message.reply("", eb).get();
+		message.getChannel().sendMessage("", eb).thenAcceptAsync(futureMessage -> {
 			KHUxBot.actionMessages.add(new ActionMessage(futureMessage) {
 				@Override
-				public void run(Reaction reaction) {
-					Channel channel = futureMessage.getChannelReceiver();
-					String unicode = reaction.getUnicodeEmoji();
+				public void run(Reaction reaction, ActionMessage.Type type) {
+					TextChannel channel = futureMessage.getChannel();
+					String unicode = reaction.getEmoji().asUnicodeEmoji().get();
 					String choice = "";
 					if(unicode.equals(one)) {
 						choice += query.queries.get(0).mid;
@@ -192,36 +194,51 @@ public class MedalHandler {
 						e.printStackTrace();
 					}
 					Medal medal = KHUxBot.medalHandler.getMedalByMid(choice, game);
-					EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal);
+					EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal, false);
+					Messageable receiver;
 					if(channel != null) {
-						channel.sendMessage("", build);
+						receiver = channel;
 					} else {
-						message.getAuthor().sendMessage("", build);
+						receiver = message.getUserAuthor().get();
 					}
+					receiver.sendMessage(build).thenAcceptAsync(mes -> {
+						mes.addReaction(seven);
+						KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
+							@Override
+							public void run(Reaction reaction, ActionMessage.Type type) {
+								if(reaction.getEmoji().isUnicodeEmoji()) {
+									String emoji = reaction.getEmoji().asUnicodeEmoji().get();
+									if(emoji.equals(seven)) {
+										if(type == ActionMessage.Type.ADD) {
+											//Edit message to view 7 star
+											mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, true));
+										}else {
+											//Edit message to view 6 star
+											mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, false));
+										}
+									}
+								}
+							}
+							public boolean test(ActionMessage.Type type) {
+								return true;
+							}
+						});
+					});
 				}
 			});
-			futureMessage.addUnicodeReaction(one);
-			//It needs to wait for the reaction to actually be added. I've tried using Future.isDone(), but that doesn't seem to work.
-			//Could potentially break if speed is slow
-			Thread.sleep(350);
-			futureMessage.addUnicodeReaction(two);
+			futureMessage.addReaction(one);
+			futureMessage.addReaction(two);
 			if(query.size()>2) {
-				Thread.sleep(350);
-				futureMessage.addUnicodeReaction(three);
+				futureMessage.addReaction(three);
 				if(query.size()>3) {
-					Thread.sleep(350);
-					futureMessage.addUnicodeReaction(four);
+					futureMessage.addReaction(four);
 					if(query.size()>4) {
-						Thread.sleep(350);
-						futureMessage.addUnicodeReaction(five);
+						futureMessage.addReaction(five);
 					}
 				}
 			}
-			Thread.sleep(350);
-			futureMessage.addUnicodeReaction(cancel);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
+			futureMessage.addReaction(cancel);
+		});
 	}
 	
 	/**
@@ -229,10 +246,10 @@ public class MedalHandler {
 	 * @param medal the selected medal
 	 * @return An embeded message for the user to receive
 	 */
-	public EmbedBuilder prepareMedalMessage(Medal medal) {
+	public EmbedBuilder prepareMedalMessage(Medal medal, boolean isSeven) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
-		eb.setTitle(medal.name);
+		eb.setTitle(medal.name + " - " + (isSeven ? "7" : "6") + "\u2605");
 		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setImage(imgLink);
 		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
@@ -251,7 +268,7 @@ public class MedalHandler {
 		eb.addField("Multiplier", range, true);
 		eb.addField("Mult. w/ Max Guilt", range2, true);
 		eb.addField("Target", medal.target.name, true);
-		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of lvl 100 with max dots. See website for more specific info.");
+		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available 24 hours after the message appears.");
 		return eb;
 	}
 	
