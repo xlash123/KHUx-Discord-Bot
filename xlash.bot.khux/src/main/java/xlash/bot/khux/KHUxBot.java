@@ -316,8 +316,13 @@ public class KHUxBot {
 		scheduler.addEvent(new Event("Daily", true, GameEnum.NA, "05:00:00"){
 			@Override
 			public void run(String currentTime) {
-				actionMessages.removeIf(a -> a.isExpired());
 				keybladeHandler.updateKeybladeData();
+			}
+		});
+		scheduler.addTimedEvent(new TimedEvent("Hourly", true, 60) {
+			@Override
+			public void run() {
+				actionMessages.removeIf(a -> a.isExpired());
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Reminders", true, 1) {
