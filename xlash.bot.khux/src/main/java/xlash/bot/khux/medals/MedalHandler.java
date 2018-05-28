@@ -61,7 +61,9 @@ public class MedalHandler {
 			name = name.toLowerCase();
 			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
-			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=5&jp="+jp;
+			//Filters only the 6* medals to avoid double results
+			String filter = URLEncoder.encode("where[0][filter]", "UTF-8") + "=rarity&" + URLEncoder.encode("where[0][type]", "UTF-8") + "=group&" + URLEncoder.encode("where[0][value][]", "UTF-8") + "=6";
+			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&" + filter + "&limit=5&jp="+jp;
 			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
@@ -121,7 +123,6 @@ public class MedalHandler {
 			in.close();
 			con.disconnect();
 			String response = sb.toString();
-			System.out.println(response);
 			Gson gson = new GsonBuilder().registerTypeAdapter(Medal.class, new MedalDeserializer()).create();
 			Medal medal = gson.fromJson(response, Medal.class);
 			if(game==GameEnum.NA) {
@@ -200,27 +201,29 @@ public class MedalHandler {
 						receiver = message.getUserAuthor().get();
 					}
 					receiver.sendMessage(build).thenAcceptAsync(mes -> {
-						mes.addReaction(seven);
-						KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
-							@Override
-							public void run(Reaction reaction, ActionMessage.Type type) {
-								if(reaction.getEmoji().isUnicodeEmoji()) {
-									String emoji = reaction.getEmoji().asUnicodeEmoji().get();
-									if(emoji.equals(seven)) {
-										if(type == ActionMessage.Type.ADD) {
-											//Edit message to view 7 star
-											mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, true));
-										}else {
-											//Edit message to view 6 star
-											mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, false));
+						if(medal.hasSeven()) {
+							mes.addReaction(seven);
+							KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
+								@Override
+								public void run(Reaction reaction, ActionMessage.Type type) {
+									if(reaction.getEmoji().isUnicodeEmoji()) {
+										String emoji = reaction.getEmoji().asUnicodeEmoji().get();
+										if(emoji.equals(seven)) {
+											if(type == ActionMessage.Type.ADD) {
+												//Edit message to view 7 star
+												mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, true));
+											}else {
+												//Edit message to view 6 star
+												mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, false));
+											}
 										}
 									}
 								}
-							}
-							public boolean test(ActionMessage.Type type) {
-								return true;
-							}
-						});
+								public boolean test(ActionMessage.Type type) {
+									return true;
+								}
+							});
+						}
 					});
 				}
 			});
