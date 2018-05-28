@@ -10,8 +10,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-
-import javax.sound.midi.Synthesizer;
+import java.util.Scanner;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.javacord.api.entity.channel.TextChannel;
@@ -21,6 +20,7 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vdurmont.emoji.EmojiManager;
 
 import xlash.bot.khux.ActionMessage;
@@ -62,7 +62,7 @@ public class MedalHandler {
 			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
 			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=5&jp="+jp;
-			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
@@ -78,7 +78,6 @@ public class MedalHandler {
 			}
 			con.disconnect();
 			String response = "{queries:"+sb.toString()+"}";
-			System.out.println(response);
 			Gson gson = new Gson();
 			return gson.fromJson(response, SearchQuery.class);
 		} catch (IOException e) {
@@ -103,7 +102,7 @@ public class MedalHandler {
 		}
 		try {
 			String searchQuery = "id=" + mid + "&type=view&method=directory";
-			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
@@ -113,19 +112,18 @@ public class MedalHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			InputStream in = con.getInputStream();
+			Scanner in = new Scanner(con.getInputStream());
 			con.connect();
 			StringBuilder sb = new StringBuilder();
-			while(in.available()>0) {
-				sb.append((char) in.read());
+			while(in.hasNext()) {
+				sb.append(in.next() + " ");
 			}
+			in.close();
 			con.disconnect();
-			String response = sb.toString().substring(1, sb.length()-1);
-			Gson gson = new Gson();
-			RawMedal raw = gson.fromJson(response, RawMedal.class);
-			raw.mid = mid;
-			raw.name = raw.name.replaceAll("Namine", "Namin\u00E9").replaceAll("Lumiere", "Lumi\u00E8re");
-			Medal medal = raw.toMedal();
+			String response = sb.toString();
+			System.out.println(response);
+			Gson gson = new GsonBuilder().registerTypeAdapter(Medal.class, new MedalDeserializer()).create();
+			Medal medal = gson.fromJson(response, Medal.class);
 			if(game==GameEnum.NA) {
 				if(cachedMedalsNA.contains(medal)) {
 					cachedMedalsNA.add(medal);
@@ -246,13 +244,14 @@ public class MedalHandler {
 	 * @param medal the selected medal
 	 * @return An embeded message for the user to receive
 	 */
-	public EmbedBuilder prepareMedalMessage(Medal medal, boolean isSeven) {
+	public EmbedBuilder prepareMedalMessage(Medal m, boolean isSeven) {
+		MedalDetails medal = isSeven ? m.getSeven() : m.getSix();
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
 		eb.setTitle(medal.name + " - " + (isSeven ? "7" : "6") + "\u2605");
 		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setImage(imgLink);
-		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
+		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special).replaceAll("<b>|<\\/b>", "**"), true);
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
 		eb.addField("Strength", ""+medal.strength, true);
 		eb.addField("Gauges", ""+medal.gauges, true);
@@ -268,7 +267,7 @@ public class MedalHandler {
 		eb.addField("Multiplier", range, true);
 		eb.addField("Mult. w/ Max Guilt", range2, true);
 		eb.addField("Target", medal.target.name, true);
-		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available 24 hours after the message appears.");
+		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available 2 hours after the message appears.");
 		return eb;
 	}
 	
