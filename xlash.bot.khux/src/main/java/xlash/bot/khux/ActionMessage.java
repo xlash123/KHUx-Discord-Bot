@@ -45,7 +45,7 @@ public abstract class ActionMessage {
 	 * @return if the message is expired
 	 */
 	public boolean isExpired() {
-		return new Date().getTime()-KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli()>=3600000;
+		return new Date().getTime()-KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli()>=(1000*60*60*2);
 	}
 	
 	/**
