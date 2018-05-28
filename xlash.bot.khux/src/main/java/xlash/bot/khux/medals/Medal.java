@@ -8,7 +8,11 @@ public class Medal {
 	public Medal(RawMedal six, RawMedal seven) {
 		this.mid = six.mid;
 		this.sixStar = new MedalDetails(six.mid, six.name, six.special, six.type, six.attribute, six.tier, six.min_low_damage, six.min_high_damage, six.max_low_damage, six.max_high_damage, six.strength, six.gauges, six.aoe, six.img);
-		this.sevenStar = new MedalDetails(seven.mid, seven.name, seven.special, seven.type, seven.attribute, seven.tier, seven.min_low_damage, seven.min_high_damage, seven.max_low_damage, seven.max_high_damage, seven.strength, seven.gauges, seven.aoe, six.img);;
+		this.sevenStar = seven != null ? new MedalDetails(seven.mid, seven.name, seven.special, seven.type, seven.attribute, seven.tier, seven.min_low_damage, seven.min_high_damage, seven.max_low_damage, seven.max_high_damage, seven.strength, seven.gauges, seven.aoe, six.img) : null;
+	}
+	
+	public boolean hasSeven() {
+		return sevenStar != null;
 	}
 	
 	public MedalDetails getSix() {
