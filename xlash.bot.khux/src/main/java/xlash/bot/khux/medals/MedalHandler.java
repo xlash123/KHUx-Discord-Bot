@@ -254,9 +254,18 @@ public class MedalHandler {
 		eb.setTitle(medal.name + " - " + (isSeven ? "7" : "6") + "\u2605");
 		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setImage(imgLink);
-		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special).replaceAll("<b>|<\\/b>", "**"), true);
+		if(medal.special.isEmpty()) { //Some 7* medals don't have an updated description, so replace it with 6*
+			System.out.println("Reusing");
+			eb.addField("Special", StringEscapeUtils.unescapeHtml4(m.getSix().special).replaceAll("<b>|<\\/b>", "**"), true);
+		}else {
+			eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special).replaceAll("<b>|<\\/b>", "**"), true);
+		}
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
-		eb.addField("Strength", ""+medal.strength, true);
+		if(isSeven && medal.strength < 1000) { //857 is the calculated result from a medal with 0 as the min_strength
+			eb.addField("Strength", "Unknown", true);
+		}else {
+			eb.addField("Strength", ""+medal.strength, true);
+		}
 		eb.addField("Gauges", ""+medal.gauges, true);
 		eb.addField("Tier", ""+medal.tier.tier, true);
 		DecimalFormat df = new DecimalFormat("#.##");
