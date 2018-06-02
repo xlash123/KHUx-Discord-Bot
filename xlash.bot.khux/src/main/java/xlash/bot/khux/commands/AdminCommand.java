@@ -3,9 +3,10 @@ package xlash.bot.khux.commands;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.message.Message;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
+
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.UserUtil;
@@ -27,10 +28,10 @@ public class AdminCommand extends CommandBase{
 			this.printDescriptionUsage(message);
 			return;
 		}
-		ServerConfig config = KHUxBot.getServerConfig(message.getChannelReceiver().getServer());
+		Server server = message.getServer().get();
+		ServerConfig config = KHUxBot.getServerConfig(server);
 		if(args[0].equalsIgnoreCase("list")) {
 			String admins = "";
-			Server server = message.getChannelReceiver().getServer();
 			ArrayList<String> badUsers = new ArrayList<>();
 			for(String userId : config.admins) {
 				try {
@@ -53,22 +54,22 @@ public class AdminCommand extends CommandBase{
 			}
 			if(!admins.isEmpty()) {
 				admins = admins.substring(0, admins.length()-2);
-				message.reply("Registered admins: " + admins);
-			}else message.reply("There are no registered admins. Ask your server owner to designate bot admins!");
+				message.getChannel().sendMessage("Registered admins: " + admins);
+			}else message.getChannel().sendMessage("There are no registered admins. Ask your server owner to designate bot admins!");
 			return;
 		}
 		for(String arg : args) {
 			if(arg.equalsIgnoreCase("@everyone")) {
-				message.reply("That's a bad idea.");
+				message.getChannel().sendMessage("That's a bad idea.");
 				return;
 			}
 		}
 		String newAdmins = "";
 		int iterations = 0;
-		for(User u : message.getMentions()){
-			if(!config.admins.contains(u.getId())){
-				config.admins.add(u.getId());
-				newAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
+		for(User u : message.getMentionedUsers()){
+			if(!config.admins.contains(u.getIdAsString())){
+				config.admins.add(u.getIdAsString());
+				newAdmins += UserUtil.getNickname(u, server) + ", ";
 				iterations++;
 			}
 		}
@@ -79,13 +80,13 @@ public class AdminCommand extends CommandBase{
 				newAdmins = newAdmins.replaceAll(",", "");
 				newAdmins = newAdmins.substring(4);
 			}
-			if(iterations > 1) message.reply(newAdmins + " are now admins.");
-			else message.reply(newAdmins + " is now an admin.");
+			if(iterations > 1) message.getChannel().sendMessage(newAdmins + " are now admins.");
+			else message.getChannel().sendMessage(newAdmins + " is now an admin.");
 			if(iterations > 0){
 				config.saveConfig();
 				return;
 			}
-		}else message.reply("No new admins have been added.");
+		}else message.getChannel().sendMessage("No new admins have been added.");
 	}
 
 	@Override

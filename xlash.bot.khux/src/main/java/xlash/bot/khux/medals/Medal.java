@@ -1,59 +1,29 @@
 package xlash.bot.khux.medals;
 
-/**
- * A collection of all of a medal's stats
- *
- */
 public class Medal {
 	
-	public String mid, name, special, img;
-	public Type type;
-	public Attribute attribute;
-	public Tier tier;
-	public float baseLow, baseHigh, maxLow, maxHigh;
-	public int strength, gauges;
-	public Target target;
+	public MedalDetails sixStar, sevenStar;
+	public String mid;
 	
-	/**
-	 * An object representing a medal of specified data
-	 * @param mid
-	 * @param name
-	 * @param special
-	 * @param type
-	 * @param attribute
-	 * @param tier
-	 * @param baseLow
-	 * @param baseHigh
-	 * @param maxLow
-	 * @param maxHigh
-	 * @param strength
-	 * @param gauges
-	 * @param target
-	 * @param img
-	 */
-	public Medal(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int target, String img) {
-		this.mid = mid;
-		this.name = name;
-		this.special = special;
-		this.type = Type.getFromId(type);
-		this.attribute = Attribute.getFromId(attribute);
-		this.tier = Tier.getFromTier(tier);
-		this.baseLow = baseLow;
-		this.baseHigh = baseHigh;
-		this.maxLow = maxLow;
-		this.maxHigh = maxHigh;
-		this.strength = strength;
-		this.gauges = gauges;
-		this.target = Target.getFromId(target);
-		this.img = img;
+	public Medal(RawMedal six, RawMedal seven) {
+		this.mid = six.mid;
+		this.sixStar = new MedalDetails(six.mid, six.name, six.special, six.type, six.attribute, six.tier, six.min_low_damage, six.min_high_damage, six.max_low_damage, six.max_high_damage, six.strength, six.gauges, six.aoe, six.img);
+		if(seven.strength == 0) {
+			seven.strength = (int) (((0.6d*seven.strength_min + 1900d)/39d)*(Math.pow(119, 0.6)) + seven.strength_min);
+		}
+		this.sevenStar = seven != null ? new MedalDetails(seven.mid, seven.name, seven.special, seven.type, seven.attribute, seven.tier, seven.min_low_damage, seven.min_high_damage, seven.max_low_damage, seven.max_high_damage, seven.strength, seven.gauges, seven.aoe, seven.img.equals("null") ? six.img : seven.img) : null;
 	}
 	
-	public boolean equals(Object o) {
-		if(o instanceof Medal) {
-			Medal m = (Medal) o;
-			return m.mid.equals(this.mid);
-		}
-		return false;
+	public boolean hasSeven() {
+		return sevenStar != null;
+	}
+	
+	public MedalDetails getSix() {
+		return sixStar;
+	}
+	
+	public MedalDetails getSeven() {
+		return sevenStar;
 	}
 
 }

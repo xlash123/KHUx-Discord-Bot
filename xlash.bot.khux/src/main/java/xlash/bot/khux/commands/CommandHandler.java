@@ -3,14 +3,15 @@ package xlash.bot.khux.commands;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.permissions.PermissionState;
-import de.btobastian.javacord.entities.permissions.PermissionType;
-import de.btobastian.javacord.entities.permissions.Role;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.permission.PermissionState;
+import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
+
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
-import xlash.bot.khux.util.PermissionsUtil;
 
 /**
  * Handles message execution and storage
@@ -50,17 +51,18 @@ public class CommandHandler {
 //						return;
 //					}
 					if(com.isAdmin()){
-						User user = message.getAuthor();
+						User user = message.getUserAuthor().get();
+						Server server = message.getServer().get();
 						boolean admin = false;
-						ServerConfig config = KHUxBot.getServerConfig(message.getChannelReceiver().getServer());
+						ServerConfig config = KHUxBot.getServerConfig(server);
 						for(String id : config.admins){
-							if(user.getId().equals(id)){
+							if(user.getIdAsString().equals(id)){
 								admin = true;
 								break;
 							}
 						}
 						if(!admin) {
-							Collection<Role> roles = user.getRoles(message.getChannelReceiver().getServer());
+							Collection<Role> roles = user.getRoles(server);
 							for(Role r : roles){
 								//This works, so if anyone tries to say otherwise, they're high
 								if(r.getPermissions().getState(PermissionType.ADMINISTRATOR)==PermissionState.ALLOWED){
@@ -69,7 +71,7 @@ public class CommandHandler {
 							}
 						}
 						if(!admin){
-							message.reply("Only admins may use this command.");
+							message.getChannel().sendMessage("Only admins may use this command.");
 							return;
 						}
 					}
@@ -77,8 +79,8 @@ public class CommandHandler {
 					if(argsString.equals(content)) argsString = "";
 					String[] argsArray = argsString.split(" ");
 					if(argsArray[0].isEmpty()) argsArray = new String[0];
-					if(com.isServerOnly() && message.isPrivateMessage()) {
-						message.reply("Sorry, this command is for servers only.");
+					if(com.isServerOnly() && message.isPrivate()) {
+						message.getChannel().sendMessage("Sorry, this command is for servers only.");
 					}else com.onCommand(argsArray, message);
 				}
 			}

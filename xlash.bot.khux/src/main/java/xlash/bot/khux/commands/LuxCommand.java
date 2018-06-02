@@ -1,12 +1,15 @@
 package xlash.bot.khux.commands;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+
+import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.Reaction;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import com.vdurmont.emoji.EmojiManager;
 
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.Reaction;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
@@ -56,22 +59,24 @@ public class LuxCommand extends CommandBase{
 			for(int i=0; i<2; i++) {
 				if(timesJP[i]) strTimesJP += BonusTimes.getTimeLocalized(BonusTimes.doubleLuxStartJP[i]) + ", ";
 			}
-			if (!config.luxChannelNA.isEmpty() && !strTimesNA.isEmpty()) {
+			Optional<ServerChannel> naChannel = KHUxBot.api.getServerChannelById(config.luxChannelNA);
+			Optional<ServerChannel> jpChannel = KHUxBot.api.getServerChannelById(config.luxChannelJP);
+			if (naChannel.isPresent() && !strTimesNA.isEmpty()) {
 				strTimesNA = strTimesNA.substring(0, strTimesNA.length()-2);
-				message.reply("Double lux reminders for NA are set for channel: #"
-						+ KHUxBot.api.getChannelById(config.luxChannelNA).getName()+"\n"+
+				message.getChannel().sendMessage("Double lux reminders for NA are set for channel: #"
+						+ naChannel.get().getName()+"\n"+
 						"The registered times for NA are " + strTimesNA + ".");
 			}
 			else
-				message.reply("Double lux reminders for NA are currently turned off.");
-			if (!config.luxChannelJP.isEmpty() && !strTimesJP.isEmpty()) {
+				message.getChannel().sendMessage("Double lux reminders for NA are currently turned off.");
+			if (jpChannel.isPresent() && !strTimesJP.isEmpty()) {
 				strTimesJP = strTimesJP.substring(0, strTimesJP.length()-2);
-				message.reply("Double lux reminders for JP are set for channel: #"
-						+ KHUxBot.api.getChannelById(config.luxChannelJP).getName()+"\n"+
+				message.getChannel().sendMessage("Double lux reminders for JP are set for channel: #"
+						+ jpChannel.get().getName()+"\n"+
 						"The registered times for JP are " + strTimesJP + ".");
 			}
 			else
-				message.reply("Double lux reminders for JP are currently turned off.");
+				message.getChannel().sendMessage("Double lux reminders for JP are currently turned off.");
 			return;
 		case "check":
 			int nextTime;
@@ -87,21 +92,21 @@ public class LuxCommand extends CommandBase{
 			}
 			if(mins > 0) timeS += mins + " minutes ";
 			if(timeS.isEmpty()) {
-				message.reply("Double lux for " + game.name() + " just went active!");
-			}else message.reply("There are " + timeS + "until double lux is active for " + game.name() + ".");
+				message.getChannel().sendMessage("Double lux for " + game.name() + " just went active!");
+			}else message.getChannel().sendMessage("There are " + timeS + "until double lux is active for " + game.name() + ".");
 			break;
 		case "remind":
 			if(args.length > 1) {
 				try {
 					int time = Integer.parseInt(args[1]);
 					if(time > 30 || time < 0) {
-						message.reply("Out of range. Enter a number 0-30 inclusive.");
+						message.getChannel().sendMessage("Out of range. Enter a number 0-30 inclusive.");
 					}else {
-						message.reply("Lux reminder set for " + time + " minutes before active time.");
+						message.getChannel().sendMessage("Lux reminder set for " + time + " minutes before active time.");
 						config.luxRemind = time;
 					}
 				}catch(NumberFormatException e) {
-					message.reply("I don't think that's a number... Enter a number 0-30 inclusive.");
+					message.getChannel().sendMessage("I don't think that's a number... Enter a number 0-30 inclusive.");
 				}
 			}else {
 				this.printDescriptionUsage(message);
@@ -120,10 +125,10 @@ public class LuxCommand extends CommandBase{
 		int selections = (time0 ? 1 : 0) | (time1 ? 1<<1 : 0) | (time2 ? 1<<2 : 0) | (time3 ? 1<<3 : 0);
 		if(game==GameEnum.NA) {
 			config.luxSelectionsNA = selections;
-			config.luxChannelNA = config.luxSelectionsNA > 0 ? message.getChannelReceiver().getId() : "";
+			config.luxChannelNA = config.luxSelectionsNA > 0 ? message.getChannel().getIdAsString() : "";
 		}else {
 			config.luxSelectionsJP = selections;
-			config.luxChannelJP = config.luxSelectionsJP > 0 ? message.getChannelReceiver().getId() : "";
+			config.luxChannelJP = config.luxSelectionsJP > 0 ? message.getChannel().getIdAsString() : "";
 		}
 		if(selections>0) {
 			String strTimes = "";
@@ -137,8 +142,8 @@ public class LuxCommand extends CommandBase{
 				}
 			}
 			strTimes = strTimes.substring(0, strTimes.length()-2);
-			message.reply("The registered Lux times for " + game + " are: " + strTimes + ".");
-		}else message.reply("Lux reminders for " + game + " have been turned off.");
+			message.getChannel().sendMessage("The registered Lux times for " + game + " are: " + strTimes + ".");
+		}else message.getChannel().sendMessage("Lux reminders for " + game + " have been turned off.");
 		config.saveConfig();
 	}
 	
@@ -170,18 +175,18 @@ public class LuxCommand extends CommandBase{
 			}
 		}
 		try {
-			Message futureMessage = message.reply("", eb).get();
+			Message futureMessage = message.getChannel().sendMessage("", eb).get();
 			int iterations = game==GameEnum.NA ? 4 : 2;
 			for(int i=0; i<iterations; i++) {
-				futureMessage.addUnicodeReaction(emojis[i]);
+				futureMessage.addReaction(emojis[i]);
 				Thread.sleep(350);
 			}
-			futureMessage.addUnicodeReaction(check);
+			futureMessage.addReaction(check);
 			Thread.sleep(350);
 			KHUxBot.actionMessages.add(new ActionMessage(futureMessage) {
 				@Override
-				public void run(Reaction reaction) {
-					Message messageStored = KHUxBot.api.getMessageById(this.messageId);
+				public void run(Reaction reaction, ActionMessage.Type type) {
+					Message messageStored = channel.getMessageById(messageId).join();
 					int size = messageStored.getReactions().size()-1;
 					int[] counts = new int[4];
 					for(int i=0; i<size; i++) {
@@ -191,8 +196,8 @@ public class LuxCommand extends CommandBase{
 					setTimes(message, config, game, counts[0]>0, counts[1]>0, counts[2]>0, counts[3]>0);
 				}
 				@Override
-				public boolean test() {
-					Message messageStored = KHUxBot.api.getMessageById(this.messageId);
+				public boolean test(ActionMessage.Type type) {
+					Message messageStored = channel.getMessageById(messageId).join();
 					int size = messageStored.getReactions().size();
 					return messageStored.getReactions().get(size-1).getCount()>1;
 				}
@@ -211,8 +216,8 @@ public class LuxCommand extends CommandBase{
 			}
 		}
 		if(game==GameEnum.NA) {
-			return !config.luxChannelNA.isEmpty() && hasTimes;
-		}else return !config.luxChannelJP.isEmpty() && hasTimes;
+			return KHUxBot.api.getChannelById(config.luxChannelNA).isPresent() && hasTimes;
+		}else return KHUxBot.api.getChannelById(config.luxChannelJP).isPresent() && hasTimes;
 	}
 
 	@Override

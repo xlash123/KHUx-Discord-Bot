@@ -1,8 +1,11 @@
 package xlash.bot.khux.commands;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
-import de.btobastian.javacord.entities.message.Message;
+import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.message.Message;
+
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.TwitterHandler.Tweet;
@@ -37,11 +40,11 @@ public class TweetCommand extends CommandBase{
 		switch(args[0]){
 		case "on":
 			if(game==GameEnum.NA) {
-				config.updateChannelNA = message.getChannelReceiver().getId();
+				config.updateChannelNA = message.getChannel().getIdAsString();
 			}else {
-				config.updateChannelJP = message.getChannelReceiver().getId();
+				config.updateChannelJP = message.getChannel().getIdAsString();
 			}
-    		message.reply(game.toString() + " Twitter updates are set to post on this channel.");
+    		message.getChannel().sendMessage(game.toString() + " Twitter updates are set to post on this channel.");
 			break;
 		case "off":
 			if(game==GameEnum.NA) {
@@ -49,7 +52,7 @@ public class TweetCommand extends CommandBase{
 			}else {
 				config.updateChannelJP = "";
 			}
-    		message.reply(game.toString() + " Twitter updates have been turned off.");
+    		message.getChannel().sendMessage(game.toString() + " Twitter updates have been turned off.");
     		break;
 		case "get":
 			ArrayList<Tweet> toSend = KHUxBot.twitterHandler.getNewTwitterLinks(game, false);
@@ -61,16 +64,18 @@ public class TweetCommand extends CommandBase{
 					System.err.println(game.toString() + " Twitter Update doesn't exist");
 				}
 			}else{
-				message.getChannelReceiver().sendMessage(KHUxBot.twitterHandler.getTwitterUpdateLink(0, game).getLink());
+				message.getChannel().sendMessage(KHUxBot.twitterHandler.getTwitterUpdateLink(0, game).getLink());
 			}
 			break;
 		case "status":
-			if(!config.updateChannelNA.isEmpty()) {
-				message.reply("NA Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannelNA).getName());
-			}else message.reply("NA Twitter updates are currently turned off.");
-			if(!config.updateChannelJP.isEmpty()) {
-				message.reply("JP Twitter update reminders are set for channel: #" + KHUxBot.api.getChannelById(config.updateChannelJP).getName());
-			}else message.reply("JP Twitter updates are currently turned off.");
+			Optional<ServerChannel> naChannel = KHUxBot.api.getServerChannelById(config.updateChannelNA);
+			Optional<ServerChannel> jpChannel = KHUxBot.api.getServerChannelById(config.updateChannelJP);
+			if(naChannel.isPresent()) {
+				message.getChannel().sendMessage("NA Twitter update reminders are set for channel: #" + naChannel.get().getName());
+			}else message.getChannel().sendMessage("NA Twitter updates are currently turned off.");
+			if(jpChannel.isPresent()) {
+				message.getChannel().sendMessage("JP Twitter update reminders are set for channel: #" + jpChannel.get().getName());
+			}else message.getChannel().sendMessage("JP Twitter updates are currently turned off.");
 			return;
 			default:
 				this.printDescriptionUsage(message);

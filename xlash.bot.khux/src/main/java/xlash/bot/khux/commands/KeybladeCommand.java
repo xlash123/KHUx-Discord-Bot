@@ -2,8 +2,9 @@ package xlash.bot.khux.commands;
 
 import java.awt.Color;
 
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.keyblades.Keyblade;
 import xlash.bot.khux.keyblades.Slot;
@@ -76,11 +77,11 @@ public class KeybladeCommand extends CommandBase {
 			eb.addField("Friend Slot", ""+friend.getTypeMultiplier(level), true);
 			eb.setFooter("All Keyblade information received from khuxtracker.com. Visit the website for more specific information.");
 			eb.setColor(Color.green);
-			message.reply("", eb);
+			message.getChannel().sendMessage("", eb);
 		}else {
 			eb.setColor(Color.red);
 			eb.setDescription("I could not find that Keyblade.");
-			message.reply("", eb);
+			message.getChannel().sendMessage("", eb);
 		}
 	}
 

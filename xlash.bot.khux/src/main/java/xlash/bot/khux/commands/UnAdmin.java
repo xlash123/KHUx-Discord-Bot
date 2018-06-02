@@ -1,7 +1,9 @@
 package xlash.bot.khux.commands;
 
-import de.btobastian.javacord.entities.User;
-import de.btobastian.javacord.entities.message.Message;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
+
 import xlash.bot.khux.config.ServerConfig;
 import xlash.bot.khux.util.UserUtil;
 
@@ -24,21 +26,22 @@ public class UnAdmin extends CommandBase{
 		}
 		for(String arg : args) {
 			if(arg.equalsIgnoreCase("@everyone")) {
-				message.reply("That's a bad idea.");
+				message.getChannel().sendMessage("That's a bad idea.");
 				return;
 			}
 		}
+		Server server = message.getServer().get();
 		ServerConfig config = this.getServerConfig(message);
 		String unAdmins = "";
 		int iterations = 0;
-		for(User u : message.getMentions()){
-			if(config.admins.contains(u.getId())){
+		for(User u : message.getMentionedUsers()){
+			if(config.admins.contains(u.getIdAsString())){
 				if(config.admins.size()<=1){
-					message.reply("You must have at least one admin. " + UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + " will remain admin.");
+					message.getChannel().sendMessage("You must have at least one admin. " + UserUtil.getNickname(u, server) + " will remain admin.");
 					return;
 				}
-				config.admins.remove(u.getId());
-				unAdmins += UserUtil.getNickname(u, message.getChannelReceiver().getServer()) + ", ";
+				config.admins.remove(u.getIdAsString());
+				unAdmins += UserUtil.getNickname(u, server) + ", ";
 				iterations++;
 			}
 		}
@@ -49,13 +52,13 @@ public class UnAdmin extends CommandBase{
 				unAdmins = unAdmins.replaceAll(",", "");
 				unAdmins = unAdmins.substring(4);
 			}
-			if(iterations > 1) message.reply(unAdmins + " are no longer admins.");
-			else message.reply(unAdmins + " is no longer an admin.");
+			if(iterations > 1) message.getChannel().sendMessage(unAdmins + " are no longer admins.");
+			else message.getChannel().sendMessage(unAdmins + " is no longer an admin.");
 			if(iterations > 0){
 				config.saveConfig();
 				return;
 			}
-		}else message.reply("No people have lost admin privileges.");
+		}else message.getChannel().sendMessage("No people have lost admin privileges.");
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package xlash.bot.khux.commands;
 
-import de.btobastian.javacord.entities.message.Message;
+import org.javacord.api.entity.message.Message;
+
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.config.ServerConfig;
 
@@ -23,11 +24,11 @@ public class DefaultCommand extends CommandBase{
 		}
 		ServerConfig config = this.getServerConfig(message);
 		if(args[0].equalsIgnoreCase("get")){
-			message.reply("Default game is currently " + config.defaultGame.toString());
+			message.getChannel().sendMessage("Default game is currently " + config.defaultGame.toString());
 			return;
 		}
 		config.defaultGame = GameEnum.parseString(args[0]);
-		message.reply("Default game changed to " + config.defaultGame.toString());
+		message.getChannel().sendMessage("Default game changed to " + config.defaultGame.toString());
 	}
 
 	@Override

@@ -10,17 +10,19 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
+import java.util.Scanner;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.Messageable;
+import org.javacord.api.entity.message.Reaction;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vdurmont.emoji.EmojiManager;
 
-import de.btobastian.javacord.entities.Channel;
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.Reaction;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
 import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
@@ -59,8 +61,10 @@ public class MedalHandler {
 			name = name.toLowerCase();
 			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
-			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&limit=5&jp="+jp;
-			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
+			//Filters only the 6* medals to avoid double results
+			String filter = URLEncoder.encode("where[0][filter]", "UTF-8") + "=rarity&" + URLEncoder.encode("where[0][type]", "UTF-8") + "=group&" + URLEncoder.encode("where[0][value][]", "UTF-8") + "=6";
+			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&" + filter + "&limit=5&jp="+jp;
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
@@ -76,7 +80,6 @@ public class MedalHandler {
 			}
 			con.disconnect();
 			String response = "{queries:"+sb.toString()+"}";
-			System.out.println(response);
 			Gson gson = new Gson();
 			return gson.fromJson(response, SearchQuery.class);
 		} catch (IOException e) {
@@ -101,7 +104,7 @@ public class MedalHandler {
 		}
 		try {
 			String searchQuery = "id=" + mid + "&type=view&method=directory";
-			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
@@ -111,19 +114,17 @@ public class MedalHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			InputStream in = con.getInputStream();
+			Scanner in = new Scanner(con.getInputStream());
 			con.connect();
 			StringBuilder sb = new StringBuilder();
-			while(in.available()>0) {
-				sb.append((char) in.read());
+			while(in.hasNext()) {
+				sb.append(in.next() + " ");
 			}
+			in.close();
 			con.disconnect();
-			String response = sb.toString().substring(1, sb.length()-1);
-			Gson gson = new Gson();
-			RawMedal raw = gson.fromJson(response, RawMedal.class);
-			raw.mid = mid;
-			raw.name = raw.name.replaceAll("Namine", "Namin\u00E9").replaceAll("Lumiere", "Lumi\u00E8re");
-			Medal medal = raw.toMedal();
+			String response = sb.toString();
+			Gson gson = new GsonBuilder().registerTypeAdapter(Medal.class, new MedalDeserializer()).create();
+			Medal medal = gson.fromJson(response, Medal.class);
 			if(game==GameEnum.NA) {
 				if(cachedMedalsNA.contains(medal)) {
 					cachedMedalsNA.add(medal);
@@ -154,6 +155,7 @@ public class MedalHandler {
 		String three = EmojiManager.getForAlias("three").getUnicode();
 		String four = EmojiManager.getForAlias("four").getUnicode();
 		String five = EmojiManager.getForAlias("five").getUnicode();
+		String seven = EmojiManager.getForAlias("seven").getUnicode();
 		String cancel = EmojiManager.getForAlias("x").getUnicode();
 		eb.setColor(Color.YELLOW);
 		eb.setTitle("Did you mean...");
@@ -163,13 +165,12 @@ public class MedalHandler {
 		if(query.size() > 3) eb.addField(four, query.queries.get(3).name, true);
 		if(query.size() > 4) eb.addField(five, query.queries.get(4).name, true);
 		eb.setFooter("Click or tap on the reaction that corresponds with the medal you want.");
-		try {
-			Message futureMessage = message.reply("", eb).get();
+		message.getChannel().sendMessage("", eb).thenAcceptAsync(futureMessage -> {
 			KHUxBot.actionMessages.add(new ActionMessage(futureMessage) {
 				@Override
-				public void run(Reaction reaction) {
-					Channel channel = futureMessage.getChannelReceiver();
-					String unicode = reaction.getUnicodeEmoji();
+				public void run(Reaction reaction, ActionMessage.Type type) {
+					TextChannel channel = futureMessage.getChannel();
+					String unicode = reaction.getEmoji().asUnicodeEmoji().get();
 					String choice = "";
 					if(unicode.equals(one)) {
 						choice += query.queries.get(0).mid;
@@ -192,36 +193,53 @@ public class MedalHandler {
 						e.printStackTrace();
 					}
 					Medal medal = KHUxBot.medalHandler.getMedalByMid(choice, game);
-					EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal);
+					EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal, false);
+					Messageable receiver;
 					if(channel != null) {
-						channel.sendMessage("", build);
+						receiver = channel;
 					} else {
-						message.getAuthor().sendMessage("", build);
+						receiver = message.getUserAuthor().get();
 					}
+					receiver.sendMessage(build).thenAcceptAsync(mes -> {
+						if(medal.hasSeven()) {
+							mes.addReaction(seven);
+							KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
+								@Override
+								public void run(Reaction reaction, ActionMessage.Type type) {
+									if(reaction.getEmoji().isUnicodeEmoji()) {
+										String emoji = reaction.getEmoji().asUnicodeEmoji().get();
+										if(emoji.equals(seven)) {
+											if(type == ActionMessage.Type.ADD) {
+												//Edit message to view 7 star
+												mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, true));
+											}else {
+												//Edit message to view 6 star
+												mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, false));
+											}
+										}
+									}
+								}
+								public boolean test(ActionMessage.Type type) {
+									return true;
+								}
+							});
+						}
+					});
 				}
 			});
-			futureMessage.addUnicodeReaction(one);
-			//It needs to wait for the reaction to actually be added. I've tried using Future.isDone(), but that doesn't seem to work.
-			//Could potentially break if speed is slow
-			Thread.sleep(350);
-			futureMessage.addUnicodeReaction(two);
+			futureMessage.addReaction(one);
+			futureMessage.addReaction(two);
 			if(query.size()>2) {
-				Thread.sleep(350);
-				futureMessage.addUnicodeReaction(three);
+				futureMessage.addReaction(three);
 				if(query.size()>3) {
-					Thread.sleep(350);
-					futureMessage.addUnicodeReaction(four);
+					futureMessage.addReaction(four);
 					if(query.size()>4) {
-						Thread.sleep(350);
-						futureMessage.addUnicodeReaction(five);
+						futureMessage.addReaction(five);
 					}
 				}
 			}
-			Thread.sleep(350);
-			futureMessage.addUnicodeReaction(cancel);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
+			futureMessage.addReaction(cancel);
+		});
 	}
 	
 	/**
@@ -229,15 +247,25 @@ public class MedalHandler {
 	 * @param medal the selected medal
 	 * @return An embeded message for the user to receive
 	 */
-	public EmbedBuilder prepareMedalMessage(Medal medal) {
+	public EmbedBuilder prepareMedalMessage(Medal m, boolean isSeven) {
+		MedalDetails medal = isSeven ? m.getSeven() : m.getSix();
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
-		eb.setTitle(medal.name);
+		eb.setTitle(medal.name + " - " + (isSeven ? "7" : "6") + "\u2605");
 		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setImage(imgLink);
-		eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special), true);
+		if(medal.special.isEmpty()) { //Some 7* medals don't have an updated description, so replace it with 6*
+			System.out.println("Reusing");
+			eb.addField("Special", StringEscapeUtils.unescapeHtml4(m.getSix().special).replaceAll("<b>|<\\/b>", "**"), true);
+		}else {
+			eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special).replaceAll("<b>|<\\/b>", "**"), true);
+		}
 		eb.addField("Type/Attribute", medal.type.name+"/"+medal.attribute.name, true);
-		eb.addField("Strength", ""+medal.strength, true);
+		if(isSeven && medal.strength < 1000) { //857 is the calculated result from a medal with 0 as the min_strength
+			eb.addField("Strength", "Unknown", true);
+		}else {
+			eb.addField("Strength", ""+medal.strength, true);
+		}
 		eb.addField("Gauges", ""+medal.gauges, true);
 		eb.addField("Tier", ""+medal.tier.tier, true);
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -251,7 +279,7 @@ public class MedalHandler {
 		eb.addField("Multiplier", range, true);
 		eb.addField("Mult. w/ Max Guilt", range2, true);
 		eb.addField("Target", medal.target.name, true);
-		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of lvl 100 with max dots. See website for more specific info.");
+		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available 2 hours after the message appears.");
 		return eb;
 	}
 	

@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
-import de.btobastian.javacord.entities.Server;
+import org.javacord.api.entity.server.Server;
+
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
 
@@ -74,7 +75,7 @@ public class ServerConfig {
 	 * @param serverId id of the server
 	 */
 	public ServerConfig(Server server){
-		this(server.getId());
+		this(server.getIdAsString());
 	}
 	
 	/**
@@ -216,16 +217,16 @@ public class ServerConfig {
 		p.setProperty("Lux_Selections_JP", ""+luxSelectionsJP);
 		p.setProperty("UC_Selections_NA", ""+ucSelectionsNA);
 		p.setProperty("UC_Selections_JP", ""+ucSelectionsJP);
-		
-		FileOutputStream os;
-		try {
-			os = new FileOutputStream(new File(fileName));
-			p.store(os, "This is the config file for the Discord server: " + KHUxBot.api.getServerById(serverId).getName());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			
+		KHUxBot.api.getServerById(serverId).ifPresent(server -> {
+			try {
+				FileOutputStream os = new FileOutputStream(new File(fileName));
+				p.store(os, "This is the config file for the Discord server: " + server.getName());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+			
 	}
 	
 	/**
@@ -234,18 +235,17 @@ public class ServerConfig {
 	 * @param value
 	 */
 	public void putConfig(String prop, String value) {
-		FileInputStream in;
-		try {
-			in = new FileInputStream(new File(fileName));
-			Properties p = new Properties();
-			p.load(in);
-			p.setProperty(prop, value);
-			p.store(new FileOutputStream(fileName), "This is the config file for the Discord server: " + KHUxBot.api.getServerById(serverId).getName());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		KHUxBot.api.getServerById(serverId).ifPresent(server -> {
+			try {
+				FileInputStream in = new FileInputStream(new File(fileName));
+				Properties p = new Properties();
+				p.load(in);
+				p.setProperty(prop, value);
+				p.store(new FileOutputStream(fileName), "This is the config file for the Discord server: " + server.getName());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 }

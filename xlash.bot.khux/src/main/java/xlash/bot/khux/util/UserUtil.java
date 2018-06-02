@@ -1,7 +1,7 @@
 package xlash.bot.khux.util;
 
-import de.btobastian.javacord.entities.Server;
-import de.btobastian.javacord.entities.User;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 
 /**
  * Methods that are useful for the User class
@@ -16,11 +16,7 @@ public class UserUtil {
 	 * @return the user's nickname
 	 */
 	public static String getNickname(User u, Server s) {
-		String nickname = u.getNickname(s);
-		if(nickname==null||nickname.isEmpty()) {
-			nickname = u.getName();
-		}
-		return nickname;
+		return u.getNickname(s).orElse(u.getName());
 	}
 
 }

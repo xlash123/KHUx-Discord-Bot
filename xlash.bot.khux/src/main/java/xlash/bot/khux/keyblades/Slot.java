@@ -3,7 +3,7 @@ package xlash.bot.khux.keyblades;
 import java.util.ArrayList;
 
 import xlash.bot.khux.medals.Attribute;
-import xlash.bot.khux.medals.Medal;
+import xlash.bot.khux.medals.MedalDetails;
 import xlash.bot.khux.medals.Type;
 
 public class Slot {
@@ -86,7 +86,7 @@ public class Slot {
 	 * @param level of the Keyblade
 	 * @return
 	 */
-	public float getSlotMultipler(Medal medal, int slotNumber, int level) {
+	public float getSlotMultipler(MedalDetails medal, int slotNumber, int level) {
 		return getSlotMultiplier(medal.attribute, medal.type, slotNumber, level);
 	}
 	

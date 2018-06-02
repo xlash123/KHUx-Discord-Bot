@@ -1,7 +1,8 @@
 package xlash.bot.khux.commands;
 
-import de.btobastian.javacord.entities.message.Message;
-import de.btobastian.javacord.entities.message.embed.EmbedBuilder;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+
 import xlash.bot.khux.KHUxBot;
 import xlash.bot.khux.config.ServerConfig;
 
@@ -68,8 +69,8 @@ public abstract class CommandBase{
 	 * @return server config
 	 */
 	public final ServerConfig getServerConfig(Message message){
-		if(message.getChannelReceiver() != null) {
-			return KHUxBot.getServerConfig(message.getChannelReceiver().getServer());
+		if(message.getChannel() != null) {
+			return KHUxBot.getServerConfig(message.getServer().get());
 		}else return ServerConfig.getBlank();
 	}
 	
@@ -83,7 +84,7 @@ public abstract class CommandBase{
 		eb.addField("Description", this.getDescription(), false);
 		eb.addField("Aliases", this.getAliasesTogether(), false);
 		eb.addField("Usage", this.getUsage(), false);
-		message.reply("", eb);
+		message.getChannel().sendMessage("", eb);
 	}
 
 }
