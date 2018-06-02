@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.8.1";
-	public static final String CHANGELOG = "Fixed issue with the 5th UC time going off when the 4th time is selected. You'll need to reconfigure !uc on to fix this.";
+	public static final String VERSION = "1.9.0";
+	public static final String CHANGELOG = "Added 7 star medals! Simply click or tap the reaction emoji on any applicable medal data screen to switch between 6 and 7 star data dynamically. Changes in the ability will be bolded.\n\nPlease note that since 7 star medals are very new, some medals may have incomplete data.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
