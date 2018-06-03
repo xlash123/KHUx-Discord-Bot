@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.9.0";
-	public static final String CHANGELOG = "Added 7 star medals! Simply click or tap the reaction emoji on any applicable medal data screen to switch between 6 and 7 star data dynamically. Changes in the ability will be bolded.\n\nPlease note that since 7 star medals are very new, some medals may have incomplete data.";
+	public static final String VERSION = "1.9.1";
+	public static final String CHANGELOG = "Fixed some medals not giving the 7 star option despite having the data.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
