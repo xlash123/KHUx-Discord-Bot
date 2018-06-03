@@ -7,7 +7,6 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
-import xlash.bot.khux.medals.Medal;
 import xlash.bot.khux.medals.SearchQuery;
 
 /**
@@ -39,8 +38,7 @@ public class MedalJPCommand extends CommandBase{
 			eb.setDescription("I could not find any medals with that name.");
 			message.getChannel().sendMessage("", eb);
 		}else if(query.queries.size()==1) {
-			Medal medal = KHUxBot.medalHandler.getMedalByMid(query.queries.get(0).mid, game);
-			message.getChannel().sendMessage("", KHUxBot.medalHandler.prepareMedalMessage(medal, false));
+			KHUxBot.medalHandler.createMedalMessage(KHUxBot.medalHandler.getMedalByMid(query.queries.get(0).mid, game), message);
 		}else {
 			KHUxBot.medalHandler.promptQuery(query, message, game);
 		}

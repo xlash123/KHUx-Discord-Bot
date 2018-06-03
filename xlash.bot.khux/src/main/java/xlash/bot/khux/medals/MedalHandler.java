@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -33,19 +32,7 @@ import xlash.bot.khux.KHUxBot;
  */
 public class MedalHandler {
 	
-	public ArrayList<Medal> cachedMedalsNA = new ArrayList<>();
-	public ArrayList<Medal> cachedMedalsJP = new ArrayList<>();
-	
 	public MedalHandler() {
-		
-	}
-	
-	/**
-	 * Clears the cache of all medal databases.
-	 */
-	public void clearDatabase() {
-		cachedMedalsNA.clear();
-		cachedMedalsNA.clear();
 	}
 	
 	/**
@@ -96,12 +83,6 @@ public class MedalHandler {
 	 * @return
 	 */
 	public Medal getMedalByMid(String mid, GameEnum game) {
-		for(Medal m : cachedMedalsNA) {
-			if(m.mid.equals(mid)) return m;
-		}
-		for(Medal m : cachedMedalsJP) {
-			if(m.mid.equals(mid)) return m;
-		}
 		try {
 			String searchQuery = "id=" + mid + "&type=view&method=directory";
 			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
@@ -123,17 +104,9 @@ public class MedalHandler {
 			in.close();
 			con.disconnect();
 			String response = sb.toString();
+			System.out.println(response);
 			Gson gson = new GsonBuilder().registerTypeAdapter(Medal.class, new MedalDeserializer()).create();
 			Medal medal = gson.fromJson(response, Medal.class);
-			if(game==GameEnum.NA) {
-				if(cachedMedalsNA.contains(medal)) {
-					cachedMedalsNA.add(medal);
-				}
-			}else {
-				if(cachedMedalsNA.contains(medal) && cachedMedalsJP.contains(medal)) {
-					cachedMedalsJP.add(medal);
-				}
-			}
 			return medal;
 		} catch (IOException e) {
 			System.err.println("An error occured while searching for mid: " + mid);
@@ -155,7 +128,6 @@ public class MedalHandler {
 		String three = EmojiManager.getForAlias("three").getUnicode();
 		String four = EmojiManager.getForAlias("four").getUnicode();
 		String five = EmojiManager.getForAlias("five").getUnicode();
-		String seven = EmojiManager.getForAlias("seven").getUnicode();
 		String cancel = EmojiManager.getForAlias("x").getUnicode();
 		eb.setColor(Color.YELLOW);
 		eb.setTitle("Did you mean...");
@@ -169,7 +141,6 @@ public class MedalHandler {
 			KHUxBot.actionMessages.add(new ActionMessage(futureMessage) {
 				@Override
 				public void run(Reaction reaction, ActionMessage.Type type) {
-					TextChannel channel = futureMessage.getChannel();
 					String unicode = reaction.getEmoji().asUnicodeEmoji().get();
 					String choice = "";
 					if(unicode.equals(one)) {
@@ -193,38 +164,7 @@ public class MedalHandler {
 						e.printStackTrace();
 					}
 					Medal medal = KHUxBot.medalHandler.getMedalByMid(choice, game);
-					EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal, false);
-					Messageable receiver;
-					if(channel != null) {
-						receiver = channel;
-					} else {
-						receiver = message.getUserAuthor().get();
-					}
-					receiver.sendMessage(build).thenAcceptAsync(mes -> {
-						if(medal.hasSeven()) {
-							mes.addReaction(seven);
-							KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
-								@Override
-								public void run(Reaction reaction, ActionMessage.Type type) {
-									if(reaction.getEmoji().isUnicodeEmoji()) {
-										String emoji = reaction.getEmoji().asUnicodeEmoji().get();
-										if(emoji.equals(seven)) {
-											if(type == ActionMessage.Type.ADD) {
-												//Edit message to view 7 star
-												mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, true));
-											}else {
-												//Edit message to view 6 star
-												mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, false));
-											}
-										}
-									}
-								}
-								public boolean test(ActionMessage.Type type) {
-									return true;
-								}
-							});
-						}
-					});
+					createMedalMessage(medal, message);
 				}
 			});
 			futureMessage.addReaction(one);
@@ -239,6 +179,49 @@ public class MedalHandler {
 				}
 			}
 			futureMessage.addReaction(cancel);
+		});
+	}
+	
+	/**
+	 * Creates and sends the medal message to the channel specified by the message
+	 * @param medal
+	 * @param message
+	 */
+	public void createMedalMessage(Medal medal, Message message) {
+		String seven = EmojiManager.getForAlias("seven").getUnicode();
+		TextChannel channel = message.getChannel();
+		EmbedBuilder build = KHUxBot.medalHandler.prepareMedalMessage(medal, false);
+		Messageable receiver;
+		if(channel != null) {
+			receiver = channel;
+		} else {
+			receiver = message.getUserAuthor().get();
+		}
+		receiver.sendMessage(build).thenAcceptAsync(mes -> {
+			if(medal.hasSeven()) {
+				System.out.println("Has seven");
+				mes.addReaction(seven);
+				KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
+					@Override
+					public void run(Reaction reaction, ActionMessage.Type type) {
+						if(reaction.getEmoji().isUnicodeEmoji()) {
+							String emoji = reaction.getEmoji().asUnicodeEmoji().get();
+							if(emoji.equals(seven)) {
+								if(type == ActionMessage.Type.ADD) {
+									//Edit message to view 7 star
+									mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, true));
+								}else {
+									//Edit message to view 6 star
+									mes.edit(KHUxBot.medalHandler.prepareMedalMessage(medal, false));
+								}
+							}
+						}
+					}
+					public boolean test(ActionMessage.Type type) {
+						return true;
+					}
+				});
+			}
 		});
 	}
 	
