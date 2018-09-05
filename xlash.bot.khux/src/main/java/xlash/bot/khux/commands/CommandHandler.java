@@ -52,28 +52,32 @@ public class CommandHandler {
 //					}
 					if(com.isAdmin()){
 						User user = message.getUserAuthor().get();
-						Server server = message.getServer().get();
-						boolean admin = false;
-						ServerConfig config = KHUxBot.getServerConfig(server);
-						for(String id : config.admins){
-							if(user.getIdAsString().equals(id)){
-								admin = true;
-								break;
-							}
-						}
-						if(!admin) {
-							Collection<Role> roles = user.getRoles(server);
-							for(Role r : roles){
-								//This works, so if anyone tries to say otherwise, they're high
-								if(r.getPermissions().getState(PermissionType.ADMINISTRATOR)==PermissionState.ALLOWED){
+						
+						if(message.getServer().isPresent()) {
+							Server server = message.getServer().get();
+							boolean admin = false;
+							ServerConfig config = KHUxBot.getServerConfig(server);
+							for(String id : config.admins){
+								if(user.getIdAsString().equals(id)){
 									admin = true;
+									break;
 								}
 							}
+							if(!admin) {
+								Collection<Role> roles = user.getRoles(server);
+								for(Role r : roles){
+									//This works, so if anyone tries to say otherwise, they're high
+									if(r.getPermissions().getState(PermissionType.ADMINISTRATOR)==PermissionState.ALLOWED){
+										admin = true;
+									}
+								}
+							}
+							if(!admin){
+								message.getChannel().sendMessage("Only admins may use this command.");
+								return;
+							}
 						}
-						if(!admin){
-							message.getChannel().sendMessage("Only admins may use this command.");
-							return;
-						}
+						
 					}
 					String argsString = content.substring(content.indexOf(" ")+1);
 					if(argsString.equals(content)) argsString = "";

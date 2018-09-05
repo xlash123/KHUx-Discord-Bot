@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
@@ -21,6 +23,7 @@ import xlash.bot.khux.KHUxBot;
 public class ServerConfig {
 	
 	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/";
+	public static final String USER_DIR = DIRECTORY + "users/";
 	public final String fileName;
 	
 	public volatile String updateChannelNA, updateChannelJP;
@@ -39,15 +42,16 @@ public class ServerConfig {
 	
 	public final String serverId;
 	
-	public String botToken;
+	public boolean isUser;
 	
 	public volatile ArrayList<String> admins;
 	
-	private ServerConfig(String serverId){
+	private ServerConfig(String serverId, boolean user){
+		this.isUser = user;
 		this.serverId = serverId;
-		this.fileName = DIRECTORY + serverId + ".properties";
+		this.fileName = (user ? USER_DIR : DIRECTORY) + serverId + ".properties";
 		init();
-		File file = new File(DIRECTORY + serverId + ".properties");
+		File file = new File(fileName);
 		if(!file.exists()){
 			try {
 				file.getParentFile().mkdirs();
@@ -75,7 +79,11 @@ public class ServerConfig {
 	 * @param serverId id of the server
 	 */
 	public ServerConfig(Server server){
-		this(server.getIdAsString());
+		this(server.getIdAsString(), false);
+	}
+	
+	public ServerConfig(User user) {
+		this(user.getIdAsString(), true);
 	}
 	
 	/**
@@ -115,7 +123,6 @@ public class ServerConfig {
 			in = new FileInputStream(new File(fileName));
 			Properties p = new Properties();
 			p.load(in);
-			this.botToken = p.getProperty("Bot_Token");
 			this.updateChannelNA = p.getProperty("Update_Channel_NA");
 			this.updateChannelJP = p.getProperty("Update_Channel_JP");
 			this.luxChannelNA = p.getProperty("Lux_Channel_NA");
@@ -218,15 +225,23 @@ public class ServerConfig {
 		p.setProperty("UC_Selections_NA", ""+ucSelectionsNA);
 		p.setProperty("UC_Selections_JP", ""+ucSelectionsJP);
 			
-		KHUxBot.api.getServerById(serverId).ifPresent(server -> {
+		if(isUser) {
 			try {
 				FileOutputStream os = new FileOutputStream(new File(fileName));
-				p.store(os, "This is the config file for the Discord server: " + server.getName());
-			} catch (IOException e) {
+				p.store(os, "This is the config file for the user: " + KHUxBot.api.getUserById(serverId).get().getDiscriminatedName());
+			} catch (IOException | InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
-		});
-			
+		}else{
+			KHUxBot.api.getServerById(serverId).ifPresent(server -> {
+				try {
+					FileOutputStream os = new FileOutputStream(new File(fileName));
+					p.store(os, "This is the config file for the Discord server: " + server.getName());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -235,17 +250,30 @@ public class ServerConfig {
 	 * @param value
 	 */
 	public void putConfig(String prop, String value) {
-		KHUxBot.api.getServerById(serverId).ifPresent(server -> {
+		if(isUser) {
 			try {
 				FileInputStream in = new FileInputStream(new File(fileName));
 				Properties p = new Properties();
 				p.load(in);
 				p.setProperty(prop, value);
-				p.store(new FileOutputStream(fileName), "This is the config file for the Discord server: " + server.getName());
-			} catch (IOException e) {
+				p.store(new FileOutputStream(fileName), "This is the config file for the Discord server: " + KHUxBot.api.getUserById(serverId).get().getDiscriminatedName());
+			} catch (IOException | InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
-		});
+		}else{
+			KHUxBot.api.getServerById(serverId).ifPresent(server -> {
+				try {
+					FileInputStream in = new FileInputStream(new File(fileName));
+					Properties p = new Properties();
+					p.load(in);
+					p.setProperty(prop, value);
+					p.store(new FileOutputStream(fileName), "This is the config file for the Discord server: " + server.getName());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
+		this.loadConfig();
 	}
 
 }

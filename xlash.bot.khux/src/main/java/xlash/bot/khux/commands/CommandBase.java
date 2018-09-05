@@ -69,9 +69,9 @@ public abstract class CommandBase{
 	 * @return server config
 	 */
 	public final ServerConfig getServerConfig(Message message){
-		if(message.getChannel() != null) {
+		if(message.getServer().isPresent()) {
 			return KHUxBot.getServerConfig(message.getServer().get());
-		}else return ServerConfig.getBlank();
+		}else return KHUxBot.getServerConfig(message.getUserAuthor().get());
 	}
 	
 	/**
@@ -85,6 +85,14 @@ public abstract class CommandBase{
 		eb.addField("Aliases", this.getAliasesTogether(), false);
 		eb.addField("Usage", this.getUsage(), false);
 		message.getChannel().sendMessage("", eb);
+	}
+	
+	public void reply(Message message, String content) {
+		message.getChannel().sendMessage(content);
+	}
+	
+	public void reply(Message message, EmbedBuilder eb) {
+		message.getChannel().sendMessage(eb);
 	}
 
 }

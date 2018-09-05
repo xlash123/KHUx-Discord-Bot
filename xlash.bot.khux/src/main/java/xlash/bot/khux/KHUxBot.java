@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -18,7 +19,6 @@ import org.javacord.api.entity.user.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import xlash.bot.khux.TwitterHandler.Tweet;
 import xlash.bot.khux.commands.AdminCommand;
 import xlash.bot.khux.commands.CommandHandler;
 import xlash.bot.khux.commands.ConfigCommand;
@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.9.1";
-	public static final String CHANGELOG = "Fixed some medals not giving the 7 star option despite having the data.";
+	public static final String VERSION = "1.10.0";
+	public static final String CHANGELOG = "You can now PM the bot directly using any command, such as !lux and !uc. Anything you configure will be remembered specifically for you. No more bugging your server owners to turn on reminders just for you!";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
@@ -154,157 +154,61 @@ public class KHUxBot {
 		scheduler.addEvent(new Event("NA Lux On", true, GameEnum.NA, BonusTimes.doubleLuxStartNA){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.NA), BonusTimes.doubleLuxStartNA).contains(currentTime)) {
-						if(!config.luxChannelNA.isEmpty()){
-							server.getTextChannelById(config.luxChannelNA).ifPresent(channel -> {
-								channel.sendMessage("NA: " + config.luxOnPrompt);
-							});
-						}
-					}
-				}
+				setLux(GameEnum.NA, true, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("NA Lux Off", true, GameEnum.NA, BonusTimes.doubleLuxStopNA){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.NA), BonusTimes.doubleLuxStopNA).contains(currentTime)) {
-						if(!config.luxChannelNA.isEmpty()){
-							server.getTextChannelById(config.luxChannelNA).ifPresent(channel -> {
-								channel.sendMessage("NA: " + config.luxOffPrompt);
-							});
-						}
-					}
-				}
+				setLux(GameEnum.NA, false, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("JP Lux On", true, GameEnum.JP, BonusTimes.doubleLuxStartJP){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.JP), BonusTimes.doubleLuxStartJP).contains(currentTime)) {
-						if(!config.luxChannelJP.isEmpty()){
-							server.getTextChannelById(config.luxChannelJP).ifPresent(channel -> {
-								channel.sendMessage("JP: " + config.luxOnPrompt);
-							});
-						}
-					}
-				}
+				setLux(GameEnum.JP, true, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("JP Lux Off", true, GameEnum.JP, BonusTimes.doubleLuxStopJP){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(LuxCommand.getTimes(config, GameEnum.JP), BonusTimes.doubleLuxStopJP).contains(currentTime)) {
-						if(!config.luxChannelJP.isEmpty()){
-							server.getTextChannelById(config.luxChannelJP).ifPresent(channel -> {
-								channel.sendMessage("JP: " + config.luxOffPrompt);
-							});
-						}
-					}
-				}
+				setLux(GameEnum.JP, false, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("NA UX On", true, GameEnum.NA, BonusTimes.uxBonusStartNA){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.NA), BonusTimes.uxBonusStartNA).contains(currentTime)) {
-						if(!config.ucChannelNA.isEmpty()){
-							server.getTextChannelById(config.ucChannelNA).ifPresent(channel -> {
-								channel.sendMessage("NA: " + config.ucOnPrompt);
-							});
-						}
-					}
-				}
+				setUX(GameEnum.NA, true, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("NA UX Off", true, GameEnum.NA, BonusTimes.uxBonusEndNA){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.NA), BonusTimes.uxBonusEndNA).contains(currentTime)) {
-						if(!config.ucChannelNA.isEmpty()){
-							server.getTextChannelById(config.ucChannelNA).ifPresent(channel -> {
-								channel.sendMessage("NA: " + config.ucOffPrompt);
-							});
-						}
-					}
-				}
+				setUX(GameEnum.NA, false, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("JP UX On", true, GameEnum.JP, BonusTimes.uxBonusStartJP){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.JP), BonusTimes.uxBonusStartJP).contains(currentTime)) {
-						if(!config.ucChannelJP.isEmpty()){
-							server.getTextChannelById(config.ucChannelJP).ifPresent(channel -> {
-								channel.sendMessage("JP: " + config.ucOnPrompt);
-							});
-						}
-					}
-				}
+				setUX(GameEnum.JP, true, currentTime);
 			}
 		});
 		scheduler.addEvent(new Event("JP UX Off", true, GameEnum.JP, BonusTimes.uxBonusEndJP){
 			@Override
 			public void run(String currentTime) {
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, GameEnum.JP), BonusTimes.uxBonusEndJP).contains(currentTime)) {
-						if(!config.ucChannelJP.isEmpty()){
-							server.getTextChannelById(config.ucChannelJP).ifPresent(channel -> {
-								channel.sendMessage("JP: " + config.ucOffPrompt);
-							});
-						}
-					}
-				}
+				setUX(GameEnum.JP, false, currentTime);
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update NA", true, 1) {
 			@Override
 			public void run() {
-				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.NA, true);
-				if(tweets.isEmpty()) return;
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(!config.updateChannelNA.isEmpty()){
-						server.getTextChannelById(config.updateChannelNA).ifPresent(channel -> {
-							for (Tweet tweet : tweets) {
-								if (tweet != null)
-									channel.sendMessage(tweet.getLink());
-							}
-						});
-					}
-				}
+				twitterHandler.sendNewUpdates(serverConfigs, GameEnum.NA);
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Twitter Update JP", true, 1) {
 			@Override
 			public void run() {
-				ArrayList<Tweet> tweets = twitterHandler.getNewTwitterLinks(GameEnum.JP, true);
-				if(tweets.isEmpty()) return;
-				for(Server server : api.getServers()){
-					ServerConfig config = getServerConfig(server);
-					if(!config.updateChannelNA.isEmpty()){
-						server.getTextChannelById(config.updateChannelJP).ifPresent(channel -> {
-							for (Tweet tweet : tweets) {
-								if (tweet != null)
-									channel.sendMessage(tweet.getLink());
-							}
-						});
-					}
-				}
+				twitterHandler.sendNewUpdates(serverConfigs, GameEnum.JP);
 			}
 		});
 		scheduler.addTimedEvent(new TimedEvent("Bot Update", true, 20) {
@@ -386,6 +290,34 @@ public class KHUxBot {
 		System.out.println("Initialization finished!");
 	}
 	
+	public void setLux(GameEnum game, boolean on, String currentTime) {
+		for(ServerConfig config : serverConfigs){
+			String[] times = on ? (game==GameEnum.NA ? BonusTimes.doubleLuxStartNA : BonusTimes.doubleLuxStartJP) : (game==GameEnum.NA ? BonusTimes.doubleLuxStopNA : BonusTimes.doubleLuxStopJP);
+			if(BonusTimes.getTimes(LuxCommand.getTimes(config, game), times).contains(currentTime)) {
+				String channel = game==GameEnum.NA ? config.updateChannelNA : config.updateChannelJP;
+				if(!channel.isEmpty()){
+					api.getTextChannelById(channel).ifPresent(c -> {
+						c.sendMessage(game.toString() + ": " + (on ? config.luxOnPrompt : config.luxOffPrompt));
+					});
+				}
+			}
+		}
+	}
+	
+	public void setUX(GameEnum game, boolean on, String currentTime) {
+		for(ServerConfig config : serverConfigs){
+			String[] times = on ? (game==GameEnum.NA ? BonusTimes.uxBonusStartNA : BonusTimes.uxBonusStartJP) : (game==GameEnum.NA ? BonusTimes.uxBonusStartNA : BonusTimes.uxBonusEndNA);
+			if(BonusTimes.getTimes(UnionCrossCommand.getTimes(config, game), times).contains(currentTime)) {
+				String channel = game==GameEnum.NA ? config.ucChannelNA : config.ucChannelJP;
+				if(!channel.isEmpty()){
+					api.getTextChannelById(channel).ifPresent(c -> {
+						c.sendMessage(game.toString() + ": " + (on ? config.ucOnPrompt : config.ucOffPrompt));
+					});
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Returns the ServerConfig class for the specified server.
 	 * @param server to grab config for
@@ -399,6 +331,23 @@ public class KHUxBot {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns the ServerConfig class for the specified server.
+	 * @param server to grab config for
+	 * @return ServerConfig, or null if not registered.
+	 */
+	public static ServerConfig getServerConfig(User user){
+		String id = user.getIdAsString();
+		for(ServerConfig config : serverConfigs){
+			if(id.equals(config.serverId)){
+				return config;
+			}
+		}
+		ServerConfig ret = new ServerConfig(user);
+		serverConfigs.add(ret);
+		return ret;
 	}
 	
 	/**
@@ -478,6 +427,19 @@ public class KHUxBot {
 				serverConfigs.remove(getServerConfig(server));
 			}
 		});
+		
+		File userFiles = new File(ServerConfig.USER_DIR);
+		for(File file : userFiles.listFiles()){
+			String id = file.getName().substring(0, file.getName().lastIndexOf("."));
+			try {
+				User user = api.getUserById(id).get();
+				serverConfigs.add(new ServerConfig(user));
+				user.sendMessage("");
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		scheduler.startThread();
 		System.out.println("Connected to servers:");
 		for(Server server : api.getServers()){
