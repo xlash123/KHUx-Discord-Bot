@@ -16,10 +16,10 @@
 </repository>
   </repositories>
   <dependencies>
-  <dependency>
-    <groupId>de.btobastian.Javacord</groupId>
+<dependency>
+    <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>6ad0034</version>
+    <version>3.0.0</version>
     <type>pom</type>
 </dependency>
 <dependency>
