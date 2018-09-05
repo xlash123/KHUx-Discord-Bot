@@ -1,10 +1,16 @@
 package xlash.bot.khux;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
+import xlash.bot.khux.TwitterHandler.Tweet;
+import xlash.bot.khux.config.ServerConfig;
 
 /**
  * Manages all the Twitter functionality. No, I'm not going to use their API.
@@ -24,6 +30,31 @@ public class TwitterHandler {
 	public TwitterHandler() {
 		latestTweetsNA = this.getCurrentTweetList(GameEnum.NA);
 		latestTweetsJP = this.getCurrentTweetList(GameEnum.JP);
+	}
+	
+	public boolean sendNewUpdates(Collection<ServerConfig> configs, GameEnum game) {
+		ArrayList<Tweet> tweets = this.getNewTwitterLinks(game, true);
+		if(tweets.isEmpty()) return false;
+		
+		if(configs != null) {
+			for(ServerConfig config: configs) {
+				sendNewUpdates(config, game, tweets);
+			}
+		}
+		
+		return true;
+	}
+	
+	public void sendNewUpdates(ServerConfig config, GameEnum game, ArrayList<Tweet> tweets) {
+		String channelId = game == GameEnum.NA ? config.updateChannelNA : config.updateChannelJP;
+		if(!channelId.isEmpty()){
+			KHUxBot.api.getTextChannelById(channelId).ifPresent(channel -> {
+				for (Tweet tweet : tweets) {
+					if (tweet != null)
+						channel.sendMessage(tweet.getLink());
+				}
+			});
+		}
 	}
 
 	/**
