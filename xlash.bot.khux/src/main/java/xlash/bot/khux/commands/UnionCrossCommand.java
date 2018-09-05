@@ -3,7 +3,7 @@ package xlash.bot.khux.commands;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -59,20 +59,20 @@ public class UnionCrossCommand extends CommandBase{
 			for(int i=0; i<timesJP.length; i++) {
 				if(timesJP[i]) strTimesJP += BonusTimes.getTimeLocalized(BonusTimes.uxBonusStartJP[i]) + ", ";
 			}
-			Optional<ServerChannel> naChannel = KHUxBot.api.getServerChannelById(config.ucChannelNA);
-			Optional<ServerChannel> jpChannel = KHUxBot.api.getServerChannelById(config.ucChannelJP);
+			Optional<TextChannel> naChannel = KHUxBot.api.getTextChannelById(config.ucChannelNA);
+			Optional<TextChannel> jpChannel = KHUxBot.api.getTextChannelById(config.ucChannelJP);
 			if (naChannel.isPresent() && !strTimesNA.isEmpty()) {
 				strTimesNA = strTimesNA.substring(0, strTimesNA.length()-2);
-				message.getChannel().sendMessage("UC reminders for NA are set for channel: #"
-						+ naChannel.get().getName()+"\n"+
+				message.getChannel().sendMessage("UC reminders for NA are set for channel: <#"
+						+ naChannel.get().getIdAsString()+">\n"+
 						"The registered times for NA are " + strTimesNA + ".");
 			}
 			else
 				message.getChannel().sendMessage("UC reminders for NA are currently turned off.");
 			if (jpChannel.isPresent() && strTimesJP.isEmpty()) {
 				strTimesJP = strTimesJP.substring(0, strTimesJP.length()-2);
-				message.getChannel().sendMessage("UC reminders for JP are set for channel: #"
-						+ jpChannel.get().getName()+"\n"+
+				message.getChannel().sendMessage("UC reminders for JP are set for channel: <#"
+						+ jpChannel.get().getIdAsString()+">\n"+
 						"The registered times for JP are " + strTimesJP + ".");
 			}
 			else

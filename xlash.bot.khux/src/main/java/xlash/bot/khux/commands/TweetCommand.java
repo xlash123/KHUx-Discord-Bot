@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 
 import xlash.bot.khux.GameEnum;
@@ -68,13 +69,13 @@ public class TweetCommand extends CommandBase{
 			}
 			break;
 		case "status":
-			Optional<ServerChannel> naChannel = KHUxBot.api.getServerChannelById(config.updateChannelNA);
-			Optional<ServerChannel> jpChannel = KHUxBot.api.getServerChannelById(config.updateChannelJP);
+			Optional<TextChannel> naChannel = KHUxBot.api.getTextChannelById(config.updateChannelNA);
+			Optional<TextChannel> jpChannel = KHUxBot.api.getTextChannelById(config.updateChannelJP);
 			if(naChannel.isPresent()) {
-				message.getChannel().sendMessage("NA Twitter update reminders are set for channel: #" + naChannel.get().getName());
+				message.getChannel().sendMessage("NA Twitter update reminders are set for channel: <#" + naChannel.get().getIdAsString() + ">");
 			}else message.getChannel().sendMessage("NA Twitter updates are currently turned off.");
 			if(jpChannel.isPresent()) {
-				message.getChannel().sendMessage("JP Twitter update reminders are set for channel: #" + jpChannel.get().getName());
+				message.getChannel().sendMessage("JP Twitter update reminders are set for channel: <#" + jpChannel.get().getIdAsString() + ">");
 			}else message.getChannel().sendMessage("JP Twitter updates are currently turned off.");
 			return;
 			default:

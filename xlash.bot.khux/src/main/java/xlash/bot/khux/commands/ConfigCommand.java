@@ -17,7 +17,7 @@ public class ConfigCommand extends CommandBase{
 
 	@Override
 	public void onCommand(String[] args, Message message) {
-		if(args.length<3){
+		if(args.length<1){
 			this.printDescriptionUsage(message);
 		}else{
 			ServerConfig config = this.getServerConfig(message);
@@ -25,9 +25,17 @@ public class ConfigCommand extends CommandBase{
 			switch(args[0].toLowerCase()){
 			case "lux":
 				property += "Lux";
+				if(args.length<3){
+					this.printDescriptionUsage(message);
+					return;
+				}
 				break;
 			case "uc":
 				property += "UC";
+				if(args.length<3){
+					this.printDescriptionUsage(message);
+					return;
+				}
 				break;
 			case "get":
 				message.getChannel().sendMessage("Lux On: " + config.luxOnPrompt + "\nLux Off: " + config.luxOffPrompt + "\nUC On: " + config.ucOnPrompt + "\nUC Off: " + config.ucOffPrompt);
