@@ -85,7 +85,7 @@ public class BotConfig {
 		FileOutputStream os;
 		try {
 			os = new FileOutputStream(new File(FILE_NAME));
-			p.store(os, "This is the config file for the KHUx Bot. Consumer/Access tokens are for communicating with the Twitter API.");
+			p.store(os, "This is the config file for the KHUx Bot.");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
