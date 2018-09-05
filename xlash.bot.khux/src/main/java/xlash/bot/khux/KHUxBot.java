@@ -429,14 +429,16 @@ public class KHUxBot {
 		});
 		
 		File userFiles = new File(ServerConfig.USER_DIR);
-		for(File file : userFiles.listFiles()){
-			String id = file.getName().substring(0, file.getName().lastIndexOf("."));
-			try {
-				User user = api.getUserById(id).get();
-				serverConfigs.add(new ServerConfig(user));
-				user.sendMessage("");
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+		if(userFiles != null && userFiles.listFiles() != null) {
+			for(File file : userFiles.listFiles()){
+				String id = file.getName().substring(0, file.getName().lastIndexOf("."));
+				try {
+					User user = api.getUserById(id).get();
+					serverConfigs.add(new ServerConfig(user));
+					user.sendMessage("");
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
