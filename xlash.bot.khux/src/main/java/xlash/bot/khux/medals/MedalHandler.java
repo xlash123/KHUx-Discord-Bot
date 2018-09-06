@@ -104,7 +104,6 @@ public class MedalHandler {
 			in.close();
 			con.disconnect();
 			String response = sb.toString();
-			System.out.println(response);
 			Gson gson = new GsonBuilder().registerTypeAdapter(Medal.class, new MedalDeserializer()).create();
 			Medal medal = gson.fromJson(response, Medal.class);
 			return medal;
@@ -237,7 +236,6 @@ public class MedalHandler {
 		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setImage(imgLink);
 		if(medal.special.isEmpty()) { //Some 7* medals don't have an updated description, so replace it with 6*
-			System.out.println("Reusing");
 			eb.addField("Special", StringEscapeUtils.unescapeHtml4(m.getSix().special).replaceAll("<b>|<\\/b>", "**"), true);
 		}else {
 			eb.addField("Special", StringEscapeUtils.unescapeHtml4(medal.special).replaceAll("<b>|<\\/b>", "**"), true);
