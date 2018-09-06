@@ -51,7 +51,7 @@ public class MedalHandler {
 			//Filters only the 6* medals to avoid double results
 			String filter = URLEncoder.encode("where[0][filter]", "UTF-8") + "=rarity&" + URLEncoder.encode("where[0][type]", "UTF-8") + "=group&" + URLEncoder.encode("where[0][value][]", "UTF-8") + "=6";
 			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&" + filter + "&limit=5&jp="+jp;
-			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
@@ -85,7 +85,7 @@ public class MedalHandler {
 	public Medal getMedalByMid(String mid, GameEnum game) {
 		try {
 			String searchQuery = "id=" + mid + "&type=view&method=directory";
-			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/test.php").openConnection();
+			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
