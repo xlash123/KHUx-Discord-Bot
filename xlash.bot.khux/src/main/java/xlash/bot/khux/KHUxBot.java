@@ -81,39 +81,44 @@ public class KHUxBot {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 0) {
-			String runningFile;
-			try {
-				runningFile = new File(
-						KHUxBot.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-								.getAbsolutePath();
+		if (args.length == 0) startCmd();
+		System.out.println("Running bot version: " + VERSION);
+		findUpdate();
+		botConfig = new BotConfig();
+		botConfig.loadConfig();
+		if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
+			System.out.println("This is your first time running this bot. Thanks for installing!");
+			System.out.println("To being using the bot, please enter your bot token.");
+			System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
+			System.out.print("Enter token: ");
+			Scanner in = new Scanner(System.in);
+			botConfig.botToken = in.nextLine();
+			in.close();
+		}
+		botConfig.saveConfig();
+		new KHUxBot();
+	}
+	
+	public static boolean startCmd() {
+		String runningFile;
+		try {
+			File file = new File(KHUxBot.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			if(!file.isDirectory()) {
+				runningFile = file.getPath();
 				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "start", "java", "-jar",
 						"\"" + runningFile + "\"", "run");
 				builder.redirectErrorStream(true);
 				builder.start();
-				System.out.println("If you're reading this, run with argument 'run'.");
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+				System.exit(0);
+				return true;
 			}
-		} else {
-			System.out.println("Running bot version: " + VERSION);
-			findUpdate();
-			botConfig = new BotConfig();
-			botConfig.loadConfig();
-			if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
-				System.out.println("This is your first time running this bot. Thanks for installing!");
-				System.out.println("To being using the bot, please enter your bot token.");
-				System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
-				System.out.print("Enter token: ");
-				Scanner in = new Scanner(System.in);
-				botConfig.botToken = in.nextLine();
-				in.close();
-			}
-			botConfig.saveConfig();
-			new KHUxBot();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		
+		return false;
 	}
 
 	/**
@@ -221,11 +226,6 @@ public class KHUxBot {
 			@Override
 			public void run(String currentTime) {
 				keybladeHandler.updateKeybladeData();
-			}
-		});
-		scheduler.addTimedEvent(new TimedEvent("Hourly", true, 60) {
-			@Override
-			public void run() {
 				actionMessages.removeIf(a -> a.isExpired());
 			}
 		});

@@ -199,7 +199,6 @@ public class MedalHandler {
 		}
 		receiver.sendMessage(build).thenAcceptAsync(mes -> {
 			if(medal.hasSeven()) {
-				System.out.println("Has seven");
 				mes.addReaction(seven);
 				KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
 					@Override
@@ -262,7 +261,7 @@ public class MedalHandler {
 		eb.addField("Multiplier", range, true);
 		eb.addField("Mult. w/ Max Guilt", range2, true);
 		eb.addField("Target", medal.target.name, true);
-		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available 2 hours after the message appears.");
+		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available ~48 hours after the message appears.");
 		return eb;
 	}
 	

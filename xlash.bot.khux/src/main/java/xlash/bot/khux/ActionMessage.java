@@ -41,11 +41,11 @@ public abstract class ActionMessage {
 	public abstract void run(Reaction reaction, Type type);
 	
 	/**
-	 * Determines if the message is expired and should be deleted (1 hour)
+	 * Determines if the message is expired and should be deleted (24 hours)
 	 * @return if the message is expired
 	 */
 	public boolean isExpired() {
-		return new Date().getTime()-KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli()>=(1000*60*60*2);
+		return new Date().getTime()-KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli()>=(24*60*60*1000);
 	}
 	
 	/**
