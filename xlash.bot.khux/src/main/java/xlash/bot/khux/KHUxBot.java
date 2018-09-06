@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.10.0";
-	public static final String CHANGELOG = "You can now PM the bot directly using any command, such as !lux and !uc. Anything you configure will be remembered specifically for you. No more bugging your server owners to turn on reminders just for you!";
+	public static final String VERSION = "1.10.1";
+	public static final String CHANGELOG = "Fixed some small bugs.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
