@@ -15,7 +15,8 @@ public class MedalDeserializer implements JsonDeserializer<Medal> {
 	public Medal deserialize(JsonElement el, Type type, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject ob = el.getAsJsonObject();
 		Gson gson = new Gson();
-		return new Medal(gson.fromJson(ob.get("6"), RawMedal.class), ob.has("7") ? gson.fromJson(ob.get("7"), RawMedal.class) : null);
+		System.out.println(ob);
+		return new Medal(ob.has("6") ? gson.fromJson(ob.get("6"), RawMedal.class) : null, ob.has("7") ? gson.fromJson(ob.get("7"), RawMedal.class) : null);
 	}
 
 }

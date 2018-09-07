@@ -1,14 +1,18 @@
 package xlash.bot.khux.medals;
 
 import java.awt.Color;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -25,6 +29,7 @@ import com.vdurmont.emoji.EmojiManager;
 import xlash.bot.khux.ActionMessage;
 import xlash.bot.khux.GameEnum;
 import xlash.bot.khux.KHUxBot;
+import xlash.bot.khux.medals.SearchQuery.MedalQuery;
 
 /**
  * Manages all the medals
@@ -49,26 +54,42 @@ public class MedalHandler {
 			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
 			//Filters only the 6* medals to avoid double results
-			String filter = URLEncoder.encode("where[0][filter]", "UTF-8") + "=rarity&" + URLEncoder.encode("where[0][type]", "UTF-8") + "=group&" + URLEncoder.encode("where[0][value][]", "UTF-8") + "=6";
-			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0&" + filter + "&limit=5&jp="+jp;
+			String filter = "&" + URLEncoder.encode("where[0][filter]", "UTF-8") + "=rarity&" + URLEncoder.encode("where[0][type]", "UTF-8") + "=group&" + URLEncoder.encode("where[0][value][]", "UTF-8") + "=6";
+			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0" + "" + "&limit=10&jp="+jp;
 			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+			
 			try(OutputStream out = con.getOutputStream()){
 				out.write(searchQuery.getBytes());
 			}
-			InputStream in = con.getInputStream();
+			Scanner in = new Scanner(con.getInputStream());
 			con.connect();
 			StringBuilder sb = new StringBuilder();
-			while(in.available()>0) {
-				sb.append((char) in.read());
+			while(in.hasNext()) {
+				sb.append(in.next() + " ");
 			}
+			in.close();
 			con.disconnect();
 			String response = "{queries:"+sb.toString()+"}";
 			Gson gson = new Gson();
-			return gson.fromJson(response, SearchQuery.class);
+			SearchQuery res = gson.fromJson(response, SearchQuery.class);
+			//Remove duplicates due to 6 and 7 stars
+			for(int i=0; i<res.queries.size(); i++) {
+				MedalQuery q = res.queries.get(i);
+				if(res.queries.subList(0, i).stream().filter(qr -> qr.mid.equals(q.mid)).count()>0 || res.queries.subList(i+1, res.queries.size()).stream().filter(qr -> qr.mid.equals(q.mid)).count()>0) {
+					res.queries.remove(i);
+					i--;
+				}
+			}
+			//Truncate list to 5 items
+			List<MedalQuery> subList = res.queries.subList(0, res.queries.size()<5 ? res.queries.size() : 5);
+			res.queries = new ArrayList<>();
+			res.queries.addAll(subList);
+			
+			return res;
 		} catch (IOException e) {
 			System.err.println("An error occured while searching for: " + name);
 			e.printStackTrace();
@@ -197,7 +218,7 @@ public class MedalHandler {
 			receiver = message.getUserAuthor().get();
 		}
 		receiver.sendMessage(build).thenAcceptAsync(mes -> {
-			if(medal.hasSeven()) {
+			if(medal.hasSeven() && medal.hasSix()) {
 				mes.addReaction(seven);
 				KHUxBot.actionMessages.add(new ActionMessage(mes, false) {
 					@Override
@@ -229,6 +250,7 @@ public class MedalHandler {
 	 * @return An embeded message for the user to receive
 	 */
 	public EmbedBuilder prepareMedalMessage(Medal m, boolean isSeven) {
+		if(!m.hasSix()) isSeven = true;
 		MedalDetails medal = isSeven ? m.getSeven() : m.getSix();
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.GREEN);
