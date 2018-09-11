@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.10.1";
-	public static final String CHANGELOG = "Fixed some small bugs.";
+	public static final String VERSION = "1.10.3";
+	public static final String CHANGELOG = "Fixed bug with raid messages not appearing/appearing in the update channel.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
@@ -294,7 +294,7 @@ public class KHUxBot {
 		for(ServerConfig config : serverConfigs){
 			String[] times = on ? (game==GameEnum.NA ? BonusTimes.doubleLuxStartNA : BonusTimes.doubleLuxStartJP) : (game==GameEnum.NA ? BonusTimes.doubleLuxStopNA : BonusTimes.doubleLuxStopJP);
 			if(BonusTimes.getTimes(LuxCommand.getTimes(config, game), times).contains(currentTime)) {
-				String channel = game==GameEnum.NA ? config.updateChannelNA : config.updateChannelJP;
+				String channel = game==GameEnum.NA ? config.luxChannelNA : config.luxChannelJP;
 				if(!channel.isEmpty()){
 					api.getTextChannelById(channel).ifPresent(c -> {
 						c.sendMessage(game.toString() + ": " + (on ? config.luxOnPrompt : config.luxOffPrompt));
