@@ -123,14 +123,15 @@ public class BonusTimes {
 		}
 		
 		int closest = Integer.MAX_VALUE;
-		Date now = new Date();
+		Calendar now = Calendar.getInstance(sdf.getTimeZone());
 		for(String time : times) {
 			try {
 				Date luxTime = sdf.parse(time);
-				luxTime.setYear(Calendar.getInstance().get(Calendar.YEAR)-1900);
-				luxTime.setMonth(Calendar.getInstance().get(Calendar.MONTH));
-				luxTime.setDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-				int difference = (int) ((luxTime.getTime() - now.getTime())/1000) + 60;
+				Calendar cal = Calendar.getInstance(sdf.getTimeZone());
+				cal.clear();
+				cal.setTimeInMillis(luxTime.getTime());
+				cal.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+				int difference = (int) ((cal.getTimeInMillis() - now.getTimeInMillis())/1000+60);
 				if(difference < 0) {
 					difference += 86400;
 				}
