@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.10.3";
-	public static final String CHANGELOG = "Fixed bug with raid messages not appearing/appearing in the update channel.";
+	public static final String VERSION = "1.10.4";
+	public static final String CHANGELOG = "Fixed bug that made reminders appear 1 hour too late.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
