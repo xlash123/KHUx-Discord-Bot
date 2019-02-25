@@ -20,6 +20,8 @@ public abstract class ActionMessage {
 	public boolean killable;
 	public boolean dead;
 	
+	public boolean unlocked, supernova;
+	
 	/**
 	 * Runs the run method on the specified message when any reaction emoji surpasses 1 and the optional test method returns true.
 	 * @param message
@@ -45,7 +47,8 @@ public abstract class ActionMessage {
 	 * @return if the message is expired
 	 */
 	public boolean isExpired() {
-		return new Date().getTime()-KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli()>=(24*60*60*1000);
+		long timeDiff = new Date().getTime() - KHUxBot.api.getMessageById(messageId, channel).join().getCreationTimestamp().toEpochMilli();
+		return timeDiff >= (24*60*60*1000); //24 hours
 	}
 	
 	/**
