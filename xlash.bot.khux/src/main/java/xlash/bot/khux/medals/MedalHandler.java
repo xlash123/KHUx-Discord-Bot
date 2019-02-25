@@ -1,14 +1,7 @@
 package xlash.bot.khux.medals;
 
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
@@ -16,11 +9,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Scanner;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.javacord.api.entity.channel.TextChannel;
@@ -61,7 +51,6 @@ public class MedalHandler {
 			name = name.replaceAll(" and ", " & ");
 			name = URLEncoder.encode(name, "UTF-8");
 			//Filters only the 6* medals to avoid double results
-			String filter = "&" + URLEncoder.encode("where[0][filter]", "UTF-8") + "=rarity&" + URLEncoder.encode("where[0][type]", "UTF-8") + "=group&" + URLEncoder.encode("where[0][value][]", "UTF-8") + "=6";
 			String searchQuery = "type=search&table=medals&search="+name+"&order=kid&asc=DESC&method=directory&user=&page=0" + "" + "&limit=10&jp="+jp;
 			HttpURLConnection con = (HttpURLConnection) new URL("https://khuxtracker.com/query.php").openConnection();
 			con.setDoOutput(true);
@@ -334,7 +323,7 @@ public class MedalHandler {
 		}
 		String imgLink = "http://www.khunchainedx.com/w/images" + medal.img;
 		eb.setThumbnail(imgLink);
-		eb.setFooter("Medal information from khuxtracker.com. All info is displayed based off of max level with max dots. See website for more specific info. 7 star toggling will not be available ~48 hours after the message appears.");
+		eb.setFooter("Medal information from khuxtracker.com. All info is generally based on max stats. See website for more specific info. Options below will not work ~48 hours after this message was initially sent.");
 		return eb;
 	}
 	

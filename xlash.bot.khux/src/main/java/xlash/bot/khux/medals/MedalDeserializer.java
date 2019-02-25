@@ -1,7 +1,6 @@
 package xlash.bot.khux.medals;
 
 import java.lang.reflect.Type;
-import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
@@ -16,6 +15,7 @@ public class MedalDeserializer implements JsonDeserializer<Medal> {
 	public Medal deserialize(JsonElement el, Type type, JsonDeserializationContext context) throws JsonParseException {
 		Gson gson = new Gson();
 		JsonObject ob = el.getAsJsonObject();
+		System.out.println(ob);
 		RawMedal baseMedal = gson.fromJson(ob.get("medal"), RawMedal.class);
 		ob = ob.getAsJsonObject("bank2");
 		//If a medal rarity has a supernova, add that supernova. If its unlocked form also has supernova, add that data too (str and supernova)

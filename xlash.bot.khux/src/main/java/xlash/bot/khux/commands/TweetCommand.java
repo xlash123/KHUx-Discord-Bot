@@ -3,7 +3,6 @@ package xlash.bot.khux.commands;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 

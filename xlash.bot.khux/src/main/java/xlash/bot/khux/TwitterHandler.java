@@ -3,13 +3,10 @@ package xlash.bot.khux;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import xlash.bot.khux.TwitterHandler.Tweet;
 import xlash.bot.khux.config.ServerConfig;
 
 /**
