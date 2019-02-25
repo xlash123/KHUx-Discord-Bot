@@ -8,10 +8,10 @@ public class RawMedal {
 	
 	public String mid, name, special, img;
 	public float min_low_damage, min_high_damage, max_low_damage, max_high_damage;
-	public int tier, strength, strength_min, gauges, attribute, type, aoe;
+	public int tier, strength, strength_min, gauges, gauges_additional, hits, attribute, type, aoe;
 	
-	public MedalDetails toMedal() {
-		return new MedalDetails(mid, name, special, type, attribute, tier, min_low_damage, min_high_damage, max_low_damage, max_high_damage, strength, gauges, aoe, img);
+	public Supernova toSupernova() {
+		return new Supernova(special, min_low_damage, min_high_damage, max_low_damage, max_high_damage, gauges_additional, hits, aoe);
 	}
 
 }

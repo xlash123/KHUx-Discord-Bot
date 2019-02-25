@@ -11,8 +11,9 @@ public class MedalDetails {
 	public Attribute attribute;
 	public Tier tier;
 	public float baseLow, baseHigh, maxLow, maxHigh;
-	public int strength, gauges;
+	public int strength, gauges, gaugesAdded;
 	public Target target;
+	public Supernova supernova;
 	
 	/**
 	 * An object representing a medal of specified data
@@ -31,7 +32,7 @@ public class MedalDetails {
 	 * @param target
 	 * @param img
 	 */
-	public MedalDetails(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int target, String img) {
+	public MedalDetails(String mid, String name, String special, int type, int attribute, int tier, float baseLow, float baseHigh, float maxLow, float maxHigh, int strength, int gauges, int gauges_additional, int target, String img, Supernova supernova) {
 		this.mid = mid;
 		this.name = name;
 		this.special = special;
@@ -44,8 +45,10 @@ public class MedalDetails {
 		this.maxHigh = maxHigh;
 		this.strength = strength;
 		this.gauges = gauges;
+		this.gaugesAdded = gauges_additional;
 		this.target = Target.getFromId(target);
 		this.img = img;
+		this.supernova = supernova;
 	}
 	
 	public boolean equals(Object o) {
