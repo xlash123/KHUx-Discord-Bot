@@ -49,8 +49,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.11.0";
-	public static final String CHANGELOG = "Added supernova/unlockable supernova support. Also corrected Tier 9 multiplier. Medal images now appear as a much smaller thumbnail.";
+	public static final String VERSION = "1.11.1";
+	public static final String CHANGELOG = "Minor bug fix.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
