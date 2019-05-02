@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 public class KeybladeHandler {
@@ -67,10 +68,16 @@ public class KeybladeHandler {
 			Gson gson = gsonBuilder.create();
 			this.keyblades.clear();
 			for(int i=0; i<keybladesJson.size(); i++) {
-				JsonElement keybladeJson = keybladesJson.get(i);
-				Keyblade parsedKeyblade = gson.fromJson(keybladeJson, Keyblade.class);
-				System.out.println("Created " + parsedKeyblade.name);
-				keyblades.add(parsedKeyblade);
+				try {
+					JsonElement keybladeJson = keybladesJson.get(i);
+					Keyblade parsedKeyblade = gson.fromJson(keybladeJson, Keyblade.class);
+					if(parsedKeyblade != null) {
+						System.out.println("Created " + parsedKeyblade.name);
+						keyblades.add(parsedKeyblade);
+					}else System.out.println("Failed to create a Keyblade");
+				}catch(JsonParseException e) {
+					System.out.println("Failed to create a Keyblade");
+				}
 			}
 			
 			//Now for the level aliases.

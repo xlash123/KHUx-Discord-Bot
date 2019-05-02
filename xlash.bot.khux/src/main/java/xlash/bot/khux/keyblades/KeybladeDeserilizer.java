@@ -45,7 +45,9 @@ public class KeybladeDeserilizer implements JsonDeserializer<Keyblade>{
 				parseForLevel(attr, attrMultipliers);
 				JsonObject type = slot.getAsJsonObject("type");
 				typeActive = type.get("active").getAsInt();
-				slotType = xlash.bot.khux.medals.Type.getFromName(type.get("name").getAsString());
+				JsonElement typeNameEl = type.get("name");
+				if(typeNameEl.isJsonNull()) return null;
+				slotType = xlash.bot.khux.medals.Type.getFromName(typeNameEl.getAsString());
 				parseForLevel(type, typeMultipliers);
 			}
 			slots[s-1] = new Slot(slotAttribute, slotType, attrActive, typeActive, slotActive, attrMultipliers, typeMultipliers);
