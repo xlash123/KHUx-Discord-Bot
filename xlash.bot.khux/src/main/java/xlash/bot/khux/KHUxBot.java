@@ -86,7 +86,10 @@ public class KHUxBot {
 		findUpdate();
 		botConfig = new BotConfig();
 		botConfig.loadConfig();
-		if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
+		String botTokenEnv = System.getenv("KHUX_API_TOKEN");
+		if (botTokenEnv != null && !botTokenEnv.isEmpty()) {
+			botConfig.botToken = botTokenEnv;
+		}else if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
 			System.out.println("This is your first time running this bot. Thanks for installing!");
 			System.out.println("To being using the bot, please enter your bot token.");
 			System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");
