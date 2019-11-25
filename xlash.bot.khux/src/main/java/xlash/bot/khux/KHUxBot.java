@@ -51,8 +51,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.11.1";
-	public static final String CHANGELOG = "Minor bug fix.";
+	public static final String VERSION = "1.11.2";
+	public static final String CHANGELOG = "Updated Javacord API and made some backend changes. KHUxBot should be more stable now.";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
