@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -87,9 +89,18 @@ public class KHUxBot {
 		botConfig = new BotConfig();
 		botConfig.loadConfig();
 		String botTokenEnv = System.getenv("KHUX_API_TOKEN");
+		String botTokenFile = System.getenv("KHUX_API_TOKEN_FILE");
 		if (botTokenEnv != null && !botTokenEnv.isEmpty()) {
 			botConfig.botToken = botTokenEnv;
-		}else if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
+		} else if (botTokenFile != null && !botTokenFile.isEmpty()) {
+			try {
+				botConfig.botToken = new String(Files.readAllBytes(Paths.get(botTokenFile))).trim();
+			} catch (Exception e){
+				System.out.println("Couldn't read from KHUX_API_TOKEN_FILE\n");
+			}
+		}
+		
+		if (botConfig.botToken == null || botConfig.botToken.isEmpty()) {
 			System.out.println("This is your first time running this bot. Thanks for installing!");
 			System.out.println("To being using the bot, please enter your bot token.");
 			System.out.println("If you need to make changes later, go to the config file in 'khuxbot config/config.properties'.");

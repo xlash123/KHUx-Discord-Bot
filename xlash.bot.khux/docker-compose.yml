@@ -1,0 +1,21 @@
+version: "3.3"
+
+services:
+  bot:
+    image: xlash/khux-bot
+    volumes:
+      - type: volume
+        source: config
+        target: /khux_config/
+    secrets:
+      - discord-api-token
+    environment:
+      - KHUX_API_TOKEN_FILE=/run/secrets/discord-api-token
+      - CONFIG_DIR=/khux_config
+
+volumes:
+  config:
+
+secrets:
+  discord-api-token:
+    external: true

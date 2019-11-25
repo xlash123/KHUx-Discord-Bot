@@ -27,6 +27,7 @@ jar {
 	manifest {
 		attributes("Main-Class": "xlash.bot.khux.KHUxBot")
 	}
+  baseName 'khux-bot'
 }
 
 buildscript {
@@ -41,3 +42,7 @@ buildscript {
 }
 
 apply plugin: "com.github.johnrengelman.shadow"
+
+shadowJar {
+  archiveName = "${baseName}.jar"
+}

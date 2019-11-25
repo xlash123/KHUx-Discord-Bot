@@ -13,7 +13,17 @@ import java.util.Properties;
  */
 public class BotConfig {
 	
-	public static final String FILE_NAME = System.getProperty("user.dir") + "/khuxbot config/config.properties";
+	public static final String CONFIG_DIRECTORY;
+	public static final String FILE_NAME;
+
+	static {
+		String dir = System.getenv("CONFIG_DIR");
+		if (dir == null) {
+			dir = System.getProperty("user.dir") + "/khuxbot config/";
+		}
+		CONFIG_DIRECTORY = dir + "/";
+		FILE_NAME = CONFIG_DIRECTORY + "/config.properties";
+	}
 	
 	/**
 	 * A unique and secret token id used for impersonating this program as a bot user.
@@ -33,6 +43,7 @@ public class BotConfig {
 	 */
 	public BotConfig(){
 		init();
+
 		File file = new File(FILE_NAME);
 		if(!file.exists()){
 			try {

@@ -22,8 +22,8 @@ import xlash.bot.khux.KHUxBot;
  */
 public class ServerConfig {
 	
-	public static final String DIRECTORY = System.getProperty("user.dir") + "/khuxbot config/";
-	public static final String USER_DIR = DIRECTORY + "users/";
+	public static final String DIRECTORY = BotConfig.CONFIG_DIRECTORY;
+	public static final String USER_DIR = BotConfig.CONFIG_DIRECTORY + "/users/";
 	public final String fileName;
 	
 	public volatile String updateChannelNA, updateChannelJP;
