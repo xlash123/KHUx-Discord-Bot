@@ -86,14 +86,19 @@ Omiting level will simply display the max level stats.
 You can also view all of the commands and their usage by running !help.
 
 ## How to install
-If you choose not to let [my host](https://discordapp.com/oauth2/authorize?client_id=300117950457708560&scope=bot&permissions=0) join your server, you can run your own instance by doing the following:
+If you just want to have this bot running on your server and nothing else, have your server owner or moderator join the bot to your server through [this link](https://discordapp.com/oauth2/authorize?client_id=300117950457708560&scope=bot&permissions=0).
 
-Download the [latest build](https://github.com/xlash123/KHUx-Discord-Bot/releases/) or build from the source (using Maven). Then either double click on the file (only for Windows) or run the following in terminal/cmd.
-`java -jar "[filepath]" run`
-A good explaination of how to get the Discord App ID is explained [here](https://github.com/BtoBastian/Javacord/blob/master/README.md) in the Javacord README.
-<br>
-If you're still lost, here's a helpful [Reddit thread](https://www.reddit.com/r/KingdomHearts/comments/65puab/khux_easy_guide_to_run_xlash123s_khux_bot_in_your/), thanks to /u/MaxialstarOA, although it is now slightly outdated.
+If you wish to run your own personal host, the easiest way to install is to use Docker and use the public [Docker image](https://hub.docker.com/repository/docker/xlash123/khux-bot). It is reccommended that you use Linux as Windows may cause some weirdness.
 
+In order to run an instance of the bot, you must have a created bot account through the [Discord Developer Portal](https://discordapp.com/developers). Once created, grab your bot's API token under the Bot tab. To link this with the program, run the following command: `echo "<bot token>" | docker secret create discord-api-token -`.
+
+Now the container may be launched:
+```
+git clone https://github.com/xlash123/KHUx-Discord-Bot.git
+cd KHUx-Discord-Bot/xlash.khux.bot
+docker stack deploy -c docker-compose.yml khux
+```
+You may alternatively use `docker-compose up` for the last command.
 ## Questions?
 
 Any bugs, suggestions, or questions can be posted as an issue. I'll respond to anything I get.
