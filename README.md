@@ -94,11 +94,12 @@ In order to run an instance of the bot, you must have a created bot account thro
 
 Now the container may be launched:
 ```
-git clone https://github.com/xlash123/KHUx-Discord-Bot.git
-cd KHUx-Discord-Bot/xlash.khux.bot
+curl -o docker-compose.yml https://raw.githubusercontent.com/xlash123/KHUx-Discord-Bot/master/xlash.bot.khux/docker-compose.yml
 docker stack deploy -c docker-compose.yml khux
 ```
 You may alternatively use `docker-compose up` for the last command.
+
+You also may alternatively use `docker run`, but you must supply all the necessary arguments to ensure the container knows its Discord API token. Take a look at the Docker compose file for insight.
 ## Questions?
 
 Any bugs, suggestions, or questions can be posted as an issue. I'll respond to anything I get.
