@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   bot:
-    image: xlash/khux-bot
+    image: xlash123/khux-bot
     volumes:
       - type: volume
         source: config
