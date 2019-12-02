@@ -276,7 +276,6 @@ public class MedalHandler {
 	 * @return An embeded message for the user to receive
 	 */
 	public EmbedBuilder prepareMedalMessage(Medal m, boolean isSeven, boolean isUnlocked, boolean isSn) {
-		System.out.println("Creating message: " + isSeven + " " + isUnlocked + " " + isSn);
 		DecimalFormat df = new DecimalFormat("#.##");
 		if(!m.hasSix()) isSeven = true;
 		MedalDetails medal = isSeven ? m.getSeven() : m.getSix();

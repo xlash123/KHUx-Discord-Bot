@@ -230,10 +230,8 @@ public class Scheduler {
 				}
 				else currentTime = currentTimeJP;
 				if(e.enabled && time.equals(currentTime)){
-					System.out.println("Running " + e.getName());
 					try{
 						e.run(currentTime);
-						System.out.println("Passed " + e.getName());
 					}catch(Exception e1){
 						System.err.println("Error occured while running event: " + e.getName());
 						e1.printStackTrace();
@@ -247,7 +245,6 @@ public class Scheduler {
 			if(e.enabled){
 				long difference = currentDate.getTime() - e.lastRun;
 				if(difference > e.getFrequency()*60000){
-					System.out.println("Running " + e.getName());
 					try{
 						e.run();
 					}catch(Exception e1){

@@ -15,7 +15,6 @@ public class MedalDeserializer implements JsonDeserializer<Medal> {
 	public Medal deserialize(JsonElement el, Type type, JsonDeserializationContext context) throws JsonParseException {
 		Gson gson = new Gson();
 		JsonObject ob = el.getAsJsonObject();
-		System.out.println(ob);
 		RawMedal baseMedal = gson.fromJson(ob.get("medal"), RawMedal.class);
 		ob = ob.getAsJsonObject("bank2");
 		//If a medal rarity has a supernova, add that supernova. If its unlocked form also has supernova, add that data too (str and supernova)
@@ -54,7 +53,6 @@ public class MedalDeserializer implements JsonDeserializer<Medal> {
 		}else if(e.isJsonArray()) {
 			return e.getAsJsonArray().get(i);
 		}
-		System.out.println("You stupid");
 		return null;
 	}
 	

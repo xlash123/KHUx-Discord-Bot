@@ -35,7 +35,6 @@ public class AdminCommand extends CommandBase{
 			ArrayList<String> badUsers = new ArrayList<>();
 			for(String userId : config.admins) {
 				try {
-					System.out.println("Trying " + userId);
 					User user = KHUxBot.api.getUserById(userId).get();
 					if(user != null) {
 						admins += UserUtil.getNickname(user, server) + ", ";
