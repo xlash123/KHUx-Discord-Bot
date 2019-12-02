@@ -230,12 +230,6 @@ public class KHUxBot {
 				twitterHandler.sendNewUpdates(serverConfigs, GameEnum.JP);
 			}
 		});
-		scheduler.addTimedEvent(new TimedEvent("Bot Update", true, 20) {
-			@Override
-			public void run() {
-				findUpdate();
-			}
-		});
 		scheduler.addEvent(new Event("Daily", true, GameEnum.NA, "05:00:00"){
 			@Override
 			public void run(String currentTime) {
