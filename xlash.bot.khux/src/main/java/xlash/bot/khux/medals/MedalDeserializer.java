@@ -47,11 +47,15 @@ public class MedalDeserializer implements JsonDeserializer<Medal> {
 	}
 	
 	private JsonElement get(JsonElement e, int i) {
-		if(e == null) return null;
-		else if(e.isJsonObject()) {
-			return e.getAsJsonObject().get("" + i);
-		}else if(e.isJsonArray()) {
-			return e.getAsJsonArray().get(i);
+		try {
+			if(e == null) return null;
+			else if(e.isJsonObject()) {
+				return e.getAsJsonObject().get("" + i);
+			}else if(e.isJsonArray()) {
+				return e.getAsJsonArray().get(i);
+			}
+		} catch (IndexOutOfBoundsException er) {
+			return null;
 		}
 		return null;
 	}

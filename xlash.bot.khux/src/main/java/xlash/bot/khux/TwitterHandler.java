@@ -145,7 +145,6 @@ public class TwitterHandler {
 			} catch (Exception e) {
 				tries++;
 				System.err.println("Failed to get update from Twitter.");
-				e.printStackTrace();
 			}
 		} while (tries < 3);
 		return null;
