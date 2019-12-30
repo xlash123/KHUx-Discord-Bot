@@ -53,8 +53,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.11.3";
-	public static final String CHANGELOG = "Updated depencencies";
+	public static final String VERSION = "1.11.4";
+	public static final String CHANGELOG = "Minor bug fixes";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
@@ -141,7 +141,6 @@ public class KHUxBot {
 	 * Creates a new object of only the greatest KHUx Discord Bot known to mankind. Please only create one instance.
 	 */
 	public KHUxBot() {
-		FallbackLoggerConfiguration.setTrace(true);
 		this.initialize();
 		commandHandler = new CommandHandler();
 		registerCommands();
