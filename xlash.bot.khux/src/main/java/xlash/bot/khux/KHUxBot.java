@@ -19,7 +19,6 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.logging.ExceptionLogger;
-import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -53,8 +52,8 @@ import xlash.bot.khux.util.BonusTimes;
  */
 public class KHUxBot {
 
-	public static final String VERSION = "1.11.4";
-	public static final String CHANGELOG = "Minor bug fixes";
+	public static final String VERSION = "1.11.5";
+	public static final String CHANGELOG = "Fixed commands not working on servers";
 
 	/** Instance of the Discord API*/
 	public static DiscordApi api;
@@ -387,9 +386,6 @@ public class KHUxBot {
 	 * @param api
 	 */
 	public void connect(DiscordApi api) {
-		api.addServerBecomesAvailableListener(event -> {
-			initializeServer(event.getServer());
-		});
 		api.addMessageCreateListener(event -> {
 			Message message = event.getMessage();
 			commandHandler.executeCommand(message);
@@ -439,19 +435,6 @@ public class KHUxBot {
 				serverConfigs.remove(getServerConfig(server));
 			}
 		});
-		api.addReconnectListener(event -> {
-			System.out.println("Reconnecting... Refreshing servers...");
-			synchronized(serverConfigs) {
-				for(ServerConfig config : serverConfigs) {
-					config.saveConfig();
-				}
-				serverConfigs.clear();
-				for(Server server : api.getServers()){
-					initializeServer(server);
-				}
-				System.out.printf("Reloaded %d servers\n", serverConfigs.size());
-			}
-		});
 		api.addLostConnectionListener(event -> {
 			System.out.println("Lost connection");
 		});
@@ -473,6 +456,7 @@ public class KHUxBot {
 		scheduler.startThread();
 		System.out.println("Connected to servers:");
 		for(Server server : api.getServers()){
+			initializeServer(server);
 			System.out.println(">" + server.getName());
 		}
 		System.out.println("Total of " + api.getServers().size() + " servers connected.");
