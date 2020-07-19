@@ -3,6 +3,8 @@
 This is a bot I created to make it easier to retrieve medal info, remind your server about lux or Union Cross times, and posting updates from Twitter for either the NA or JP version of KHUx. This was made using the libraries [Javacord](https://github.com/BtoBastian/Javacord/) by BtoBastian, [JSoup](https://jsoup.org/), [Emoji-Java](https://github.com/vdurmont/emoji-java) by vdurmont, and [Gson](https://github.com/google/gson) by Google, with extreme thanks to Rosie for her amazing website [khuxtracker.com](http://khuxtracker.com/) which I use for the searching algorithm and database.
 
 ## My Host
+**Important:** I have terminated service for the bot. See [here](https://github.com/xlash123/KHUx-Discord-Bot/issues/46#issuecomment-660675398) for my response. I will leave this section here for archival (and potentially revival) purposes.
+
 [Click here](https://discordapp.com/oauth2/authorize?client_id=300117950457708560&scope=bot&permissions=0) to have my hosted instance of the bot join your server (You must be a server admin to do such). Note that any channels that the bot will post in will need **permission both to post plain text and embedded message**.
 
 ## How to use
